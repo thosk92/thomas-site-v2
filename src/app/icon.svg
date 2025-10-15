@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TZ favicon">
+  <defs>
+    <linearGradient id="tzg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+  <!-- soft white background -->
+  <rect width="64" height="64" rx="14" fill="#FAFAFA"/>
+  <!-- minimal TZ monogram -->
+  <g fill="url(#tzg)">
+    <!-- T -->
+    <path d="M10 19h28v6H26v22h-8V25H10z"/>
+    <!-- Z -->
+    <path d="M36 19h18v6H47l6 12H42l-6 10h18v6H33l9-16h11l-9-12h-8z"/>
+  </g>
+</svg>

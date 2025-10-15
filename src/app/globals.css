@@ -24,3 +24,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Animated background utility */
+.bg-animated {
+  background: radial-gradient(1400px 900px at 20% 8%, color-mix(in oklab, #6366f1 14%, transparent), transparent 62%),
+              radial-gradient(1200px 800px at 82% 18%, color-mix(in oklab, #ec4899 12%, transparent), transparent 58%),
+              radial-gradient(1200px 1000px at 50% 85%, color-mix(in oklab, #38bdf8 10%, transparent), transparent 54%),
+              var(--background);
+  animation: bg-move 24s ease-in-out infinite alternate;
+  will-change: background-position, transform;
+  transform: translateZ(0);
+}
+
+@keyframes bg-move {
+  0% { background-position: 0px 0px, 0px 0px, 0px 0px; }
+  50% { background-position: 60px -40px, -50px 30px, 40px 60px; }
+  100% { background-position: -90px 60px, 70px -20px, -60px -70px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-animated { animation: none; }
+}
+
+/* Hide scrollbars but keep scrolling for carousels */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;    /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar { display: none; }
