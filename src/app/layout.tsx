@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     description: "Minimal, motion-friendly portfolio by Thomas Zanelli.",
     images: ["/icon.svg"],
   },
-  themeColor: "#ffffff",
+  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#ffffff" }],
 };
 
 export default function RootLayout({
@@ -44,6 +44,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="supported-color-schemes" content="light" />
+      </head>
       <body className={`${grotesk.variable} ${geistMono.variable} antialiased`}>
         <Nebula />
         <PointerTracker />
