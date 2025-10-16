@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       try {
         const result = await resend.emails.send({
           to,
-          from: `Thomas Zanelli <${fromEmail}>`,
+          from: fromEmail,
           subject,
           text,
           html,
