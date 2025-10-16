@@ -21,7 +21,7 @@ export default function ContactForm() {
       if (!res.ok) throw new Error("Request failed");
       setState("success");
       (e.currentTarget as HTMLFormElement).reset();
-    } catch (e: any) {
+    } catch (_err: unknown) {
       setState("error");
       setErr("Something went wrong. Please try again later.");
     }
