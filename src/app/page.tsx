@@ -1,4 +1,5 @@
 import PrinciplesCarousel from "@/components/PrinciplesCarousel";
+import ContactForm from "@/components/ContactForm";
 
 export default function Home() {
   return (
@@ -71,6 +72,15 @@ export default function Home() {
     </section>
 
     <PrinciplesCarousel />
+
+    {/* Contact */}
+    <section id="contact" className="container mx-auto px-6 sm:px-8 py-24">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Contact</h2>
+      <p className="mt-4 max-w-2xl text-foreground/70">Tell me about your project or opportunity. I’ll reply soon.</p>
+      <div className="mt-8">
+        <ContactForm />
+      </div>
+    </section>
     </>
   );
 }
