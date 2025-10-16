@@ -27,11 +27,7 @@ export default function PointerTracker() {
     };
     window.addEventListener("pointermove", onMove);
 
-    const isInteractive = (el: Element | null) => !!el && (
-      el instanceof HTMLAnchorElement ||
-      el instanceof HTMLButtonElement ||
-      (el as HTMLElement).closest?.("a, button, [role=button], [data-hoverable]") !== null
-    );
+    // removed unused helper isInteractive
 
     const getEffectiveBg = (node: HTMLElement | null): string => {
       let el: HTMLElement | null = node;
