@@ -38,14 +38,27 @@ export async function POST(req: NextRequest) {
     const text = `Name: ${name}\nEmail: ${email}\nIP: ${ip}\n\n${message}`;
 
     const resend = new Resend(process.env.RESEND_API_KEY as string);
-    const result = await resend.emails.send({ to, from, subject, text });
-    if ((result as any)?.error) {
-      console.error("contact:error", { code: "SEND_FAILED" });
-      return NextResponse.json({ ok: false, code: "SEND_FAILED" }, { status: 502 });
-    }
+    const html = `<p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><pre style="white-space:pre-wrap">${message}</pre>`;
 
-    return NextResponse.json({ ok: true });
-  } catch (err) {
+    let attempt = 0;
+    const maxAttempts = 3;
+    while (attempt < maxAttempts) {
+      try {
+        const result = await resend.emails.send({ to, from, subject, text, html });
+        const hasError = typeof (result as { error?: unknown }).error !== "undefined";
+        if (!hasError) {
+          return NextResponse.json({ ok: true });
+        }
+      } catch {
+        // ignore and retry
+      }
+      attempt++;
+      await new Promise((r) => setTimeout(r, 300 * Math.pow(2, attempt))); // 300ms, 600ms, 1200ms
+    }
+    console.error("contact:error", { code: "SEND_RETRY_FAILED" });
+    return NextResponse.json({ ok: false, code: "SEND_RETRY_FAILED" }, { status: 502 });
+
+  } catch {
     console.error("contact:error", { code: "UNEXPECTED" });
     return NextResponse.json({ ok: false, code: "UNEXPECTED" }, { status: 500 });
   }
