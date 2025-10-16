@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Nebula from "@/components/Nebula";
@@ -34,6 +34,9 @@ export const metadata: Metadata = {
     description: "Minimal, motion-friendly portfolio by Thomas Zanelli.",
     images: ["/icon.svg"],
   },
+};
+
+export const viewport: Viewport = {
   themeColor: [{ media: "(prefers-color-scheme: light)", color: "#ffffff" }],
 };
 
