@@ -34,6 +34,7 @@ export const metadata: Metadata = {
     description: "Minimal, motion-friendly portfolio by Thomas Zanelli.",
     images: ["/icon.svg"],
   },
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
