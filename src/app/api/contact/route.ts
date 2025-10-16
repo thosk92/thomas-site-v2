@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const to = process.env.CONTACT_TO || "";
-    const from = process.env.CONTACT_FROM || "onboarding@resend.dev";
+    const fromEmail = process.env.CONTACT_FROM || "onboarding@resend.dev";
     if (!to || !process.env.RESEND_API_KEY) {
       console.error("contact:error", { code: "MISSING_ENV", hasTo: !!to, hasKey: !!process.env.RESEND_API_KEY });
       return NextResponse.json({ ok: false, code: "MISSING_ENV" }, { status: 500 });
@@ -38,17 +38,26 @@ export async function POST(req: NextRequest) {
     const text = `Name: ${name}\nEmail: ${email}\nIP: ${ip}\n\n${message}`;
 
     const resend = new Resend(process.env.RESEND_API_KEY as string);
-    const html = `<p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><pre style="white-space:pre-wrap">${message}</pre>`;
+    const html = `<p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><pre style=\"white-space:pre-wrap\">${message}</pre>`;
 
     let attempt = 0;
     const maxAttempts = 3;
     while (attempt < maxAttempts) {
       try {
-        const result = await resend.emails.send({ to, from, subject, text, html });
-        const hasError = typeof (result as { error?: unknown }).error !== "undefined";
+        const result = await resend.emails.send({
+          to,
+          from: `Thomas Zanelli <${fromEmail}>`,
+          subject,
+          text,
+          html,
+          replyTo: email,
+        });
+        const hasError = typeof (result as { error?: { message?: string } }).error !== "undefined";
         if (!hasError) {
           return NextResponse.json({ ok: true });
         }
+        const errMsg = (result as { error?: { message?: string } }).error?.message || "unknown";
+        console.error("contact:error", { code: "SEND_FAILED", message: errMsg });
       } catch {
         // ignore and retry
       }
