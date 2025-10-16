@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req: NextRequest) {
   try {
     const fwd = req.headers.get("x-forwarded-for") || "";
@@ -21,12 +19,13 @@ export async function POST(req: NextRequest) {
     if (!emailRegex.test(email)) return NextResponse.json({ ok: false }, { status: 400 });
 
     const to = process.env.CONTACT_TO || "";
-    const from = process.env.CONTACT_FROM || "no-reply@thomaszanelli.co";
+    const from = process.env.CONTACT_FROM || "onboarding@resend.dev";
     if (!to || !process.env.RESEND_API_KEY) return NextResponse.json({ ok: false }, { status: 500 });
 
     const subject = `New contact from ${name}`;
     const text = `Name: ${name}\nEmail: ${email}\nIP: ${ip}\n\n${message}`;
 
+    const resend = new Resend(process.env.RESEND_API_KEY as string);
     await resend.emails.send({ to, from, subject, text });
 
     return NextResponse.json({ ok: true });
