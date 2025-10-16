@@ -61,7 +61,7 @@ export default function HeadingDust() {
     const count = Math.floor(Math.max(24, (state.w * state.h) / (60 * 140)));
     const ps = makeParticles(count);
 
-    const draw = (t: number) => {
+    const draw = () => {
       const now = performance.now();
       if (now - state.last < state.fpsInterval) return;
       state.last = now;
@@ -93,7 +93,7 @@ export default function HeadingDust() {
     };
 
     let rid = 0;
-    const loop = (tt: number) => { if (state.running) draw(tt); rid = requestAnimationFrame(loop); };
+    const loop = () => { if (state.running) draw(); rid = requestAnimationFrame(loop); };
     rid = requestAnimationFrame(loop);
 
     return () => { cancelAnimationFrame(rid); window.removeEventListener("pointermove", onPointer); ro.disconnect(); };
