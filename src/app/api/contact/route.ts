@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
+export const runtime = "nodejs";
+
 export async function POST(req: NextRequest) {
   try {
     const fwd = req.headers.get("x-forwarded-for") || "";
@@ -44,7 +46,7 @@ export async function POST(req: NextRequest) {
     const maxAttempts = 3;
     while (attempt < maxAttempts) {
       try {
-        const result = await resend.emails.send({
+        await resend.emails.send({
           to,
           from: fromEmail,
           subject,
@@ -52,14 +54,10 @@ export async function POST(req: NextRequest) {
           html,
           replyTo: email,
         });
-        const hasError = typeof (result as { error?: { message?: string } }).error !== "undefined";
-        if (!hasError) {
-          return NextResponse.json({ ok: true });
-        }
-        const errMsg = (result as { error?: { message?: string } }).error?.message || "unknown";
-        console.error("contact:error", { code: "SEND_FAILED", message: errMsg });
-      } catch {
-        // ignore and retry
+        return NextResponse.json({ ok: true });
+      } catch (e) {
+        const msg = (e as { message?: string })?.message || "unknown";
+        console.error("contact:error", { code: "SEND_FAILED", message: msg });
       }
       attempt++;
       await new Promise((r) => setTimeout(r, 300 * Math.pow(2, attempt))); // 300ms, 600ms, 1200ms
