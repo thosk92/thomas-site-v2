@@ -1,29 +1,51 @@
 "use client";
 import { useState } from "react";
 
+type FormState = "idle" | "loading" | "success" | "error";
+
 export default function ContactForm() {
-  const [state, setState] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [err, setErr] = useState<string>("");
+  const [state, setState] = useState<FormState>("idle");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [err, setErr] = useState("");
+
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setErr("");
-    setState("loading");
-    const fd = new FormData(e.currentTarget);
-    const payload = Object.fromEntries(fd.entries());
+    if (!name.trim() || !email.trim() || !message.trim()) {
+      setErr("Please fill in all fields.");
+      setState("error");
+      return;
+    }
+    if (!emailRe.test(email)) {
+      setErr("Please enter a valid email address.");
+      setState("error");
+      return;
+    }
 
+    setState("loading");
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+        body: JSON.stringify({ name, email, message, hp: "" }),
+        cache: "no-store",
       });
-      if (!res.ok) throw new Error("Request failed");
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({} as any));
+        const code = (data && typeof data === "object" ? (data as { code?: string }).code : undefined) || "UNKNOWN";
+        const provider = (data && typeof data === "object" ? (data as { providerMessage?: string }).providerMessage : undefined) || "";
+        throw new Error(`HTTP ${res.status} ${code}${provider ? ` - ${provider}` : ""}`);
+      }
       setState("success");
-      (e.currentTarget as HTMLFormElement).reset();
-    } catch {
+      setName(""); setEmail(""); setMessage("");
+    } catch (ex) {
       setState("error");
-      setErr("Something went wrong. Please try again later.");
+      const msg = ex instanceof Error ? ex.message : "Something went wrong. Please try again later.";
+      setErr(msg);
     }
   }
 
@@ -33,20 +55,40 @@ export default function ContactForm() {
       <div className="grid gap-4">
         <div>
           <label htmlFor="name" className="block text-sm text-foreground/70">Name</label>
-          <input id="name" name="name" required className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40" />
+          <input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+            className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
+          />
         </div>
         <div>
           <label htmlFor="email" className="block text-sm text-foreground/70">Email</label>
-          <input id="email" name="email" type="email" required className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40" />
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
+          />
         </div>
         <div>
           <label htmlFor="message" className="block text-sm text-foreground/70">Message</label>
-          <textarea id="message" name="message" required rows={5} className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40" />
+          <textarea
+            id="message"
+            rows={5}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            required
+            className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
+          />
         </div>
         <p className="text-xs text-foreground/60">By submitting, you agree to the processing of your data to handle your request. Read the <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>.</p>
         <div className="flex items-center gap-3">
           <button disabled={state === "loading"} className="inline-flex items-center rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium disabled:opacity-60">
-            {state === "loading" ? "Sending..." : "Send message"}
+            {state === "loading" ? "Sending..." : "Send"}
           </button>
           {state === "success" && <span className="text-sm text-green-700">Sent. I’ll get back to you soon.</span>}
           {state === "error" && <span className="text-sm text-red-700">{err}</span>}
