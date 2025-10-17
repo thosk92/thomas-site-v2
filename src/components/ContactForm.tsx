@@ -9,8 +9,6 @@ export default function ContactForm() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [err, setErr] = useState("");
-  const [status, setStatus] = useState<number | null>(null);
-  const [resp, setResp] = useState<string>("");
 
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -36,7 +34,6 @@ export default function ContactForm() {
         body: JSON.stringify({ name, email, message, hp: "" }),
         cache: "no-store",
       });
-      setStatus(res.status);
       if (!res.ok) {
         const rawErr: unknown = await res.json().catch(() => ({}));
         let code = "UNKNOWN";
@@ -52,16 +49,14 @@ export default function ContactForm() {
             provider = (rawErr as { providerMessage: string }).providerMessage;
           }
         }
-        setResp(JSON.stringify(rawErr));
         throw new Error(`HTTP ${res.status} ${code}${provider ? ` - ${provider}` : ""}`);
       }
       // Success: set UI first, then best-effort parse
       setState("success");
       try {
-        const rawOk: unknown = await res.json();
-        setResp(JSON.stringify(rawOk));
+        await res.json();
       } catch {
-        setResp("{}");
+        // ignore
       }
       setName(""); setEmail(""); setMessage("");
     } catch (ex) {
@@ -73,7 +68,6 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={onSubmit} className="max-w-xl" aria-live="polite">
-      <div className="mb-2 text-xs text-foreground/60">Contact form v5</div>
       <input type="text" name="hp" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
       <div className="grid gap-4">
         <div>
@@ -115,10 +109,6 @@ export default function ContactForm() {
           </button>
           {state === "success" && <span className="text-sm text-green-700">Sent. I’ll get back to you soon.</span>}
           {state === "error" && <span className="text-sm text-red-700">{err}</span>}
-        </div>
-        <div className="mt-2 text-xs text-foreground/60">
-          {status !== null && <div>HTTP status: <code>{status}</code></div>}
-          {resp && <div>Response: <code className="break-words">{resp}</code></div>}
         </div>
       </div>
     </form>
