@@ -14,14 +14,14 @@ export default function PageIt() {
             Progetto spazi digitali che trasmettono un senso umano.
           </h1>
           <p className="mt-8 max-w-3xl text-base sm:text-lg md:text-xl text-foreground/80">
-            Design consapevole, codice pulito e uno scopo chiaro — la tecnologia dovrebbe essere connessione, non complessità.
+            Design attento, codice pulito e uno scopo chiaro — la tecnologia dovrebbe trasmettere connessione, non complessità.
           </p>
           <section id="about" className="mt-10 max-w-3xl">
             <p className="text-lg sm:text-xl md:text-2xl leading-relaxed">
               Progetto con intenzione e scrivo codice con cura.
             </p>
             <p className="mt-3 text-base sm:text-lg md:text-xl text-foreground/80">
-              Ogni progetto mette in equilibrio logica ed emozione — per risultare chiaro, senza tempo e davvero umano.
+              Ogni progetto equilibra logica ed emozione — plasmato per essere chiaro, senza tempo e autenticamente umano.
             </p>
           </section>
           <div className="mt-10 flex gap-4">
