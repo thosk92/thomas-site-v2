@@ -1,0 +1,33 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+function swapLocale(path: string, target: "en" | "it"): string {
+  // Normalize root
+  if (!path || path === "/") return `/${target}`;
+  const parts = path.split("?")[0].split("#")[0].split("/").filter(Boolean);
+  if (parts.length === 0) return `/${target}`;
+  if (parts[0] === "en" || parts[0] === "it") {
+    parts[0] = target;
+    return "/" + parts.join("/");
+  }
+  // If no locale prefix, prepend
+  return `/${target}/` + parts.join("/");
+}
+
+export default function LanguageSwitch() {
+  const pathname = usePathname() || "/";
+  const isIt = pathname === "/it" || pathname.startsWith("/it/");
+  const target = isIt ? "en" : "it";
+  const href = swapLocale(pathname, target);
+  return (
+    <Link
+      href={href}
+      className="inline-flex items-center rounded-full border border-foreground/20 bg-white/70 px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-white transition"
+      prefetch={false}
+      aria-label={isIt ? "Switch to English" : "Passa all'italiano"}
+    >
+      {isIt ? "English" : "Italiano"}
+    </Link>
+  );
+}

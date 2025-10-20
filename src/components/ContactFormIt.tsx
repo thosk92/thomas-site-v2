@@ -3,7 +3,7 @@ import { useState } from "react";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
-export default function ContactForm() {
+export default function ContactFormIt() {
   const [state, setState] = useState<FormState>("idle");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -16,12 +16,12 @@ export default function ContactForm() {
     e.preventDefault();
     setErr("");
     if (!name.trim() || !email.trim() || !message.trim()) {
-      setErr("Please fill in all fields.");
+      setErr("Per favore compila tutti i campi.");
       setState("error");
       return;
     }
     if (!emailRe.test(email)) {
-      setErr("Please enter a valid email address.");
+      setErr("Inserisci un indirizzo email valido.");
       setState("error");
       return;
     }
@@ -51,17 +51,12 @@ export default function ContactForm() {
         }
         throw new Error(`HTTP ${res.status} ${code}${provider ? ` - ${provider}` : ""}`);
       }
-      // Success: set UI first, then best-effort parse
       setState("success");
-      try {
-        await res.json();
-      } catch {
-        // ignore
-      }
+      try { await res.json(); } catch {}
       setName(""); setEmail(""); setMessage("");
     } catch (ex) {
       setState("error");
-      const msg = ex instanceof Error ? ex.message : "Something went wrong. Please try again later.";
+      const msg = ex instanceof Error ? ex.message : "Qualcosa è andato storto. Riprova più tardi.";
       setErr(msg);
     }
   }
@@ -71,7 +66,7 @@ export default function ContactForm() {
       <input type="text" name="hp" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
       <div className="grid gap-4">
         <div>
-          <label htmlFor="name" className="block text-sm text-foreground/70">Name</label>
+          <label htmlFor="name" className="block text-sm text-foreground/70">Nome</label>
           <input
             id="name"
             value={name}
@@ -92,7 +87,7 @@ export default function ContactForm() {
           />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm text-foreground/70">Message</label>
+          <label htmlFor="message" className="block text-sm text-foreground/70">Messaggio</label>
           <textarea
             id="message"
             rows={5}
@@ -102,12 +97,12 @@ export default function ContactForm() {
             className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
           />
         </div>
-        <p className="text-xs text-foreground/60">By submitting, you agree to the processing of your data to handle your request. Read the <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>.</p>
+        <p className="text-xs text-foreground/60">Inviando il form, acconsenti al trattamento dei dati per gestire la tua richiesta. Leggi la <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>.</p>
         <div className="flex items-center gap-3">
           <button disabled={state === "loading"} className="inline-flex items-center rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium disabled:opacity-60">
-            {state === "loading" ? "Sending..." : "Send"}
+            {state === "loading" ? "Invio..." : "Invia"}
           </button>
-          {state === "success" && <span className="text-sm text-green-700">Sent. I’ll get back to you soon.</span>}
+          {state === "success" && <span className="text-sm text-green-700">Inviato. Ti risponderò a breve.</span>}
           {state === "error" && <span className="text-sm text-red-700">{err}</span>}
         </div>
       </div>
