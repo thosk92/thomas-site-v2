@@ -11,7 +11,7 @@ export default function PageIt() {
         <div className="container mx-auto px-6 sm:px-8">
           <div className="mb-6 text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-foreground">Thomas Zanelli</div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-[-0.015em] max-w-6xl">
-            Progetto spazi digitali che sentono umani.
+            Progetto spazi digitali che trasmettono un senso umano.
           </h1>
           <p className="mt-8 max-w-3xl text-base sm:text-lg md:text-xl text-foreground/80">
             Design consapevole, codice pulito e uno scopo chiaro — la tecnologia dovrebbe essere connessione, non complessità.
