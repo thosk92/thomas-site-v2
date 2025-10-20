@@ -121,23 +121,23 @@ export default function PrinciplesCarousel() {
       />
 
       <div className="container mx-auto px-6 sm:px-8">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Principles</h2>
-        <p className="mt-4 max-w-2xl text-foreground/70">What guides every decision.</p>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Principi</h2>
+        <p className="mt-4 max-w-2xl text-foreground/70">Ciò che guida ogni decisione.</p>
 
         <div
           ref={wrapRef}
           className="mt-12 overflow-x-auto no-scrollbar snap-x snap-mandatory focus:outline-none"
           tabIndex={0}
-          aria-label="Principles carousel. Use mouse wheel, drag, or arrow keys to navigate."
+          aria-label="Carosello dei principi. Usa la rotella del mouse, trascina o i tasti freccia per navigare."
           role="region"
         >
           <ul ref={listRef} className="flex gap-6 pb-2">
             {[
-              {title: "Human first", body: "Interfaces should earn attention by being natural, not loud."},
-              {title: "Clarity", body: "Reduce noise. Elevate signal. Name things clearly."},
-              {title: "Craft", body: "Typography, rhythm, and motion tuned with care."},
-              {title: "Performance", body: "Speed feels like respect. Lightweight by default."},
-              {title: "Purpose", body: "Every element should justify its presence—or it goes."},
+              {title: "Prima l'umano", body: "Le interfacce devono meritare attenzione essendo naturali, non rumorose."},
+              {title: "Chiarezza", body: "Riduci il rumore. Eleva il segnale. Dai nomi chiari."},
+              {title: "Cura", body: "Tipografia, ritmo e motion calibrati con attenzione."},
+              {title: "Performance", body: "La velocità è rispetto. Leggerezza per impostazione predefinita."},
+              {title: "Scopo", body: "Ogni elemento deve giustificare la propria presenza — altrimenti non c'è."},
             ].map((p, i) => (
               <li key={i} className="snap-center shrink-0 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[38%] border border-foreground/10 rounded-xl p-6 transition-transform duration-300 ease-out bg-white/60 backdrop-blur-[1px]">
                 <h3 className="text-xl sm:text-2xl font-medium">{p.title}</h3>
@@ -146,7 +146,7 @@ export default function PrinciplesCarousel() {
             ))}
           </ul>
         </div>
-        <div className="mt-4 text-xs text-foreground/50">Swipe / drag to explore</div>
+        <div className="mt-4 text-xs text-foreground/50">Scorri / trascina per esplorare</div>
       </div>
     </section>
   );

@@ -18,20 +18,20 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://thomaszanelli.co"),
   title: "Thomas Zanelli — Designer & Frontend",
-  description: "Minimal, motion-friendly portfolio by Thomas Zanelli.",
+  description: "Portfolio minimale, attento al movimento, di Thomas Zanelli.",
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
     url: "https://thomaszanelli.co/",
     title: "Thomas Zanelli — Designer & Frontend",
-    description: "Minimal, motion-friendly portfolio by Thomas Zanelli.",
+    description: "Portfolio minimale, attento al movimento, di Thomas Zanelli.",
     siteName: "Thomas Zanelli",
     images: [{ url: "/icon.svg", width: 1200, height: 630, alt: "Thomas Zanelli" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Thomas Zanelli — Designer & Frontend",
-    description: "Minimal, motion-friendly portfolio by Thomas Zanelli.",
+    description: "Portfolio minimale, attento al movimento, di Thomas Zanelli.",
     images: ["/icon.svg"],
   },
 };
@@ -46,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="it">
       <head>
         <meta name="supported-color-schemes" content="light" />
       </head>

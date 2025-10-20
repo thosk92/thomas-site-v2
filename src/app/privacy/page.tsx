@@ -1,54 +1,50 @@
 export default function PrivacyPage() {
   return (
     <main className="container mx-auto px-6 sm:px-8 py-16">
-      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Privacy Policy</h1>
+      <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight">Informativa sulla Privacy</h1>
       <div className="prose max-w-3xl mt-6">
         <p>
-          This page explains how I process personal data collected through the contact form on this website.
+          Questa pagina spiega come tratto i dati personali raccolti tramite il modulo di contatto su questo sito web.
         </p>
-        <h2>Data Controller</h2>
+        <h2>Titolare del trattamento</h2>
         <p>
           Thomas Zanelli — Email: <a href="mailto:thomaszanelli@icloud.com">thomaszanelli@icloud.com</a>
         </p>
-        <h2>Purpose and Legal Basis</h2>
+        <h2>Finalità e base giuridica</h2>
         <p>
-          I process your data solely to respond to your inquiry or proposals regarding work opportunities. The legal basis is
-          legitimate interest (Article 6(1)(f) GDPR).
+          I tuoi dati vengono trattati esclusivamente per rispondere alla tua richiesta o a proposte relative a opportunità di lavoro. La base giuridica è l’interesse legittimo (art. 6(1)(f) GDPR).
         </p>
-        <h2>Data Processed</h2>
+        <h2>Dati trattati</h2>
         <p>
-          Name, email address, and message content. No special categories of data are required.
+          Nome, indirizzo email e contenuto del messaggio. Non sono richieste categorie particolari di dati.
         </p>
-        <h2>Recipients and Processors</h2>
+        <h2>Destinatari e responsabili</h2>
         <ul>
-          <li>Vercel (hosting and serverless platform).</li>
-          <li>Resend (email delivery provider).</li>
-          <li>Your message will also be delivered to my inbox.</li>
+          <li>Vercel (piattaforma di hosting e serverless).</li>
+          <li>Resend (fornitore di invio email).</li>
+          <li>Il tuo messaggio verrà recapitato anche alla mia casella di posta.</li>
         </ul>
         <p>
-          These providers may process data outside the EU. Standard Contractual Clauses and appropriate safeguards apply
-          per their documentation. Data Processing Agreements are in place or available via their terms.
+          Questi fornitori possono trattare dati anche fuori dall’UE. Si applicano le Clausole Contrattuali Standard e le adeguate garanzie indicate nella loro documentazione. Sono in essere o disponibili accordi di trattamento dati secondo i rispettivi termini.
         </p>
-        <h2>Retention</h2>
+        <h2>Conservazione</h2>
         <p>
-          I keep correspondence for up to 12 months, unless a longer period is necessary to handle your request or comply with
-          legal obligations.
+          La corrispondenza viene conservata fino a 12 mesi, salvo periodi più lunghi necessari a gestire la tua richiesta o adempiere a obblighi di legge.
         </p>
-        <h2>Data Security</h2>
+        <h2>Sicurezza dei dati</h2>
         <p>
-          Inputs are validated and not logged. Serverless functions apply basic rate-limiting and anti-spam measures.
+          Gli input vengono validati e non vengono registrati nei log. Le funzioni serverless applicano misure base anti-spam e di rate limiting.
         </p>
-        <h2>Rights</h2>
+        <h2>Diritti</h2>
         <p>
-          You can request access, rectification, erasure, restriction, or object to processing by writing to
+          Puoi richiedere accesso, rettifica, cancellazione, limitazione o opporti al trattamento scrivendo a
           <a href="mailto:thomaszanelli@icloud.com"> thomaszanelli@icloud.com</a>.
         </p>
-        <h2>Cookies</h2>
+        <h2>Cookie</h2>
         <p>
-          The contact form does not use cookies. If additional services (analytics, captcha) are added, this notice will be
-          updated accordingly.
+          Il modulo di contatto non utilizza cookie. Se verranno aggiunti servizi ulteriori (analytics, captcha), questa informativa sarà aggiornata di conseguenza.
         </p>
-        <p className="text-sm text-foreground/70">Last updated: {new Date().toISOString().slice(0, 10)}</p>
+        <p className="text-sm text-foreground/70">Ultimo aggiornamento: {new Date().toISOString().slice(0, 10)}</p>
       </div>
     </main>
   );
