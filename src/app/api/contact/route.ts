@@ -59,7 +59,16 @@ export async function POST(req: NextRequest) {
           replyTo: email,
         });
         console.log("contact:sent", { ok: true });
-        return NextResponse.json({ ok: true, id: (result as any)?.data?.id ?? null }, { headers: { "Cache-Control": "no-store" } });
+        let id: string | null = null;
+        const r: unknown = result;
+        if (r && typeof r === "object" && "data" in r) {
+          const data = (r as { data?: unknown | null }).data;
+          if (data && typeof data === "object" && "id" in data) {
+            const maybeId = (data as { id?: unknown }).id;
+            if (typeof maybeId === "string") id = maybeId;
+          }
+        }
+        return NextResponse.json({ ok: true, id }, { headers: { "Cache-Control": "no-store" } });
       } catch (e) {
         const err = e as { message?: string; name?: string; stack?: string };
         console.error("contact:error", { code: "SEND_FAILED", message: err?.message || "unknown" });
