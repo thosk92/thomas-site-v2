@@ -3,6 +3,7 @@ import { Space_Grotesk, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Nebula from "@/components/Nebula";
 import PointerTracker from "@/components/PointerTracker";
+import LanguageSwitch from "@/components/LanguageSwitch";
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -53,6 +54,7 @@ export default function RootLayout({
       <body className={`${grotesk.variable} ${geistMono.variable} antialiased`}>
         <Nebula />
         <PointerTracker />
+        <div className="fixed top-4 right-4 z-20"><LanguageSwitch /></div>
         <div className="relative z-10 min-h-screen">{children}</div>
       </body>
     </html>
