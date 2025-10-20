@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import PrivacyLink from "@/components/PrivacyLink";
 
 type FormState = "idle" | "loading" | "success" | "error";
 
@@ -97,7 +98,7 @@ export default function ContactFormIt() {
             className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
           />
         </div>
-        <p className="text-xs text-foreground/60">Inviando il form, acconsenti al trattamento dei dati per gestire la tua richiesta. Leggi la <a href="/it/privacy" className="underline underline-offset-2">Informativa sulla Privacy</a>.</p>
+        <p className="text-xs text-foreground/60">Inviando il form, acconsenti al trattamento dei dati per gestire la tua richiesta. Leggi la <PrivacyLink className="underline underline-offset-2" />.</p>
         <div className="flex items-center gap-3">
           <button disabled={state === "loading"} className="inline-flex items-center rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium disabled:opacity-60">
             {state === "loading" ? "Invio..." : "Invia"}
