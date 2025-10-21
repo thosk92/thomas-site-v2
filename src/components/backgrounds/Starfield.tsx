@@ -29,7 +29,7 @@ export default function Starfield() {
       canvas.style.width = w + "px";
       canvas.style.height = h + "px";
       ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-      const count = Math.floor((w * h) / 4500);
+      const count = Math.floor((w * h) / 3000);
       stars.length = 0;
       for (let i = 0; i < count; i++) {
         stars.push({
@@ -47,37 +47,43 @@ export default function Starfield() {
     };
 
     let t = 0;
-    const loop = () => {
+    const render = (drift = { x: 0, y: 0 }) => {
       const w = canvas.width / DPR;
       const h = canvas.height / DPR;
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = "rgba(0,0,0,0)";
       ctx.fillRect(0, 0, w, h);
-
-      t += 0.0025;
-      const driftX = Math.sin(t) * 0.6;
-      const driftY = Math.cos(t * 0.8) * 0.6;
+      let driftX = drift.x;
+      let driftY = drift.y;
+      if (motionOk) {
+        t += 0.003;
+        driftX = Math.sin(t) * 1.0;
+        driftY = Math.cos(t * 0.8) * 1.0;
+      }
 
       for (let i = 0; i < stars.length; i++) {
         const st = stars[i];
         const par = st.z; // parallax factor
-        const x = (st.x + driftX * 50 * par + w) % w;
-        const y = (st.y + driftY * 50 * par + h) % h;
-        ctx.globalAlpha = 0.35 + 0.6 * par;
-        ctx.fillStyle = "#000000";
+        const x = (st.x + driftX * 80 * par + w) % w;
+        const y = (st.y + driftY * 80 * par + h) % h;
+        ctx.globalAlpha = 0.65 + 0.35 * par;
+        ctx.fillStyle = "#141416";
         ctx.beginPath();
-        ctx.arc(x, y, st.s * par, 0, Math.PI * 2);
+        ctx.arc(x, y, st.s * par + 0.3, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.globalAlpha = 1;
+    };
 
+    const loop = () => {
+      render();
       if (running) raf = requestAnimationFrame(loop);
     };
 
     resize();
     window.addEventListener("resize", resize);
     document.addEventListener("visibilitychange", onVis);
-    if (motionOk) loop(); else ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (motionOk) loop(); else render({ x: 0.2, y: 0.15 });
 
     return () => {
       running = false;
