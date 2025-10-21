@@ -8,6 +8,8 @@ export default function PointerTracker() {
   const ref = useRef<HTMLDivElement>(null);
   // inner ring that scales and changes color
   const ringRef = useRef<HTMLDivElement>(null);
+  // center dot ref to toggle between black/white
+  const dotRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current!;
@@ -19,6 +21,39 @@ export default function PointerTracker() {
     let targetScale = 1;
     let borderColor = "rgba(0,0,0,0.35)";
     let targetBorderColor = borderColor;
+    let isDark = false;
+
+    const readTheme = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const bg = (cs.getPropertyValue("--background") || "#ffffff").trim();
+      // consider very dark backgrounds as dark mode
+      isDark = /^#?0{3,6}$/i.test(bg) || bg.toLowerCase() === "black";
+      if (isDark) {
+        targetBorderColor = "rgba(255,255,255,0.95)";
+        borderColor = targetBorderColor;
+        ring.style.borderColor = targetBorderColor;
+        ring.style.boxShadow = "0 0 28px rgba(255,255,255,0.22)";
+        ring.style.mixBlendMode = "normal";
+        if (dotRef.current) {
+          dotRef.current.style.background = "#fff";
+          dotRef.current.style.boxShadow = "0 0 2px rgba(255,255,255,0.5)";
+        }
+      } else {
+        targetBorderColor = "rgba(0,0,0,0.35)";
+        borderColor = targetBorderColor;
+        ring.style.borderColor = targetBorderColor;
+        ring.style.boxShadow = "0 0 24px rgba(0,0,0,0.08)";
+        ring.style.mixBlendMode = "multiply";
+        if (dotRef.current) {
+          dotRef.current.style.background = "#000";
+          dotRef.current.style.boxShadow = "0 0 2px rgba(0,0,0,0.3)";
+        }
+      }
+    };
+    readTheme();
+    const mql = matchMedia("(prefers-color-scheme: dark)");
+    const onScheme = () => readTheme();
+    mql.addEventListener?.("change", onScheme);
 
     const onMove = (e: PointerEvent) => {
       if (e.pointerType === "touch") return; // ignore touch
@@ -66,16 +101,21 @@ export default function PointerTracker() {
       const hoverEl = t?.closest?.("a, button, [role=button], [data-hoverable]") as HTMLElement | null;
       if (hoverEl) {
         targetScale = 1.8; // grow a bit more
-        const bg = getEffectiveBg(hoverEl);
-        const lumBg = luminance(bg);
-        // if background is light but text is dark (transparent bg cases), still invert to white
-        const textColor = getTextColor(hoverEl);
-        const lumText = luminance(textColor);
-        const useWhite = lumBg < 0.45 || (lumBg >= 0.45 && lumText < 0.45);
-        targetBorderColor = useWhite ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.35)";
+        if (isDark) {
+          // Force white in dark mode
+          targetBorderColor = "rgba(255,255,255,0.95)";
+        } else {
+          const bg = getEffectiveBg(hoverEl);
+          const lumBg = luminance(bg);
+          // if background is light but text is dark (transparent bg cases), still invert to white
+          const textColor = getTextColor(hoverEl);
+          const lumText = luminance(textColor);
+          const useWhite = lumBg < 0.45 || (lumBg >= 0.45 && lumText < 0.45);
+          targetBorderColor = useWhite ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.35)";
+        }
       } else {
         targetScale = 1;
-        targetBorderColor = "rgba(0,0,0,0.35)";
+        targetBorderColor = isDark ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.35)";
       }
     };
     window.addEventListener("mouseover", onOver);
@@ -103,7 +143,16 @@ export default function PointerTracker() {
     };
     rid = requestAnimationFrame(loop);
 
-    return () => { cancelAnimationFrame(rid); window.removeEventListener("pointermove", onMove); window.removeEventListener("mouseover", onOver); };
+    const onTheme = () => readTheme();
+    window.addEventListener("theme-change", onTheme);
+
+    return () => {
+      cancelAnimationFrame(rid);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("mouseover", onOver);
+      window.removeEventListener("theme-change", onTheme);
+      mql.removeEventListener?.("change", onScheme);
+    };
   }, []);
 
   return (
@@ -134,6 +183,7 @@ export default function PointerTracker() {
         }}
       />
       <div
+        ref={dotRef}
         aria-hidden
         style={{
           position: "absolute",

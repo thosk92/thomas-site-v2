@@ -92,34 +92,49 @@ body {
 
 /* Blob A: grande, morbido, in alto a sinistra */
 .aurora-bg::before {
+  /* Aurora borealis curtains: vertical bands with soft transparency */
   background:
-    /* primary green glow */
-    radial-gradient(closest-side at 25% 20%, color-mix(in oklab, #16a34a 11%, transparent) 0 60%, transparent 70%),
-    /* faint teal tint */
-    radial-gradient(closest-side at 80% 35%, color-mix(in oklab, #22d3ee 6%, transparent) 0 55%, transparent 70%);
+    /* main green curtains */
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #16a34a 14%, transparent) 0 6px,
+      transparent 6px 26px),
+    /* teal accent bands */
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #22d3ee 8%, transparent) 0 4px,
+      transparent 4px 32px);
+  background-size: 140% 100%, 160% 100%;
+  background-position: 0% 0%, 20% 0%;
   transform-origin: 20% 20%;
-  animation: aurora-orbit-a 55s ease-in-out infinite alternate;
+  animation: aurora-sweep-a 48s linear infinite, aurora-orbit-a 55s ease-in-out infinite alternate;
   /* pointer-influenced offsets (set via JS) */
   --aurora-x-a: 0px; /* desktop pointer moves */
   --aurora-y-a: 0px;
-  transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0);
-  mask-image: radial-gradient(100% 100% at 30% 25%, #000 55%, transparent 80%);
+  transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0) skewX(-6deg) rotate(-4deg);
+  /* soft masks to avoid hard rectangular feel */
+  mask-image:
+    radial-gradient(120% 120% at 20% 15%, #000 50%, transparent 85%);
   mask-composite: intersect;
 }
 
 /* Blob B: medio, in basso a destra */
 .aurora-bg::after {
   background:
-    /* secondary green glow */
-    radial-gradient(closest-side at 75% 80%, color-mix(in oklab, #15803d 10%, transparent) 0 60%, transparent 72%),
-    /* subtle sky tint */
-    radial-gradient(closest-side at 35% 70%, color-mix(in oklab, #38bdf8 5%, transparent) 0 50%, transparent 70%);
+    /* deeper green curtains */
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #15803d 12%, transparent) 0 8px,
+      transparent 8px 28px),
+    /* sky blue hint */
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #38bdf8 6%, transparent) 0 5px,
+      transparent 5px 36px);
+  background-size: 120% 100%, 180% 100%;
+  background-position: 10% 0%, 60% 0%;
   transform-origin: 80% 80%;
-  animation: aurora-orbit-b 65s ease-in-out infinite alternate;
+  animation: aurora-sweep-b 60s linear infinite reverse, aurora-orbit-b 65s ease-in-out infinite alternate;
   --aurora-x-b: 0px;
   --aurora-y-b: 0px;
-  transform: translate3d(var(--aurora-x-b), var(--aurora-y-b), 0);
-  mask-image: radial-gradient(100% 100% at 70% 75%, #000 55%, transparent 82%);
+  transform: translate3d(var(--aurora-x-b), var(--aurora-y-b), 0) skewX(5deg) rotate(3deg);
+  mask-image: radial-gradient(120% 120% at 80% 85%, #000 50%, transparent 85%);
   mask-composite: intersect;
 }
 
@@ -133,6 +148,18 @@ body {
   0% { transform: translate3d(0,0,0) rotate(0.001deg); opacity: 0.8; }
   50% { transform: translate3d(-2%, 2%, 0) rotate(-7deg); opacity: 0.85; }
   100% { transform: translate3d(3%, -3%, 0) rotate(5deg); opacity: 0.78; }
+}
+
+/* horizontal slow sweeps to mimic aurora ribbons */
+@keyframes aurora-sweep-a {
+  0% { background-position: 0% 0%, 20% 0%; }
+  50% { background-position: 40% 0%, -10% 0%; }
+  100% { background-position: -20% 0%, 30% 0%; }
+}
+@keyframes aurora-sweep-b {
+  0% { background-position: 10% 0%, 60% 0%; }
+  50% { background-position: -15% 0%, 90% 0%; }
+  100% { background-position: 35% 0%, 40% 0%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
