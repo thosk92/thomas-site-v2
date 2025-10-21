@@ -4,10 +4,8 @@ import { useEffect } from "react";
 export default function AuroraMotion() {
   useEffect(() => {
     const prefersReduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    const pointerFine = window.matchMedia?.("(pointer: fine)").matches;
-    if (prefersReduce || !pointerFine) return;
+    if (prefersReduce) return;
 
-    const root = document.documentElement;
     const el = document.querySelector<HTMLElement>(".aurora-bg");
     if (!el) return;
 
@@ -26,6 +24,16 @@ export default function AuroraMotion() {
       targetY = ny * 12; // px
     };
 
+    // Mobile: use device orientation if available
+    const onOrient = (e: DeviceOrientationEvent) => {
+      const beta = (e.beta ?? 0);  // front/back tilt [-180,180]
+      const gamma = (e.gamma ?? 0); // left/right tilt [-90,90]
+      const nx = Math.max(-1, Math.min(1, gamma / 45));
+      const ny = Math.max(-1, Math.min(1, beta / 60));
+      targetX = nx * 14;
+      targetY = ny * 10;
+    };
+
     const tick = () => {
       // smooth
       xA += (targetX - xA) * 0.06;
@@ -41,10 +49,17 @@ export default function AuroraMotion() {
     };
 
     window.addEventListener("pointermove", onMove);
+    // Attach orientation only if supported
+    if (typeof window.DeviceOrientationEvent !== "undefined") {
+      window.addEventListener("deviceorientation", onOrient);
+    }
     raf = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("pointermove", onMove);
+      if (typeof window.DeviceOrientationEvent !== "undefined") {
+        window.removeEventListener("deviceorientation", onOrient);
+      }
       cancelAnimationFrame(raf);
     };
   }, []);
