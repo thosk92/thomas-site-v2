@@ -31,7 +31,7 @@ export default function Nebula() {
     const onChange = () => readTheme();
     mq.addEventListener?.("change", onChange);
     // respond to custom theme changes (time/system/solar/toggle)
-    const onThemeChange = (_e: Event) => readTheme();
+    const onThemeChange = () => readTheme();
     window.addEventListener("theme-change", onThemeChange);
     return () => {
       mq.removeEventListener?.("change", onChange);
@@ -91,40 +91,23 @@ export default function Nebula() {
 
     const makeParticles = (w: number, h: number): P[] => {
       const area = (w * h) / (1280 * 800);
-      const density = 500 * Math.max(0.6, Math.min(1.2, area)) * (w < 768 ? 0.75 : 1);
+      // slightly reduced density to lower visual weight
+      const density = 350 * Math.max(0.6, Math.min(1.2, area)) * (w < 768 ? 0.7 : 1);
       const count = Math.floor(density);
       const arr: P[] = new Array(count);
       for (let i = 0; i < count; i++) {
         const z = Math.pow(Math.random(), 2.2);
-        // palette: dark (black/graphite), emerald, petrol
-        const roll = Math.random();
-        let hue = 0, sat = 0, light = 18;
-        if (theme.isDark) {
-          // Dark mode palette tuned for #000 background and #F8F8F8 text
-          if (roll < 0.35) { // deep graphite wisps
-            hue = 0; sat = 0; light = rnd(4, 14);
-          } else if (roll < 0.7) { // emerald glow
-            hue = rnd(150, 165); sat = rnd(45, 60); light = rnd(38, 52);
-          } else { // petrol-teal glow
-            hue = rnd(180, 198); sat = rnd(40, 58); light = rnd(36, 50);
-          }
-        } else {
-          // Light mode palette (original-ish)
-          if (roll < 0.35) { // dark
-            hue = 0; sat = 0; light = rnd(10, 22);
-          } else if (roll < 0.7) { // emerald
-            hue = rnd(150, 165); sat = rnd(55, 70); light = rnd(45, 62);
-          } else { // petrol
-            hue = rnd(180, 200); sat = rnd(45, 65); light = rnd(42, 58);
-          }
-        }
+        // palette: constrained to dark green hues across themes
+        let hue = rnd(150, 165); // green range
+        let sat = theme.isDark ? rnd(40, 60) : rnd(45, 65);
+        let light = theme.isDark ? rnd(30, 48) : rnd(38, 56);
         arr[i] = {
           x: Math.random() * w,
           y: Math.random() * h,
           z,
           hue, sat, light,
-          size: mix(1.0, 3.2, 1 - z),
-          baseA: theme.isDark ? mix(0.08, 0.25, 1 - z) : mix(0.06, 0.20, 1 - z),
+          size: mix(1.0, 3.0, 1 - z),
+          baseA: theme.isDark ? mix(0.08, 0.22, 1 - z) : mix(0.06, 0.18, 1 - z),
           vx: rnd(-0.25, 0.25) * (0.6 + z),
           vy: rnd(-0.25, 0.25) * (0.6 + z),
         };

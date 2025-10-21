@@ -5,8 +5,6 @@ import { useEffect, useRef } from "react";
 const NIGHT_START = 19; // 19:00
 const NIGHT_END = 7;    // 07:00
 
-type Pref = "system" | "time" | "solar" | "light" | "dark";
-
 function isDarkByTime(d: Date): boolean {
   const h = d.getHours();
   return h >= NIGHT_START || h < NIGHT_END;
@@ -56,14 +54,6 @@ function getSunTimes(date: Date, lat: number, lng: number): { sunrise: Date | nu
   }
 }
 
-function readPref(): Pref {
-  try {
-    const v = window.localStorage.getItem("theme-pref");
-    if (v === "light" || v === "dark" || v === "time" || v === "solar" || v === "system") return v;
-  } catch {}
-  return "system";
-}
-
 export default function TimeTheme() {
   const timeoutRef = useRef<number | null>(null);
 
@@ -107,7 +97,7 @@ export default function TimeTheme() {
       return null;
     };
 
-    const evalSolar = async () => {
+    const evalSolar = async (): Promise<{ hasCoords: boolean; isDark: boolean }> => {
       const now = new Date();
       const setDark = (d: boolean) => { root.classList.toggle("time-dark", d); notify(); };
       // Try geolocation first; if fails or denied, fallback to stored coords; if none, fallback to time window
@@ -137,72 +127,55 @@ export default function TimeTheme() {
 
       const coords = await getCoords();
       if (!coords) {
-        // No coordinates available: fallback to time window
-        const d = evalTime();
-        setDark(d);
-        const next = new Date(now.getTime() + 60 * 60 * 1000);
-        scheduleAt(next, tick);
-        return d;
+        // No coordinates available: report hasCoords=false and do not schedule here; let caller decide fallback
+        return { hasCoords: false, isDark: evalTime() };
       }
       const { sunrise, sunset } = getSunTimes(now, coords.lat, coords.lng);
       if (!sunrise || !sunset) {
-        const d = evalTime();
-        setDark(d);
-        const next = new Date(now.getTime() + 60 * 60 * 1000);
-        scheduleAt(next, tick);
-        return d;
+        return { hasCoords: false, isDark: evalTime() };
       }
       const isDark = now < sunrise || now >= sunset;
       setDark(isDark);
       // schedule at next boundary
       const nextBoundary = now < sunrise ? sunrise : now < sunset ? sunset : new Date(sunrise.getTime() + 24 * 60 * 60 * 1000);
       scheduleAt(nextBoundary, tick);
-      return isDark;
+      return { hasCoords: true, isDark };
     };
 
     const tick = async () => {
       clearTimers();
-      const pref = readPref();
       root.classList.remove("time-dark");
-      switch (pref) {
-        case "light":
-          applyClasses("light");
-          break;
-        case "dark":
-          applyClasses("dark");
-          break;
-        case "system": {
-          applyClasses("unset");
-          const dark = evalSystem();
-          root.classList.toggle("time-dark", dark);
+      // 1) Try Solar
+      applyClasses("unset");
+      try {
+        const res = await evalSolar();
+        if (res.hasCoords) {
+          root.classList.toggle("time-dark", res.isDark);
           notify();
-          // listen to system changes implicitly via media query change below
-          break;
+          return;
         }
-        case "time": {
-          applyClasses("unset");
-          const dark = evalTime();
-          root.classList.toggle("time-dark", dark);
-          notify();
-          // schedule next NIGHT boundary
-          const now = new Date();
-          const h = now.getHours();
-          const next = new Date(now);
-          next.setSeconds(0); next.setMilliseconds(0); next.setMinutes(0);
-          if (dark) {
-            if (h < NIGHT_END) next.setHours(NIGHT_END); else { next.setDate(next.getDate() + 1); next.setHours(NIGHT_END); }
-          } else {
-            if (h < NIGHT_START) next.setHours(NIGHT_START); else { next.setDate(next.getDate() + 1); next.setHours(NIGHT_START); }
-          }
-          scheduleAt(next, tick);
-          break;
+      } catch {}
+      // 2) Fallback to Time
+      try {
+        const dark = evalTime();
+        root.classList.toggle("time-dark", dark);
+        notify();
+        const now = new Date();
+        const h = now.getHours();
+        const next = new Date(now);
+        next.setSeconds(0); next.setMilliseconds(0); next.setMinutes(0);
+        if (dark) {
+          if (h < NIGHT_END) next.setHours(NIGHT_END); else { next.setDate(next.getDate() + 1); next.setHours(NIGHT_END); }
+        } else {
+          if (h < NIGHT_START) next.setHours(NIGHT_START); else { next.setDate(next.getDate() + 1); next.setHours(NIGHT_START); }
         }
-        case "solar": {
-          applyClasses("unset");
-          await evalSolar();
-          break;
-        }
-      }
+        scheduleAt(next, tick);
+        return;
+      } catch {}
+      // 3) Fallback to System
+      const sysDark = evalSystem();
+      root.classList.toggle("time-dark", sysDark);
+      notify();
     };
 
     // initial
@@ -211,25 +184,16 @@ export default function TimeTheme() {
     const onVis = () => { if (!document.hidden) tick(); };
     document.addEventListener("visibilitychange", onVis);
 
-    const onSys = () => { if (readPref() === "system") tick(); };
+    const onSys = () => { tick(); };
     const mql = window.matchMedia("(prefers-color-scheme: dark)");
     mql.addEventListener?.("change", onSys);
 
-    const onPref = (_e: Event) => tick();
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "theme-solar-lat" || e.key === "theme-solar-lng") {
-        if (readPref() === "solar") tick();
-      }
-    };
-    window.addEventListener("theme-pref-change", onPref);
-    window.addEventListener("storage", onStorage);
+    // No user preference handling anymore; we only react to visibility/system changes.
 
     return () => {
       clearTimers();
       document.removeEventListener("visibilitychange", onVis);
       mql.removeEventListener?.("change", onSys);
-      window.removeEventListener("theme-pref-change", onPref);
-      window.removeEventListener("storage", onStorage);
     };
   }, []);
 

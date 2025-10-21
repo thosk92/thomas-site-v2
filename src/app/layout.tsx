@@ -7,7 +7,6 @@ import BackgroundMount from "@/components/BackgroundMount";
 import PointerTracker from "@/components/PointerTracker";
 import LanguageSwitch from "@/components/LanguageSwitch";
 import TimeTheme from "@/components/TimeTheme";
-import ThemeToggle from "@/components/ThemeToggle";
 import GeoPrefetch from "@/components/GeoPrefetch";
 
 const grotesk = Space_Grotesk({
@@ -70,9 +69,6 @@ export default function RootLayout({
         <div className="fixed top-4 right-4 z-20 flex items-center gap-2">
           <Suspense fallback={null}>
             <LanguageSwitch />
-          </Suspense>
-          <Suspense fallback={null}>
-            <ThemeToggle />
           </Suspense>
         </div>
         <div className="relative z-10 min-h-screen">{children}</div>
