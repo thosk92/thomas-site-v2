@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Roboto_Mono } from "next/font/google";
+import { Space_Grotesk, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Nebula from "@/components/Nebula";
 import PointerTracker from "@/components/PointerTracker";
@@ -11,7 +11,7 @@ const grotesk = Space_Grotesk({
   weight: ["300", "400", "500", "700"],
 });
 
-const geistMono = Roboto_Mono({
+const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
