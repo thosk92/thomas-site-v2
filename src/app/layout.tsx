@@ -3,11 +3,12 @@ import { Space_Grotesk } from "next/font/google";
 import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
-import BackgroundMount from "@/components/BackgroundMount";
+// Aurora background is now CSS-based in globals.css
 import PointerTracker from "@/components/PointerTracker";
 import LanguageSwitch from "@/components/LanguageSwitch";
 import TimeTheme from "@/components/TimeTheme";
 import GeoPrefetch from "@/components/GeoPrefetch";
+import ScrollReveal from "@/components/ScrollReveal";
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -62,9 +63,8 @@ export default function RootLayout({
       <body className={`${grotesk.variable} ${robotoMono.variable} antialiased`}>
         <GeoPrefetch />
         <TimeTheme />
-        <Suspense fallback={null}>
-          <BackgroundMount />
-        </Suspense>
+        <div className="aurora-bg" aria-hidden />
+        <ScrollReveal />
         <PointerTracker />
         <div className="fixed top-4 right-4 z-20 flex items-center gap-2">
           <Suspense fallback={null}>

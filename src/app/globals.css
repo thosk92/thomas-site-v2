@@ -70,3 +70,48 @@ body {
   scrollbar-width: none;    /* Firefox */
 }
 .no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Aurora background (CSS-only, motion-aware) */
+.aurora-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(40rem 28rem at 12% 8%, color-mix(in oklab, var(--foreground) 12%, transparent), transparent 62%),
+    radial-gradient(36rem 26rem at 88% 14%, color-mix(in oklab, var(--foreground) 10%, transparent), transparent 58%),
+    radial-gradient(34rem 28rem at 50% 86%, color-mix(in oklab, var(--foreground) 8%, transparent), transparent 54%),
+    var(--background);
+  animation: aurora-drift 45s ease-in-out infinite alternate;
+  will-change: background-position, transform;
+  transform: translateZ(0);
+}
+
+@keyframes aurora-drift {
+  0% { background-position: 0px 0px,   0px 0px,   0px 0px; }
+  50%{ background-position: 60px -40px, -50px 30px, 40px 60px; }
+  100%{ background-position: -90px 60px, 70px -20px, -60px -70px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora-bg { animation: none; }
+}
+
+/* Scroll reveal (motion-aware) */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 600ms ease, transform 700ms ease;
+}
+
+.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    transition: opacity 300ms ease;
+    transform: none;
+  }
+}
