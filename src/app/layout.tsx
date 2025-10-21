@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import Nebula from "@/components/Nebula";
+import BackgroundMount from "@/components/BackgroundMount";
 import PointerTracker from "@/components/PointerTracker";
 import LanguageSwitch from "@/components/LanguageSwitch";
 
@@ -50,7 +50,7 @@ export default function RootLayout({
         <meta name="supported-color-schemes" content="light" />
       </head>
       <body className={`${grotesk.variable} ${GeistMono.variable} antialiased`}>
-        <Nebula />
+        <BackgroundMount />
         <PointerTracker />
         <div className="fixed top-4 right-4 z-20"><LanguageSwitch /></div>
         <div className="relative z-10 min-h-screen">{children}</div>
