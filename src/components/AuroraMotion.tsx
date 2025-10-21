@@ -57,8 +57,11 @@ export default function AuroraMotion() {
       orientAttached = true;
     };
     if (typeof window.DeviceOrientationEvent !== "undefined") {
-      // @ts-ignore - iOS specific API
-      const req = (window.DeviceOrientationEvent as any).requestPermission;
+      type DOEWithPermission = typeof window.DeviceOrientationEvent & {
+        requestPermission?: () => Promise<"granted" | "denied">;
+      };
+      const doe = window.DeviceOrientationEvent as DOEWithPermission;
+      const req = doe.requestPermission;
       if (typeof req === "function") {
         const onFirstTouch = async () => {
           try {
