@@ -2,11 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { GeistMono } from "geist/font/mono";
 import "./globals.css";
-import dynamic from "next/dynamic";
+import DepthParallax from "@/components/backgrounds/DepthParallax";
 import PointerTracker from "@/components/PointerTracker";
 import LanguageSwitch from "@/components/LanguageSwitch";
-
-const DepthParallax = dynamic(() => import("@/components/backgrounds/DepthParallax"), { ssr: false });
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
