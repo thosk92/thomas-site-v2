@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body { height: 100%; }
+:root { --bg: #FFFFFF; --text: #0F0F10; color-scheme: light; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+body { background: var(--bg) !important; color: var(--text); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+/* Ensure sections default to white if they set backgrounds */
+section, main, header, footer { background-color: transparent; }
