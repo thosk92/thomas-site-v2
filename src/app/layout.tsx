@@ -10,6 +10,7 @@ import TimeTheme from "@/components/TimeTheme";
 import GeoPrefetch from "@/components/GeoPrefetch";
 import ScrollReveal from "@/components/ScrollReveal";
 import AuroraMotion from "@/components/AuroraMotion";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -74,9 +75,10 @@ export default function RootLayout({
           </Suspense>
         </div>
         <div className="relative z-10 min-h-screen">{children}</div>
+        <SpeedInsights />
         <footer className="border-t mt-12" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
           <div className="max-w-5xl mx-auto px-4 py-6 text-center text-xs" style={{ color: "color-mix(in oklab,var(--foreground) 70%, transparent)" }}>
-            P. IVA: 01492490451 · Sito prodotto da Thomas Zanelli · Tutti i diritti sono riservati
+            {new Date().getFullYear()} Thomas Zanelli · Built with Next.js and deployed on Vercel
           </div>
         </footer>
       </body>
