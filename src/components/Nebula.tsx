@@ -68,7 +68,8 @@ export default function Nebula() {
 
     const makeParticles = (w: number, h: number): P[] => {
       const area = (w * h) / (1280 * 800);
-      const count = Math.floor(500 * Math.max(0.6, Math.min(1.2, area)));
+      const density = 500 * Math.max(0.6, Math.min(1.2, area)) * (w < 768 ? 0.75 : 1);
+      const count = Math.floor(density);
       const arr: P[] = new Array(count);
       for (let i = 0; i < count; i++) {
         const z = Math.pow(Math.random(), 2.2);
@@ -87,8 +88,8 @@ export default function Nebula() {
           y: Math.random() * h,
           z,
           hue, sat, light,
-          size: mix(0.8, 2.4, 1 - z),
-          baseA: mix(0.04, 0.16, 1 - z),
+          size: mix(1.0, 3.2, 1 - z),
+          baseA: mix(0.06, 0.20, 1 - z),
           vx: rnd(-0.25, 0.25) * (0.6 + z),
           vy: rnd(-0.25, 0.25) * (0.6 + z),
         };
@@ -106,15 +107,25 @@ export default function Nebula() {
       const w = state.w, h = state.h;
       // base white
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "#FAFAFA";
+      ctx.fillStyle = "#F7F7F7";
       ctx.fillRect(0, 0, w, h);
 
+      // subtle vignette to increase perceived depth
+      const vg = ctx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.5,
+                                          w * 0.5, h * 0.5, Math.max(w, h) * 0.9);
+      vg.addColorStop(0, "rgba(0,0,0,0)");
+      vg.addColorStop(1, "rgba(0,0,0,0.06)");
+      ctx.globalCompositeOperation = "multiply";
+      ctx.fillStyle = vg;
+      ctx.fillRect(0, 0, w, h);
+      ctx.globalCompositeOperation = "source-over";
+
       // flow speed reacts to scroll
-      const speedBoost = mix(0.9, 1.5, state.scrollNorm);
-      const px = (state.cursorX - 0.5) * w * 0.03;
-      const py = (state.cursorY - 0.5) * h * 0.03;
+      const speedBoost = mix(0.85, 1.7, state.scrollNorm);
+      const px = (state.cursorX - 0.5) * w * 0.06;
+      const py = (state.cursorY - 0.5) * h * 0.06;
       // lightweight global wind (frame-based), with slight per-depth variation
-      const windPhase = t * 0.0005;
+      const windPhase = t * 0.0007;
       const windGX = Math.sin(windPhase) * 0.05;
       const windGY = Math.cos(windPhase * 0.8) * 0.05;
 
