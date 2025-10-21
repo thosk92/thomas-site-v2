@@ -6,12 +6,35 @@
   color-scheme: light;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #F8F8F8;
+    color-scheme: dark;
+  }
 }
+
+/* Time-based override: when <html class="time-dark"> is set, force dark variables */
+:root.time-dark {
+  --background: #000000;
+  --foreground: #F8F8F8;
+  color-scheme: dark;
+}
+
+/* Explicit user overrides via force classes */
+:root.force-dark {
+  --background: #000000;
+  --foreground: #F8F8F8;
+  color-scheme: dark;
+}
+
+:root.force-light {
+  --background: #ffffff;
+  --foreground: #171717;
+  color-scheme: light;
+}
+
+/* Removed Tailwind @theme inline block (no longer needed) */
 
 
 body {

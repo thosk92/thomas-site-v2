@@ -177,7 +177,7 @@ export default function PrinciplesCarousel() {
 
       <div className="container mx-auto px-6 sm:px-8">
         <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Principles</h2>
-        <p className="mt-4 max-w-2xl text-foreground/70">What guides every decision.</p>
+        <p className="mt-4 max-w-2xl text-[color-mix(in oklab,var(--foreground) 70%, transparent)]">What guides every decision.</p>
 
         <div
           ref={wrapRef}
@@ -194,14 +194,14 @@ export default function PrinciplesCarousel() {
               {title: "Performance", body: "Speed feels like respect. Lightweight by default."},
               {title: "Purpose", body: "Every element should justify its presence—or it goes."},
             ].map((p, i) => (
-              <li key={i} className="snap-center shrink-0 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[38%] border border-foreground/10 rounded-xl p-6 transition-transform duration-300 ease-out bg-white/60 backdrop-blur-[1px]">
+              <li key={i} className="snap-center shrink-0 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[38%] border rounded-xl p-6 transition-transform duration-300 ease-out bg-white/60 backdrop-blur-[1px]" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
                 <h3 className="text-xl sm:text-2xl font-medium">{p.title}</h3>
-                <p className="mt-2 text-foreground/80">{p.body}</p>
+                <p className="mt-2 text-[color-mix(in oklab,var(--foreground) 80%, transparent)]">{p.body}</p>
               </li>
             ))}
           </ul>
         </div>
-        <div className="mt-4 text-xs text-foreground/50">Swipe / drag to explore</div>
+        <div className="mt-4 text-xs text-[color-mix(in oklab,var(--foreground) 50%, transparent)]">Swipe / drag to explore</div>
       </div>
     </section>
   );

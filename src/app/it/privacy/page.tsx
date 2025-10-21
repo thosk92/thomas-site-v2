@@ -44,7 +44,7 @@ export default function PrivacyPageIt() {
         <p>
           Il modulo di contatto non utilizza cookie. Se verranno aggiunti servizi ulteriori (analytics, captcha), questa informativa sarà aggiornata di conseguenza.
         </p>
-        <p className="text-sm text-foreground/70">Ultimo aggiornamento: {new Date().toISOString().slice(0, 10)}</p>
+        <p className="text-sm text-[color-mix(in oklab,var(--foreground) 70%, transparent)]">Ultimo aggiornamento: {new Date().toISOString().slice(0, 10)}</p>
       </div>
     </main>
   );

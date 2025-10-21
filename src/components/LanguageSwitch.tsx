@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import type { Route } from "next";
 
 function swapLocale(path: string, target: "en" | "it"): string {
   // Normalize root
@@ -19,11 +20,12 @@ export default function LanguageSwitch() {
   const pathname = usePathname() || "/";
   const isIt = pathname === "/it" || pathname.startsWith("/it/");
   const target = isIt ? "en" : "it";
-  const href = swapLocale(pathname, target);
+  const href = swapLocale(pathname, target) as unknown as Route;
   return (
     <Link
       href={href}
-      className="inline-flex items-center rounded-full border border-foreground/20 bg-white/70 px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-white transition"
+      className="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-white transition"
+      style={{ borderColor: "color-mix(in oklab,var(--foreground) 20%, transparent)", background: "rgba(255,255,255,0.7)" }}
       prefetch={false}
       aria-label={isIt ? "Switch to English" : "Passa all'italiano"}
     >

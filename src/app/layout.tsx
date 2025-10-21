@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
-import { GeistMono } from "geist/font/mono";
+import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import BackgroundMount from "@/components/BackgroundMount";
 import PointerTracker from "@/components/PointerTracker";
 import LanguageSwitch from "@/components/LanguageSwitch";
+import TimeTheme from "@/components/TimeTheme";
+import ThemeToggle from "@/components/ThemeToggle";
+import GeoPrefetch from "@/components/GeoPrefetch";
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -13,7 +16,11 @@ const grotesk = Space_Grotesk({
   weight: ["300", "400", "500", "700"],
 });
 
-// Geist Mono provided via 'geist/font/mono'
+const robotoMono = Roboto_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "700"],
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://thomaszanelli.co"),
@@ -37,7 +44,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [{ media: "(prefers-color-scheme: light)", color: "#ffffff" }],
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
 };
 
 export default function RootLayout({
@@ -48,21 +58,26 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <meta name="supported-color-schemes" content="light" />
+        <meta name="supported-color-schemes" content="light dark" />
       </head>
-      <body className={`${grotesk.variable} ${GeistMono.variable} antialiased`}>
+      <body className={`${grotesk.variable} ${robotoMono.variable} antialiased`}>
+        <GeoPrefetch />
+        <TimeTheme />
         <Suspense fallback={null}>
           <BackgroundMount />
         </Suspense>
         <PointerTracker />
-        <div className="fixed top-4 right-4 z-20">
+        <div className="fixed top-4 right-4 z-20 flex items-center gap-2">
           <Suspense fallback={null}>
             <LanguageSwitch />
           </Suspense>
+          <Suspense fallback={null}>
+            <ThemeToggle />
+          </Suspense>
         </div>
         <div className="relative z-10 min-h-screen">{children}</div>
-        <footer className="border-t border-foreground/10 mt-12">
-          <div className="max-w-5xl mx-auto px-4 py-6 text-center text-xs text-foreground/70">
+        <footer className="border-t mt-12" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
+          <div className="max-w-5xl mx-auto px-4 py-6 text-center text-xs" style={{ color: "color-mix(in oklab,var(--foreground) 70%, transparent)" }}>
             P. IVA: 01492490451 · Sito prodotto da Thomas Zanelli · Tutti i diritti sono riservati
           </div>
         </footer>

@@ -72,40 +72,49 @@ export default function ContactForm() {
       <input type="text" name="hp" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
       <div className="grid gap-4">
         <div>
-          <label htmlFor="name" className="block text-sm text-foreground/70">Name</label>
+          <label htmlFor="name" className="block text-sm text-[color-mix(in oklab,var(--foreground) 70%, transparent)]">Name</label>
           <input
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
+            className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:ring-1"
+            style={{ borderColor: "color-mix(in oklab,var(--foreground) 20%, transparent)" }}
+            onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 1px color-mix(in oklab,var(--foreground) 40%, transparent) inset`)}
+            onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
           />
         </div>
         <div>
-          <label htmlFor="email" className="block text-sm text-foreground/70">Email</label>
+          <label htmlFor="email" className="block text-sm text-[color-mix(in oklab,var(--foreground) 70%, transparent)]">Email</label>
           <input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
+            className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:ring-1"
+            style={{ borderColor: "color-mix(in oklab,var(--foreground) 20%, transparent)" }}
+            onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 1px color-mix(in oklab,var(--foreground) 40%, transparent) inset`)}
+            onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
           />
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm text-foreground/70">Message</label>
+          <label htmlFor="message" className="block text-sm text-[color-mix(in oklab,var(--foreground) 70%, transparent)]">Message</label>
           <textarea
             id="message"
             rows={5}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             required
-            className="mt-1 w-full rounded-md border border-foreground/20 bg-white px-3 py-2 outline-none focus:border-foreground/40"
+            className="mt-1 w-full rounded-md border bg-white px-3 py-2 outline-none focus:ring-1"
+            style={{ borderColor: "color-mix(in oklab,var(--foreground) 20%, transparent)" }}
+            onFocus={(e) => (e.currentTarget.style.boxShadow = `0 0 0 1px color-mix(in oklab,var(--foreground) 40%, transparent) inset`)}
+            onBlur={(e) => (e.currentTarget.style.boxShadow = "none")}
           />
         </div>
-        <p className="text-xs text-foreground/60">By submitting, you agree to the processing of your data to handle your request. Read the <PrivacyLink className="underline underline-offset-2" />.</p>
+        <p className="text-xs text-[color-mix(in oklab,var(--foreground) 60%, transparent)]">By submitting, you agree to the processing of your data to handle your request. Read the <PrivacyLink className="underline underline-offset-2" />.</p>
         <div className="flex items-center gap-3">
-          <button disabled={state === "loading"} className="inline-flex items-center rounded-full bg-foreground text-background px-5 py-2.5 text-sm font-medium disabled:opacity-60">
+          <button disabled={state === "loading"} className="inline-flex items-center rounded-full px-5 py-2.5 text-sm font-medium disabled:opacity-60" style={{ background: "var(--foreground)", color: "var(--background)" }}>
             {state === "loading" ? "Sending..." : "Send"}
           </button>
           {state === "success" && <span className="text-sm text-green-700">Sent. I’ll get back to you soon.</span>}

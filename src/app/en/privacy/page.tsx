@@ -48,7 +48,7 @@ export default function PrivacyPageEn() {
           The contact form does not use cookies. If additional services (analytics, captcha) are added, this notice will be
           updated accordingly.
         </p>
-        <p className="text-sm text-foreground/70">Last updated: {new Date().toISOString().slice(0, 10)}</p>
+        <p className="text-sm text-[color-mix(in oklab,var(--foreground) 70%, transparent)]">Last updated: {new Date().toISOString().slice(0, 10)}</p>
       </div>
     </main>
   );

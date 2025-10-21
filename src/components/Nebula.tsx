@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 export default function Nebula() {
   const ref = useRef<HTMLCanvasElement>(null);
   const [reduced, setReduced] = useState(false);
+  const [theme, setTheme] = useState<{ bg: string; fg: string; isDark: boolean }>({ bg: "#ffffff", fg: "#171717", isDark: false });
 
   useEffect(() => {
     const m = matchMedia("(prefers-reduced-motion: reduce)");
@@ -14,6 +15,27 @@ export default function Nebula() {
     h();
     m.addEventListener?.("change", h);
     return () => m.removeEventListener?.("change", h);
+  }, []);
+
+  useEffect(() => {
+    const readTheme = () => {
+      const cs = getComputedStyle(document.documentElement);
+      const bg = (cs.getPropertyValue("--background") || "#ffffff").trim();
+      const fg = (cs.getPropertyValue("--foreground") || "#171717").trim();
+      // consider very dark backgrounds as dark mode
+      const isDark = /^#?0{3,6}$/i.test(bg) || bg.toLowerCase() === "black";
+      setTheme({ bg, fg, isDark });
+    };
+    readTheme();
+    const mq = matchMedia("(prefers-color-scheme: dark)");
+    const onChange = () => readTheme();
+    mq.addEventListener?.("change", onChange);
+    // respond to custom theme changes (time/system/solar/toggle)
+    window.addEventListener("theme-change", onChange as any);
+    return () => {
+      mq.removeEventListener?.("change", onChange);
+      window.removeEventListener("theme-change", onChange as any);
+    };
   }, []);
 
   useEffect(() => {
@@ -76,12 +98,24 @@ export default function Nebula() {
         // palette: dark (black/graphite), emerald, petrol
         const roll = Math.random();
         let hue = 0, sat = 0, light = 18;
-        if (roll < 0.35) { // dark
-          hue = 0; sat = 0; light = rnd(10, 22);
-        } else if (roll < 0.7) { // emerald
-          hue = rnd(150, 165); sat = rnd(55, 70); light = rnd(45, 62);
-        } else { // petrol
-          hue = rnd(180, 200); sat = rnd(45, 65); light = rnd(42, 58);
+        if (theme.isDark) {
+          // Dark mode palette tuned for #000 background and #F8F8F8 text
+          if (roll < 0.35) { // deep graphite wisps
+            hue = 0; sat = 0; light = rnd(4, 14);
+          } else if (roll < 0.7) { // emerald glow
+            hue = rnd(150, 165); sat = rnd(45, 60); light = rnd(38, 52);
+          } else { // petrol-teal glow
+            hue = rnd(180, 198); sat = rnd(40, 58); light = rnd(36, 50);
+          }
+        } else {
+          // Light mode palette (original-ish)
+          if (roll < 0.35) { // dark
+            hue = 0; sat = 0; light = rnd(10, 22);
+          } else if (roll < 0.7) { // emerald
+            hue = rnd(150, 165); sat = rnd(55, 70); light = rnd(45, 62);
+          } else { // petrol
+            hue = rnd(180, 200); sat = rnd(45, 65); light = rnd(42, 58);
+          }
         }
         arr[i] = {
           x: Math.random() * w,
@@ -89,7 +123,7 @@ export default function Nebula() {
           z,
           hue, sat, light,
           size: mix(1.0, 3.2, 1 - z),
-          baseA: mix(0.06, 0.20, 1 - z),
+          baseA: theme.isDark ? mix(0.08, 0.25, 1 - z) : mix(0.06, 0.20, 1 - z),
           vx: rnd(-0.25, 0.25) * (0.6 + z),
           vy: rnd(-0.25, 0.25) * (0.6 + z),
         };
@@ -105,20 +139,31 @@ export default function Nebula() {
       state.last = now;
 
       const w = state.w, h = state.h;
-      // base white
+      // base fill using theme background
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "#F7F7F7";
+      ctx.fillStyle = theme.bg || "#F7F7F7";
       ctx.fillRect(0, 0, w, h);
 
-      // subtle vignette to increase perceived depth
-      const vg = ctx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.5,
-                                          w * 0.5, h * 0.5, Math.max(w, h) * 0.9);
-      vg.addColorStop(0, "rgba(0,0,0,0)");
-      vg.addColorStop(1, "rgba(0,0,0,0.06)");
-      ctx.globalCompositeOperation = "multiply";
-      ctx.fillStyle = vg;
-      ctx.fillRect(0, 0, w, h);
-      ctx.globalCompositeOperation = "source-over";
+      // vignette changes per theme
+      if (theme.isDark) {
+        const vg = ctx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.5,
+                                            w * 0.5, h * 0.5, Math.max(w, h) * 0.9);
+        vg.addColorStop(0, "rgba(255,255,255,0)");
+        vg.addColorStop(1, "rgba(255,255,255,0.05)");
+        ctx.globalCompositeOperation = "screen"; // lift edges slightly on black
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalCompositeOperation = "screen"; // keep for particles below
+      } else {
+        const vg = ctx.createRadialGradient(w * 0.5, h * 0.5, Math.min(w, h) * 0.5,
+                                            w * 0.5, h * 0.5, Math.max(w, h) * 0.9);
+        vg.addColorStop(0, "rgba(0,0,0,0)");
+        vg.addColorStop(1, "rgba(0,0,0,0.06)");
+        ctx.globalCompositeOperation = "multiply";
+        ctx.fillStyle = vg;
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalCompositeOperation = "source-over";
+      }
 
       // flow speed reacts to scroll
       const speedBoost = mix(0.85, 1.7, state.scrollNorm);
@@ -154,7 +199,9 @@ export default function Nebula() {
         p.vx *= 0.988; p.vy *= 0.988;
 
         const a = p.baseA * (1 + Math.sin(t * 0.001 * 0.6) * 0.18);
-        const light = Math.min(92, Math.max(8, p.light + (1 - p.z) * 6));
+        const light = theme.isDark
+          ? Math.min(82, Math.max(6, p.light + (1 - p.z) * 5))
+          : Math.min(92, Math.max(8, p.light + (1 - p.z) * 6));
         ctx.fillStyle = `hsla(${p.hue}, ${p.sat.toFixed(0)}%, ${light.toFixed(0)}%, ${a.toFixed(3)})`;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
@@ -176,7 +223,7 @@ export default function Nebula() {
       document.removeEventListener("visibilitychange", onVisibility);
       ro.disconnect();
     };
-  }, [reduced]);
+  }, [reduced, theme]);
 
   return (
     <canvas
