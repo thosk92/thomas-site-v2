@@ -30,7 +30,14 @@
 
 :root.force-light {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  color-scheme: light;
+}
+
+/* Default to light when not time-dark or force-dark */
+:root:not(.time-dark):not(.force-dark) {
+  --background: #ffffff;
+  --foreground: #000000;
   color-scheme: light;
 }
 

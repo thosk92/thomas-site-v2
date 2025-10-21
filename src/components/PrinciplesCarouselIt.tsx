@@ -163,7 +163,7 @@ export default function PrinciplesCarouselIt() {
               {title: "Cura", body: "Tipografia, ritmo e movimento calibrati con attenzione."},
               {title: "Scopo", body: "Ogni elemento deve giustificare la propria presenza — altrimenti va rimosso."},
             ].map((p, i) => (
-              <li key={i} className="snap-center shrink-0 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[38%] border rounded-xl p-6 transition-transform duration-300 ease-out bg-white/60 backdrop-blur-[1px]" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
+              <li key={i} className="snap-center shrink-0 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[38%] border rounded-xl p-6 transition-transform duration-300 ease-out bg-white/10 backdrop-blur-[1px]" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
                 <h3 className="text-xl sm:text-2xl font-medium">{p.title}</h3>
                 <p className="mt-2 text-[color-mix(in oklab,var(--foreground) 92%, transparent)]">{p.body}</p>
               </li>
