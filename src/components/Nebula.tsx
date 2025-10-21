@@ -98,9 +98,9 @@ export default function Nebula() {
       for (let i = 0; i < count; i++) {
         const z = Math.pow(Math.random(), 2.2);
         // palette: constrained to dark green hues across themes
-        let hue = rnd(150, 165); // green range
-        let sat = theme.isDark ? rnd(40, 60) : rnd(45, 65);
-        let light = theme.isDark ? rnd(30, 48) : rnd(38, 56);
+        const hue = rnd(150, 165); // green range
+        const sat = theme.isDark ? rnd(40, 60) : rnd(45, 65);
+        const light = theme.isDark ? rnd(30, 48) : rnd(38, 56);
         arr[i] = {
           x: Math.random() * w,
           y: Math.random() * h,
