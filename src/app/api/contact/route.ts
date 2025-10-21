@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
           subject,
           text,
           html,
-          reply_to: email,
+          replyTo: email,
         });
         console.log("contact:sent", { ok: true });
         let id: string | null = null;
