@@ -77,24 +77,77 @@ body {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(40rem 28rem at 12% 8%, color-mix(in oklab, var(--foreground) 12%, transparent), transparent 62%),
-    radial-gradient(36rem 26rem at 88% 14%, color-mix(in oklab, var(--foreground) 10%, transparent), transparent 58%),
-    radial-gradient(34rem 28rem at 50% 86%, color-mix(in oklab, var(--foreground) 8%, transparent), transparent 54%),
-    var(--background);
-  animation: aurora-drift 45s ease-in-out infinite alternate;
-  will-change: background-position, transform;
+  background: var(--background);
+}
+
+.aurora-bg::before,
+.aurora-bg::after {
+  content: "";
+  position: absolute;
+  inset: -10% -15% -20% -15%;
+  pointer-events: none;
+  will-change: transform, opacity;
   transform: translateZ(0);
 }
 
-@keyframes aurora-drift {
-  0% { background-position: 0px 0px,   0px 0px,   0px 0px; }
-  50%{ background-position: 60px -40px, -50px 30px, 40px 60px; }
-  100%{ background-position: -90px 60px, 70px -20px, -60px -70px; }
+/* Blob A: grande, morbido, in alto a sinistra */
+.aurora-bg::before {
+  background:
+    /* primary green glow */
+    radial-gradient(closest-side at 25% 20%, color-mix(in oklab, #16a34a 11%, transparent) 0 60%, transparent 70%),
+    /* faint teal tint */
+    radial-gradient(closest-side at 80% 35%, color-mix(in oklab, #22d3ee 6%, transparent) 0 55%, transparent 70%);
+  transform-origin: 20% 20%;
+  animation: aurora-orbit-a 55s ease-in-out infinite alternate;
+  /* pointer-influenced offsets (set via JS) */
+  --aurora-x-a: 0px; /* desktop pointer moves */
+  --aurora-y-a: 0px;
+  transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0);
+  mask-image: radial-gradient(100% 100% at 30% 25%, #000 55%, transparent 80%);
+  mask-composite: intersect;
+}
+
+/* Blob B: medio, in basso a destra */
+.aurora-bg::after {
+  background:
+    /* secondary green glow */
+    radial-gradient(closest-side at 75% 80%, color-mix(in oklab, #15803d 10%, transparent) 0 60%, transparent 72%),
+    /* subtle sky tint */
+    radial-gradient(closest-side at 35% 70%, color-mix(in oklab, #38bdf8 5%, transparent) 0 50%, transparent 70%);
+  transform-origin: 80% 80%;
+  animation: aurora-orbit-b 65s ease-in-out infinite alternate;
+  --aurora-x-b: 0px;
+  --aurora-y-b: 0px;
+  transform: translate3d(var(--aurora-x-b), var(--aurora-y-b), 0);
+  mask-image: radial-gradient(100% 100% at 70% 75%, #000 55%, transparent 82%);
+  mask-composite: intersect;
+}
+
+@keyframes aurora-orbit-a {
+  0% { transform: translate3d(0,0,0) rotate(0.001deg); opacity: 0.85; }
+  50% { transform: translate3d(2%, -1%, 0) rotate(6deg); opacity: 0.9; }
+  100% { transform: translate3d(-3%, 2%, 0) rotate(-5deg); opacity: 0.8; }
+}
+
+@keyframes aurora-orbit-b {
+  0% { transform: translate3d(0,0,0) rotate(0.001deg); opacity: 0.8; }
+  50% { transform: translate3d(-2%, 2%, 0) rotate(-7deg); opacity: 0.85; }
+  100% { transform: translate3d(3%, -3%, 0) rotate(5deg); opacity: 0.78; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .aurora-bg { animation: none; }
+  .aurora-bg::before,
+  .aurora-bg::after { animation: none; }
+}
+
+/* On coarse pointers (mobile), keep aurora fixed (no animation) */
+@media (pointer: coarse) {
+  .aurora-bg::before,
+  .aurora-bg::after {
+    animation: none !important;
+    /* ignore pointer vars on mobile */
+    transform: none !important;
+  }
 }
 
 /* Scroll reveal (motion-aware) */

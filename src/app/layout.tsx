@@ -9,6 +9,7 @@ import LanguageSwitch from "@/components/LanguageSwitch";
 import TimeTheme from "@/components/TimeTheme";
 import GeoPrefetch from "@/components/GeoPrefetch";
 import ScrollReveal from "@/components/ScrollReveal";
+import AuroraMotion from "@/components/AuroraMotion";
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -64,6 +65,7 @@ export default function RootLayout({
         <GeoPrefetch />
         <TimeTheme />
         <div className="aurora-bg" aria-hidden />
+        <AuroraMotion />
         <ScrollReveal />
         <PointerTracker />
         <div className="fixed top-4 right-4 z-20 flex items-center gap-2">
