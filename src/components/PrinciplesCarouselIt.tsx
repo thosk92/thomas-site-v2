@@ -12,10 +12,21 @@ export default function PrinciplesCarouselIt() {
     let isDown = false;
     let startX = 0;
     let startScroll = 0;
+    let pointerId: number | null = null;
+
+    // performance: on-demand RAF
+    let rid = 0;
+    let running = false;
+    let lastActive = 0;
+    const ACTIVITY_TIMEOUT = 300;
+
+    const items = Array.from(list.children) as HTMLElement[];
+    const reduceMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const onPointer = (e: PointerEvent) => {
       const r = wrap.getBoundingClientRect();
       pointerX = (e.clientX - r.left) / Math.max(1, r.width);
+      startLoop();
     };
     window.addEventListener("pointermove", onPointer);
 
@@ -25,12 +36,18 @@ export default function PrinciplesCarouselIt() {
       startX = e.clientX;
       startScroll = wrap.scrollLeft;
       wrap.style.cursor = "grabbing";
+      try { wrap.setPointerCapture?.(e.pointerId); pointerId = e.pointerId; } catch {}
+      startLoop();
     };
-    const onUp = () => { isDown = false; wrap.style.cursor = "auto"; };
+    const onUp = () => {
+      isDown = false; wrap.style.cursor = "auto";
+      if (pointerId != null) { try { wrap.releasePointerCapture?.(pointerId); } catch {}; pointerId = null; }
+    };
     const onDrag = (e: PointerEvent) => {
       if (!isDown) return;
       const dx = e.clientX - startX;
       wrap.scrollLeft = startScroll - dx;
+      startLoop();
     };
     wrap.addEventListener("pointerdown", onDown);
     window.addEventListener("pointerup", onUp);
@@ -40,8 +57,9 @@ export default function PrinciplesCarouselIt() {
     const onWheel = (e: WheelEvent) => {
       if (!e.shiftKey) {
         const before = wrap.scrollLeft;
-        wrap.scrollLeft += e.deltaY * 0.9 + e.deltaX;
-        if (wrap.scrollLeft !== before) e.preventDefault();
+        const factor = 1.2;
+        wrap.scrollLeft += (e.deltaY * factor) + (e.deltaX || 0);
+        if (wrap.scrollLeft !== before) { e.preventDefault(); startLoop(); }
       }
     };
     wrap.addEventListener("wheel", onWheel as EventListener, { passive: false });
@@ -53,6 +71,7 @@ export default function PrinciplesCarouselIt() {
       } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
         wrap.scrollBy({ left: -wrap.clientWidth * 0.8, behavior: "smooth" });
       }
+      startLoop();
     };
     window.addEventListener("keydown", onKey);
 
@@ -64,25 +83,42 @@ export default function PrinciplesCarouselIt() {
       wrap.style.setProperty("--progress", String(t));
       wrap.style.setProperty("--px", String(pointerX));
 
-      const items = Array.from(list.children) as HTMLElement[];
-      for (let i = 0; i < items.length; i++) {
-        const it = items[i];
-        const basis = it.offsetLeft + it.offsetWidth * 0.5;
-        const dx = (basis - (scrollX + w * 0.5)) / w;
-        const skew = Math.max(-6, Math.min(6, -dx * 10));
-        const scale = 1 + Math.max(-0.02, Math.min(0.04, (0.5 - Math.abs(dx)) * 0.05));
-        const ty = Math.sin((t + i * 0.13) * Math.PI * 2) * 6;
-        const tilt = (pointerX - 0.5) * 2;
-        it.style.transform = `translateY(${ty.toFixed(2)}px) skewX(${skew.toFixed(2)}deg) scale(${scale.toFixed(3)}) rotateZ(${(tilt*0.5).toFixed(2)}deg)`;
+      if (!reduceMotion) {
+        for (let i = 0; i < items.length; i++) {
+          const it = items[i];
+          const basis = it.offsetLeft + it.offsetWidth * 0.5;
+          const dx = (basis - (scrollX + w * 0.5)) / w;
+          const skew = Math.max(-6, Math.min(6, -dx * 10));
+          const scale = 1 + Math.max(-0.02, Math.min(0.04, (0.5 - Math.abs(dx)) * 0.05));
+          const ty = Math.sin((t + i * 0.13) * Math.PI * 2) * 6;
+          const tilt = (pointerX - 0.5) * 2;
+          it.style.willChange = "transform";
+          it.style.transform = `translate3d(0, ${ty.toFixed(2)}px, 0) skewX(${skew.toFixed(2)}deg) scale(${scale.toFixed(3)}) rotateZ(${(tilt*0.5).toFixed(2)}deg)`;
+        }
+      }
+
+      if (performance.now() - lastActive > ACTIVITY_TIMEOUT) {
+        running = false; rid = 0; return;
       }
       rid = requestAnimationFrame(update);
     };
 
-    let rid = requestAnimationFrame(update);
-    const onScroll = () => {};
+    const startLoop = () => {
+      lastActive = performance.now();
+      if (!running) { running = true; rid = requestAnimationFrame(update); }
+    };
+    const onScroll = () => { startLoop(); };
     wrap.addEventListener("scroll", onScroll, { passive: true });
+
+    const onClick = (e: MouseEvent) => {
+      const target = (e.target as HTMLElement)?.closest("li");
+      if (!target || !(target instanceof HTMLElement)) return;
+      try { target.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" }); } catch {}
+    };
+    list.addEventListener("click", onClick);
+
     return () => {
-      cancelAnimationFrame(rid);
+      if (rid) cancelAnimationFrame(rid);
       window.removeEventListener("pointermove", onPointer);
       wrap.removeEventListener("scroll", onScroll);
       wrap.removeEventListener("pointerdown", onDown);
@@ -91,6 +127,7 @@ export default function PrinciplesCarouselIt() {
       window.removeEventListener("pointermove", onDrag);
       wrap.removeEventListener("wheel", onWheel as EventListener);
       window.removeEventListener("keydown", onKey);
+      list.removeEventListener("click", onClick);
     };
   }, []);
 
