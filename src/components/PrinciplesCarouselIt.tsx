@@ -121,11 +121,10 @@ export default function PrinciplesCarouselIt() {
         >
           <ul ref={listRef} className="flex gap-6 pb-2">
             {[
-              {title: "Prima l'umano", body: "Le interfacce devono meritare attenzione essendo naturali, non rumorose."},
-              {title: "Chiarezza", body: "Riduci il rumore. Eleva il segnale. Dai nomi chiari."},
-              {title: "Cura", body: "Tipografia, ritmo e motion calibrati con attenzione."},
-              {title: "Performance", body: "La velocità è rispetto. Leggerezza per impostazione predefinita."},
-              {title: "Scopo", body: "Ogni elemento deve giustificare la propria presenza — altrimenti non c'è."},
+              {title: "Umano al primo posto", body: "Le interfacce dovrebbero catturare l’attenzione con naturalezza, non con il rumore."},
+              {title: "Chiarezza", body: "Ridurre il rumore. Valorizzare il segnale. Dare nomi chiari alle cose."},
+              {title: "Cura", body: "Tipografia, ritmo e movimento calibrati con attenzione."},
+              {title: "Scopo", body: "Ogni elemento deve giustificare la propria presenza — altrimenti va rimosso."},
             ].map((p, i) => (
               <li key={i} className="snap-center shrink-0 basis-[85%] sm:basis-[60%] md:basis-[45%] lg:basis-[38%] border border-foreground/10 rounded-xl p-6 transition-transform duration-300 ease-out bg-white/60 backdrop-blur-[1px]">
                 <h3 className="text-xl sm:text-2xl font-medium">{p.title}</h3>
