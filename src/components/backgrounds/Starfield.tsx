@@ -19,7 +19,6 @@ export default function Starfield() {
     let raf = 0;
 
     const stars: { x: number; y: number; z: number; s: number }[] = [];
-    const layers = 3;
 
     const resize = () => {
       const w = window.innerWidth;

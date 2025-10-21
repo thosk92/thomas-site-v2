@@ -211,24 +211,24 @@ export default function TimeTheme() {
     const onVis = () => { if (!document.hidden) tick(); };
     document.addEventListener("visibilitychange", onVis);
 
-    const onSys = (e: MediaQueryListEvent) => { if (readPref() === "system") tick(); };
+    const onSys = () => { if (readPref() === "system") tick(); };
     const mql = window.matchMedia("(prefers-color-scheme: dark)");
     mql.addEventListener?.("change", onSys);
 
-    const onPref = () => tick();
+    const onPref = (_e: Event) => tick();
     const onStorage = (e: StorageEvent) => {
       if (e.key === "theme-solar-lat" || e.key === "theme-solar-lng") {
         if (readPref() === "solar") tick();
       }
     };
-    window.addEventListener("theme-pref-change", onPref as any);
+    window.addEventListener("theme-pref-change", onPref);
     window.addEventListener("storage", onStorage);
 
     return () => {
       clearTimers();
       document.removeEventListener("visibilitychange", onVis);
       mql.removeEventListener?.("change", onSys);
-      window.removeEventListener("theme-pref-change", onPref as any);
+      window.removeEventListener("theme-pref-change", onPref);
       window.removeEventListener("storage", onStorage);
     };
   }, []);

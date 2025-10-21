@@ -31,10 +31,11 @@ export default function Nebula() {
     const onChange = () => readTheme();
     mq.addEventListener?.("change", onChange);
     // respond to custom theme changes (time/system/solar/toggle)
-    window.addEventListener("theme-change", onChange as any);
+    const onThemeChange = (_e: Event) => readTheme();
+    window.addEventListener("theme-change", onThemeChange);
     return () => {
       mq.removeEventListener?.("change", onChange);
-      window.removeEventListener("theme-change", onChange as any);
+      window.removeEventListener("theme-change", onThemeChange);
     };
   }, []);
 

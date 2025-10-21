@@ -104,7 +104,7 @@ export default function GradientNoise() {
       }
     };
 
-    let start = performance.now();
+    const start = performance.now();
     const loop = () => {
       const now = performance.now();
       drawFrame(now);
