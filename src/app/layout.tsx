@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Geist_Mono } from "next/font/google";
+import { Space_Grotesk } from "next/font/google";
+import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 import Nebula from "@/components/Nebula";
 import PointerTracker from "@/components/PointerTracker";
@@ -11,10 +12,7 @@ const grotesk = Space_Grotesk({
   weight: ["300", "400", "500", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// Geist Mono provided via 'geist/font/mono'
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://thomaszanelli.co"),
@@ -51,11 +49,16 @@ export default function RootLayout({
       <head>
         <meta name="supported-color-schemes" content="light" />
       </head>
-      <body className={`${grotesk.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${grotesk.variable} ${GeistMono.variable} antialiased`}>
         <Nebula />
         <PointerTracker />
         <div className="fixed top-4 right-4 z-20"><LanguageSwitch /></div>
         <div className="relative z-10 min-h-screen">{children}</div>
+        <footer className="border-t border-foreground/10 mt-12">
+          <div className="max-w-5xl mx-auto px-4 py-6 text-center text-xs text-foreground/70">
+            P. IVA: 01492490451 · Sito prodotto da Thomas Zanelli · Tutti i diritti sono riservati
+          </div>
+        </footer>
       </body>
     </html>
   );
