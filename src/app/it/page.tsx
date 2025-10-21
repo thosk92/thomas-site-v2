@@ -44,28 +44,28 @@ export default function PageIt() {
       </main>
 
       <section id="process" className="container mx-auto px-6 sm:px-8 py-24">
-        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Metodo</h2>
-        <p className="mt-4 max-w-2xl text-foreground/70">Un percorso semplice verso risultati che contano.</p>
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold tracking-tight">Processo</h2>
+        <p className="mt-4 max-w-2xl text-foreground/70">Un percorso semplice verso risultati significativi.</p>
         <ol className="mt-12 grid gap-8 sm:grid-cols-2">
           <li className="group border border-foreground/10 rounded-xl p-6 bg-white/10 backdrop-blur-md transition hover:bg-white/20">
             <div className="text-sm text-foreground/60">01</div>
-            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Discover</h3>
-            <p className="mt-2 text-foreground/80">Obiettivi, utenti, vincoli. Allineiamo ciò che conta davvero.</p>
+            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Scopri</h3>
+            <p className="mt-2 text-foreground/80">Obiettivi, utenti, vincoli. Ci allineiamo su ciò che conta davvero.</p>
           </li>
           <li className="group border border-foreground/10 rounded-xl p-6 bg-white/10 backdrop-blur-md transition hover:bg-white/20">
             <div className="text-sm text-foreground/60">02</div>
-            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Design</h3>
+            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Progetta</h3>
             <p className="mt-2 text-foreground/80">Sistemi, flussi e interfacce che risultano naturali.</p>
           </li>
           <li className="group border border-foreground/10 rounded-xl p-6 bg-white/10 backdrop-blur-md transition hover:bg-white/20">
             <div className="text-sm text-foreground/60">03</div>
-            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Build</h3>
-            <p className="mt-2 text-foreground/80">Codice pulito, performance prima di tutto, accessibile per impostazione predefinita.</p>
+            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Realizza</h3>
+            <p className="mt-2 text-foreground/80">Codice pulito, prestazioni al primo posto, accessibilità di default.</p>
           </li>
           <li className="group border border-foreground/10 rounded-xl p-6 bg-white/10 backdrop-blur-md transition hover:bg-white/20">
             <div className="text-sm text-foreground/60">04</div>
-            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Polish</h3>
-            <p className="mt-2 text-foreground/80">Dettagli e motion che elevano senza distrarre.</p>
+            <h3 className="mt-2 text-xl sm:text-2xl font-medium">Rifinisci</h3>
+            <p className="mt-2 text-foreground/80">Dettagli e animazioni che elevano senza distrarre.</p>
           </li>
         </ol>
         <div className="mt-10">
