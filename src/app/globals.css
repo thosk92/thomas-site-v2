@@ -84,7 +84,10 @@ body {
     var(--background);
   animation: aurora-drift 45s ease-in-out infinite alternate;
   will-change: background-position, transform;
-  transform: translateZ(0);
+  /* default parallax variables (set by AuroraMotion) */
+  --aurora-x-a: 0px;
+  --aurora-y-a: 0px;
+  transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0);
 }
 
 /* Light mode: same green hues, less dense over white background */
@@ -130,6 +133,10 @@ body {
   transform-origin: 20% 20%;
   animation: aurora-sweep-a 48s linear infinite, aurora-orbit-a 55s ease-in-out infinite alternate;
   mask-image: radial-gradient(120% 120% at 20% 15%, #000 50%, transparent 85%);
+  /* parallax offsets set via JS (AuroraMotion) */
+  --aurora-x-a: 0px;
+  --aurora-y-a: 0px;
+  transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0) skewX(-6deg) rotate(-4deg);
 }
 
 /* Ribbons B (bottom-right bias) */
@@ -147,6 +154,9 @@ body {
   transform-origin: 80% 80%;
   animation: aurora-sweep-b 60s linear infinite reverse, aurora-orbit-b 65s ease-in-out infinite alternate;
   mask-image: radial-gradient(120% 120% at 80% 85%, #000 50%, transparent 85%);
+  --aurora-x-b: 0px;
+  --aurora-y-b: 0px;
+  transform: translate3d(var(--aurora-x-b), var(--aurora-y-b), 0) skewX(5deg) rotate(3deg);
 }
 
 @keyframes aurora-orbit-a {

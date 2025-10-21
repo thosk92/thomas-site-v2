@@ -49,17 +49,34 @@ export default function AuroraMotion() {
     };
 
     window.addEventListener("pointermove", onMove);
-    // Attach orientation only if supported
-    if (typeof window.DeviceOrientationEvent !== "undefined") {
+    // Attach orientation only if supported. On iOS, permission is required.
+    let orientAttached = false;
+    const attachOrient = () => {
+      if (orientAttached) return;
       window.addEventListener("deviceorientation", onOrient);
+      orientAttached = true;
+    };
+    if (typeof window.DeviceOrientationEvent !== "undefined") {
+      // @ts-ignore - iOS specific API
+      const req = (window.DeviceOrientationEvent as any).requestPermission;
+      if (typeof req === "function") {
+        const onFirstTouch = async () => {
+          try {
+            const res = await req();
+            if (res === "granted") attachOrient();
+          } catch {}
+          window.removeEventListener("touchend", onFirstTouch);
+        };
+        window.addEventListener("touchend", onFirstTouch, { passive: true, once: true });
+      } else {
+        attachOrient();
+      }
     }
     raf = requestAnimationFrame(tick);
 
     return () => {
       window.removeEventListener("pointermove", onMove);
-      if (typeof window.DeviceOrientationEvent !== "undefined") {
-        window.removeEventListener("deviceorientation", onOrient);
-      }
+      if (orientAttached) window.removeEventListener("deviceorientation", onOrient);
       cancelAnimationFrame(raf);
     };
   }, []);
