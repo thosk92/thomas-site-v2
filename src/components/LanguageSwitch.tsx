@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import type { Route } from "next";
 import { usePathname } from "next/navigation";
 
 function swapLocale(path: string, target: "en" | "it"): string {
@@ -20,7 +19,7 @@ export default function LanguageSwitch() {
   const pathname = usePathname() || "/";
   const isIt = pathname === "/it" || pathname.startsWith("/it/");
   const target = isIt ? "en" : "it";
-  const href = swapLocale(pathname, target) as unknown as Route;
+  const href = swapLocale(pathname, target);
   return (
     <Link
       href={href}
