@@ -32,13 +32,19 @@ export default function HeroInitials({ letters = ["T", "Z"] }: { letters?: [stri
             <stop offset="100%" stopColor="#0b4f52" stopOpacity="1" />
           </linearGradient>
         </defs>
-        <g className="hi-group">
-          <text x="46%" y="68%" className="hi-letter hi-t" textAnchor="middle">
-            {letters[0]}
-          </text>
-          <text x="54%" y="68%" className="hi-letter hi-z" textAnchor="middle">
-            {letters[1]}
-          </text>
+        <g className="hi-group" transform="translate(600 200)">
+          {/* Stylized T: asymmetric arm with block stem */}
+          <path
+            className="hi-letter hi-t"
+            transform="translate(-190 0) scale(1.05)"
+            d="M -140 -150 H 140 V -106 H 30 V 90 H -26 V -106 H -140 Z"
+          />
+          {/* Stylized Z: slanted diagonal with chamfered joints */}
+          <path
+            className="hi-letter hi-z"
+            transform="translate(190 0) scale(1.05)"
+            d="M -140 -150 H 140 V -106 H -20 L 140 90 V 134 H -140 V 90 H 20 L -140 -106 Z"
+          />
         </g>
       </svg>
       <div className="sr-only">Thomas Zanelli</div>

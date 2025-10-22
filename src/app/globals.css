@@ -365,14 +365,14 @@ body {
 /* Start sequence */
 .hi-svg.is-started .hi-letter {
   animation:
-    hi-stroke 1.2s ease-out forwards,
-    hi-fill-in 0.8s ease-out forwards 0.55s,
-    hi-fill-out 1s ease-in forwards 1.75s;
+    hi-stroke 2.2s cubic-bezier(0.22, 0.61, 0.36, 1) forwards,
+    hi-fill-in 1.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards 1.2s,
+    hi-fill-out 2.4s cubic-bezier(0.4, 0, 0.2, 1) forwards 3.2s;
 }
-.hi-svg.is-started .hi-z { animation-delay: 0.12s, 0.77s, 1.37s; }
+.hi-svg.is-started .hi-z { animation-delay: 0.2s, 1.35s, 3.4s; }
 
 /* Optional subtle glow that fades */
-.hi-svg.is-started .hi-group { animation: hi-glow 1.4s ease-out forwards; }
+.hi-svg.is-started .hi-group { animation: hi-glow 2.6s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
 
 @keyframes hi-stroke {
   from { stroke-dashoffset: 2000; }
