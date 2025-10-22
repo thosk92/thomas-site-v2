@@ -409,3 +409,36 @@ body {
   .hi-letter { stroke-dashoffset: 0; fill-opacity: 1; stroke-opacity: 0.25; }
   .hi-svg.is-started .hi-letter, .hi-svg.is-started .hi-group { animation: none; }
 }
+
+/* Signature overlay (cursive gothic minimal) */
+.sig {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  z-index: 2;
+}
+.sig-svg { width: min(92vw, 1100px); height: auto; }
+.sig-text {
+  font-family: var(--font-gothic), serif;
+  font-weight: 700;
+  font-size: clamp(2rem, 8vw, 8rem);
+  font-style: italic;
+  fill: none;
+  stroke: color-mix(in oklab, var(--foreground) 85%, transparent);
+  stroke-width: clamp(1px, 0.3vw, 6px);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 2400;
+  stroke-dashoffset: 2400;
+}
+.sig.is-started .sig-text { animation: sig-draw 2.4s ease forwards; }
+@keyframes sig-draw {
+  0% { stroke-dashoffset: 2400; opacity: 0.6; }
+  60% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.95; }
+}
+@media (max-width: 640px) {
+  .sig-svg { width: 96vw; }
+}

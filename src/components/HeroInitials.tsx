@@ -3,41 +3,42 @@ import { useEffect, useRef, useState } from "react";
 
 export default function HeroInitials({ letters = ["T", "Z"] }: { letters?: [string, string] }) {
   const [started, setStarted] = useState(false);
-  const ref = useRef<SVGSVGElement>(null);
+  const sigRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       setStarted(true);
-      return;
+      // Scroll after a short pause when reduced motion
+      const toRM = window.setTimeout(() => {
+        const main = document.querySelector("main");
+        if (main) main.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 2000);
+      return () => clearTimeout(toRM);
     }
     const t = requestAnimationFrame(() => setStarted(true));
-    return () => cancelAnimationFrame(t);
+    // After signature animation ends, wait 2s then scroll
+    let endTimer = 0;
+    const onEnd = () => {
+      endTimer = window.setTimeout(() => {
+        const main = document.querySelector("main");
+        if (main) main.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 2000);
+    };
+    const sigNode = sigRef.current;
+    sigNode?.addEventListener("animationend", onEnd, { once: true } as any);
+    return () => { cancelAnimationFrame(t); if (endTimer) clearTimeout(endTimer); sigNode?.removeEventListener("animationend", onEnd); };
   }, []);
 
   return (
     <section className="hero-initials" aria-label="Intro">
-      <svg
-        ref={ref}
-        className={`hi-svg ${started ? "is-started" : ""}`}
-        viewBox="0 0 1200 400"
-        role="img"
-        aria-labelledby="hi-title"
-      >
-        <title id="hi-title">Initials {letters[0]} {letters[1]}</title>
-        <defs>
-          <linearGradient id="hi-fill" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#0f766e" stopOpacity="1" />
-            <stop offset="50%" stopColor="#115e59" stopOpacity="1" />
-            <stop offset="100%" stopColor="#0b4f52" stopOpacity="1" />
-          </linearGradient>
-        </defs>
-        <g className="hi-group" transform="translate(600 200)">
-          {/* Gothic glyphs via UnifrakturCook */}
-          <text x="44%" y="20%" className="hi-letter hi-gothic hi-t" textAnchor="middle" dominantBaseline="middle">{letters[0]}</text>
-          <text x="56%" y="20%" className="hi-letter hi-gothic hi-z" textAnchor="middle" dominantBaseline="middle">{letters[1]}</text>
-        </g>
-      </svg>
+      {/* Signature overlay */}
+      <div ref={sigRef} className={`sig ${started ? "is-started" : ""}`} aria-hidden>
+        <svg className="sig-svg" viewBox="0 0 1200 300">
+          <text x="50%" y="40%" textAnchor="middle" className="sig-text">Thomas</text>
+          <text x="50%" y="72%" textAnchor="middle" className="sig-text">Zanelli</text>
+        </svg>
+      </div>
       <div className="sr-only">Thomas Zanelli</div>
     </section>
   );
