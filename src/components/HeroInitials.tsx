@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-export default function HeroInitials({ letters = ["T", "Z"] }: { letters?: [string, string] }) {
+export default function HeroInitials() {
   const [started, setStarted] = useState(false);
   const sigRef = useRef<HTMLDivElement>(null);
 
@@ -19,14 +19,15 @@ export default function HeroInitials({ letters = ["T", "Z"] }: { letters?: [stri
     const t = requestAnimationFrame(() => setStarted(true));
     // After signature animation ends, wait 2s then scroll
     let endTimer = 0;
-    const onEnd = () => {
+    const onEnd: EventListener = () => {
       endTimer = window.setTimeout(() => {
         const main = document.querySelector("main");
         if (main) main.scrollIntoView({ behavior: "smooth", block: "start" });
       }, 2000);
     };
     const sigNode = sigRef.current;
-    sigNode?.addEventListener("animationend", onEnd, { once: true } as any);
+    const options: AddEventListenerOptions = { once: true };
+    sigNode?.addEventListener("animationend", onEnd, options);
     return () => { cancelAnimationFrame(t); if (endTimer) clearTimeout(endTimer); sigNode?.removeEventListener("animationend", onEnd); };
   }, []);
 
