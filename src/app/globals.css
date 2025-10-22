@@ -418,8 +418,9 @@ body {
   place-items: center;
   pointer-events: none;
   z-index: 2;
+  padding-inline: 4vw;
 }
-.sig-svg { width: min(96vw, 1400px); height: auto; }
+.sig-svg { width: min(96vw, 1400px); height: auto; overflow: visible; }
 .sig-text {
   font-family: var(--font-gothic), serif;
   font-weight: 700;
@@ -443,7 +444,7 @@ body {
 @media (max-width: 640px) {
   .sig-svg { width: 100vw; }
   .sig-text {
-    font-size: clamp(6rem, 22vw, 28rem);
+    font-size: clamp(5rem, 18vw, 26rem);
     stroke-width: clamp(1.4px, 1vw, 12px);
   }
 }
