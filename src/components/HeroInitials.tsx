@@ -26,17 +26,17 @@ export default function HeroInitials({ letters = ["T", "Z"] }: { letters?: [stri
       >
         <title id="hi-title">Initials {letters[0]} {letters[1]}</title>
         <defs>
-          <linearGradient id="hi-fill" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#16a34a" stopOpacity="0.9" />
-            <stop offset="60%" stopColor="#15803d" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0.85" />
+          <linearGradient id="hi-fill" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0f766e" stopOpacity="1" />
+            <stop offset="50%" stopColor="#115e59" stopOpacity="1" />
+            <stop offset="100%" stopColor="#0b4f52" stopOpacity="1" />
           </linearGradient>
         </defs>
         <g className="hi-group">
-          <text x="20%" y="68%" className="hi-letter hi-t" textAnchor="middle">
+          <text x="46%" y="68%" className="hi-letter hi-t" textAnchor="middle">
             {letters[0]}
           </text>
-          <text x="80%" y="68%" className="hi-letter hi-z" textAnchor="middle">
+          <text x="54%" y="68%" className="hi-letter hi-z" textAnchor="middle">
             {letters[1]}
           </text>
         </g>

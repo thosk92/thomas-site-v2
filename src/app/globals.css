@@ -365,9 +365,9 @@ body {
 /* Start sequence */
 .hi-svg.is-started .hi-letter {
   animation:
-    hi-stroke 1.25s ease-out forwards,
-    hi-fill 0.9s ease-out forwards 0.65s,
-    hi-stroke-fade 0.9s ease-out forwards 1.25s;
+    hi-stroke 1.2s ease-out forwards,
+    hi-fill-in 0.8s ease-out forwards 0.55s,
+    hi-fill-out 1s ease-in forwards 1.75s;
 }
 .hi-svg.is-started .hi-z { animation-delay: 0.12s, 0.77s, 1.37s; }
 
@@ -378,13 +378,13 @@ body {
   from { stroke-dashoffset: 2000; }
   to { stroke-dashoffset: 0; }
 }
-@keyframes hi-fill {
+@keyframes hi-fill-in {
   from { fill-opacity: 0; }
   to { fill-opacity: 1; }
 }
-@keyframes hi-stroke-fade {
-  from { stroke-opacity: 0.9; }
-  to { stroke-opacity: 0.25; }
+@keyframes hi-fill-out {
+  from { fill-opacity: 1; }
+  to { fill-opacity: 0; }
 }
 @keyframes hi-glow {
   0% { filter: drop-shadow(0 12px 28px color-mix(in oklab, var(--foreground) 16%, transparent)); }
