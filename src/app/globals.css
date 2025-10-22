@@ -343,16 +343,17 @@ body {
   display: grid;
   place-items: center;
 }
-.hi-svg { width: min(92vw, 1200px); height: auto; display: block; }
+.hi-svg { width: min(98vw, 1400px); height: auto; display: block; }
 .hi-group { filter: none; }
 .hi-letter {
   font-family: inherit;
   font-weight: 800;
-  font-size: clamp(8rem, 22vw, 28rem);
+  font-size: clamp(9rem, 26vw, 32rem);
   fill: url(#hi-fill);
   fill-opacity: 0;
   stroke: color-mix(in oklab, var(--foreground) 70%, transparent);
-  stroke-width: clamp(2px, 0.6vw, 12px);
+  /* slightly finer hairline for elegance */
+  stroke-width: clamp(1px, 0.45vw, 10px);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-opacity: 0.9;
@@ -361,6 +362,18 @@ body {
   stroke-dasharray: 2000;
   stroke-dashoffset: 2000;
 }
+
+/* Mobile sizing: larger letters and a touch more stroke for clarity */
+@media (max-width: 640px) {
+  .hi-svg { width: 100vw; }
+  .hi-letter {
+    font-size: clamp(10rem, 34vw, 36rem);
+    stroke-width: clamp(1.2px, 0.7vw, 12px);
+  }
+}
+
+/* Gothic variant uses UnifrakturCook */
+.hi-gothic { font-family: var(--font-gothic), serif; font-weight: 700; letter-spacing: -0.02em; }
 
 /* Start sequence */
 .hi-svg.is-started .hi-letter {
