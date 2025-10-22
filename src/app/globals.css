@@ -419,26 +419,31 @@ body {
   pointer-events: none;
   z-index: 2;
 }
-.sig-svg { width: min(92vw, 1100px); height: auto; }
+.sig-svg { width: min(96vw, 1400px); height: auto; }
 .sig-text {
   font-family: var(--font-gothic), serif;
   font-weight: 700;
-  font-size: clamp(2rem, 8vw, 8rem);
+  font-size: clamp(4rem, 16vw, 16rem);
   font-style: italic;
   fill: none;
   stroke: color-mix(in oklab, var(--foreground) 85%, transparent);
-  stroke-width: clamp(1px, 0.3vw, 6px);
+  stroke-width: clamp(1px, 0.4vw, 8px);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-dasharray: 2400;
   stroke-dashoffset: 2400;
 }
-.sig.is-started .sig-text { animation: sig-draw 2.4s ease forwards; }
+.sig.is-started .sig-text { animation: sig-draw 5s linear forwards; }
+.sig.is-started .sig-text:nth-of-type(2) { animation-delay: 0.5s; }
 @keyframes sig-draw {
   0% { stroke-dashoffset: 2400; opacity: 0.6; }
   60% { opacity: 1; }
   100% { stroke-dashoffset: 0; opacity: 0.95; }
 }
 @media (max-width: 640px) {
-  .sig-svg { width: 96vw; }
+  .sig-svg { width: 100vw; }
+  .sig-text {
+    font-size: clamp(6rem, 22vw, 28rem);
+    stroke-width: clamp(1.4px, 1vw, 12px);
+  }
 }

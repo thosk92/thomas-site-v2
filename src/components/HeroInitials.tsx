@@ -13,7 +13,7 @@ export default function HeroInitials() {
       const toRM = window.setTimeout(() => {
         const main = document.querySelector("main");
         if (main) main.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 2000);
+      }, 1000);
       return () => clearTimeout(toRM);
     }
     const t = requestAnimationFrame(() => setStarted(true));
@@ -23,7 +23,7 @@ export default function HeroInitials() {
       endTimer = window.setTimeout(() => {
         const main = document.querySelector("main");
         if (main) main.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 2000);
+      }, 1000);
     };
     const sigNode = sigRef.current;
     const options: AddEventListenerOptions = { once: true };
