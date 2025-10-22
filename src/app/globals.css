@@ -425,7 +425,7 @@ body {
 .sig-text {
   font-family: var(--font-gothic), serif;
   font-weight: 700;
-  font-size: clamp(5rem, 18vw, 20rem);
+  font-size: clamp(4.5rem, 16vw, 18rem);
   font-style: italic;
   fill: none;
   stroke: color-mix(in oklab, var(--foreground) 85%, transparent);
@@ -445,7 +445,10 @@ body {
 @media (max-width: 640px) {
   .sig-svg { width: 100vw; }
   .sig-text {
-    font-size: clamp(7rem, 26vw, 34rem);
+    font-size: clamp(8rem, 32vw, 38rem);
     stroke-width: clamp(1.6px, 1.1vw, 12px);
   }
+  /* Mobile timing: slower handwriting, slightly larger stagger */
+  .sig.is-started .sig-text { animation: sig-draw 6.5s linear forwards; }
+  .sig.is-started .sig-text:nth-of-type(2) { animation-delay: 0.8s; }
 }
