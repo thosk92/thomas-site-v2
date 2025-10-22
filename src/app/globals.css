@@ -423,8 +423,8 @@ body {
 }
 .sig-svg { width: min(94vw, 1600px); height: auto; overflow: visible; }
 .sig-text {
-  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  font-weight: 600;
+  font-family: var(--font-script), ui-serif, Georgia, serif;
+  font-weight: 400;
   font-size: clamp(4rem, 14vw, 16rem);
   font-style: italic;
   letter-spacing: 0.02em;

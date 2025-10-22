@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
-import { UnifrakturCook } from "next/font/google";
+import { UnifrakturCook, Great_Vibes } from "next/font/google";
 import { Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
@@ -30,6 +30,12 @@ const gothic = UnifrakturCook({
   variable: "--font-gothic",
   subsets: ["latin"],
   weight: ["700"],
+});
+
+const script = Great_Vibes({
+  variable: "--font-script",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -70,7 +76,7 @@ export default function RootLayout({
       <head>
         <meta name="supported-color-schemes" content="light dark" />
       </head>
-      <body className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} antialiased`}>
+      <body className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased`}>
         <GeoPrefetch />
         <TimeTheme />
         <div className="aurora-bg" aria-hidden />
