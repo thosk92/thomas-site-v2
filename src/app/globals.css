@@ -418,13 +418,14 @@ body {
   place-items: center;
   pointer-events: none;
   z-index: 2;
-  padding-inline: 4vw;
+  padding-inline: 6vw;
+  padding-block: 6vh;
 }
-.sig-svg { width: min(96vw, 1400px); height: auto; overflow: visible; }
+.sig-svg { width: min(94vw, 1600px); height: auto; overflow: visible; }
 .sig-text {
   font-family: var(--font-gothic), serif;
   font-weight: 700;
-  font-size: clamp(4rem, 16vw, 16rem);
+  font-size: clamp(5rem, 18vw, 20rem);
   font-style: italic;
   fill: none;
   stroke: color-mix(in oklab, var(--foreground) 85%, transparent);
@@ -444,7 +445,7 @@ body {
 @media (max-width: 640px) {
   .sig-svg { width: 100vw; }
   .sig-text {
-    font-size: clamp(5rem, 18vw, 26rem);
-    stroke-width: clamp(1.4px, 1vw, 12px);
+    font-size: clamp(7rem, 26vw, 34rem);
+    stroke-width: clamp(1.6px, 1.1vw, 12px);
   }
 }
