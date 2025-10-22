@@ -35,9 +35,9 @@ export default function HeroInitials() {
     <section className="hero-initials" aria-label="Intro">
       {/* Signature overlay */}
       <div ref={sigRef} className={`sig ${started ? "is-started" : ""}`} aria-hidden>
-        <svg className="sig-svg" viewBox="0 0 1200 320">
-          <text x="50%" y="35%" textAnchor="middle" className="sig-text">Thomas</text>
-          <text x="50%" y="78%" textAnchor="middle" className="sig-text">Zanelli</text>
+        <svg className="sig-svg" viewBox="0 0 1200 380">
+          <text x="50%" y="30%" textAnchor="middle" className="sig-text">Thomas</text>
+          <text x="50%" y="88%" textAnchor="middle" className="sig-text">Zanelli</text>
         </svg>
       </div>
       <div className="sr-only">Thomas Zanelli</div>
