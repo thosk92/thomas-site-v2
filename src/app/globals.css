@@ -97,15 +97,61 @@ body {
   transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0);
 }
 
-/* Light mode: same green hues, less dense over white background */
+/* Light mode: borealis-style ribbons on white background (green only) */
 :root.force-light .aurora-bg,
 :root:not(.time-dark):not(.force-dark) .aurora-bg {
+  background: #ffffff;
+}
+
+:root.force-light .aurora-bg::before,
+:root:not(.time-dark):not(.force-dark) .aurora-bg::before,
+:root.force-light .aurora-bg::after,
+:root:not(.time-dark):not(.force-dark) .aurora-bg::after {
+  content: "";
+  position: absolute;
+  inset: -10% -15% -20% -15%;
+  pointer-events: none;
+  will-change: transform, opacity, background-position;
+}
+
+/* Light ribbons A */
+:root.force-light .aurora-bg::before,
+:root:not(.time-dark):not(.force-dark) .aurora-bg::before {
   background:
-    radial-gradient(52rem 34rem at 10% 12%, color-mix(in oklab, #16a34a 12%, transparent) 0 55%, transparent 68%),
-    radial-gradient(48rem 30rem at 86% 18%, color-mix(in oklab, #15803d 9%, transparent) 0 52%, transparent 66%),
-    radial-gradient(44rem 32rem at 50% 88%, color-mix(in oklab, #0ea5e9 6%, transparent) 0 50%, transparent 64%),
-    radial-gradient(60rem 40rem at 50% -10%, color-mix(in oklab, #16a34a 6%, transparent) 0 45%, transparent 62%),
-    #ffffff;
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #16a34a 12%, transparent) 0 6px,
+      transparent 6px 26px),
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #15803d 8%, transparent) 0 5px,
+      transparent 5px 30px);
+  background-size: 140% 100%, 160% 100%;
+  background-position: 0% 0%, 20% 0%;
+  transform-origin: 20% 20%;
+  animation: aurora-sweep-a 48s linear infinite, aurora-orbit-a 55s ease-in-out infinite alternate;
+  mask-image: radial-gradient(120% 120% at 20% 15%, #000 45%, transparent 80%);
+  --aurora-x-a: 0px;
+  --aurora-y-a: 0px;
+  transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0) skewX(-6deg) rotate(-4deg);
+}
+
+/* Light ribbons B */
+:root.force-light .aurora-bg::after,
+:root:not(.time-dark):not(.force-dark) .aurora-bg::after {
+  background:
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #15803d 10%, transparent) 0 8px,
+      transparent 8px 28px),
+    repeating-linear-gradient(90deg,
+      color-mix(in oklab, #166534 6%, transparent) 0 5px,
+      transparent 5px 36px);
+  background-size: 120% 100%, 180% 100%;
+  background-position: 10% 0%, 60% 0%;
+  transform-origin: 80% 80%;
+  animation: aurora-sweep-b 60s linear infinite reverse, aurora-orbit-b 65s ease-in-out infinite alternate;
+  mask-image: radial-gradient(120% 120% at 80% 85%, #000 45%, transparent 82%);
+  --aurora-x-b: 0px;
+  --aurora-y-b: 0px;
+  transform: translate3d(var(--aurora-x-b), var(--aurora-y-b), 0) skewX(5deg) rotate(3deg);
 }
 
 /* Dark mode: borealis-style curtains (ribbons) */
@@ -200,7 +246,11 @@ body {
   :root.time-dark .aurora-bg::before,
   :root.time-dark .aurora-bg::after,
   :root.force-dark .aurora-bg::before,
-  :root.force-dark .aurora-bg::after { animation: none; }
+  :root.force-dark .aurora-bg::after,
+  :root.force-light .aurora-bg::before,
+  :root.force-light .aurora-bg::after,
+  :root:not(.time-dark):not(.force-dark) .aurora-bg::before,
+  :root:not(.time-dark):not(.force-dark) .aurora-bg::after { animation: none; }
 }
 
 /* Scroll reveal (motion-aware) */
