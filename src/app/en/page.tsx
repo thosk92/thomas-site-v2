@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default function PageEn() {
   return (
     <>
-      <HeroInitials letters={["T","Z"]} />
+      <HeroInitials />
       <main className="relative min-h-[100vh] flex items-center">
         <div className="container mx-auto px-6 sm:px-8">
           <div data-reveal className="mb-6 text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[var(--foreground)]">Thomas Zanelli</div>
