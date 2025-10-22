@@ -33,17 +33,17 @@ export default function HeroInitials({ letters = ["T", "Z"] }: { letters?: [stri
           </linearGradient>
         </defs>
         <g className="hi-group" transform="translate(600 200)">
-          {/* Stylized T: asymmetric arm with block stem */}
+          {/* Elegant T: high-contrast serif with slight flare and curved arm */}
           <path
             className="hi-letter hi-t"
-            transform="translate(-190 0) scale(1.05)"
-            d="M -140 -150 H 140 V -106 H 30 V 90 H -26 V -106 H -140 Z"
+            transform="translate(-165 0) scale(1.06)"
+            d="M -150 -150 H 150 Q 130 -138 118 -120 H 36 Q 22 -120 22 -104 V 132 Q -8 138 -28 134 V -104 Q -28 -120 -42 -120 H -118 Q -132 -138 -150 -150 Z"
           />
-          {/* Stylized Z: slanted diagonal with chamfered joints */}
+          {/* Elegant Z: tapered diagonal with soft terminals and slight curvature */}
           <path
             className="hi-letter hi-z"
-            transform="translate(190 0) scale(1.05)"
-            d="M -140 -150 H 140 V -106 H -20 L 140 90 V 134 H -140 V 90 H 20 L -140 -106 Z"
+            transform="translate(165 0) scale(1.06)"
+            d="M -150 -150 H 150 Q 132 -134 118 -118 H -24 Q -6 -104 10 -86 L 150 52 Q 150 68 150 86 H -150 Q -132 70 -118 54 H 32 Q 12 42 -6 24 L -150 -114 Q -150 -132 -150 -150 Z"
           />
         </g>
       </svg>
