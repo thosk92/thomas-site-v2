@@ -1,6 +1,6 @@
 import PrinciplesCarouselIt from "@/components/PrinciplesCarouselIt";
 import ContactFormIt from "@/components/ContactFormIt";
-import HeroMonogram from "@/components/HeroMonogram";
+import HeroInitials from "@/components/HeroInitials";
 
 export const revalidate = 0;
 export const dynamic = "force-dynamic";
@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default function PageIt() {
   return (
     <>
-      <HeroMonogram letters={["T","Z"]} />
+      <HeroInitials letters={["T","Z"]} />
       <main className="relative min-h-[100vh] flex items-center">
         <div className="container mx-auto px-6 sm:px-8">
           <div data-reveal className="mb-6 text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[var(--foreground)]">Thomas Zanelli</div>
