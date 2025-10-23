@@ -10,10 +10,13 @@ export default function PointerTracker() {
   const ringRef = useRef<HTMLDivElement>(null);
   // center dot ref to toggle between black/white
   const dotRef = useRef<HTMLDivElement>(null);
+  // lens element to simulate magnification via backdrop filters
+  const lensRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = ref.current!;
     const ring = ringRef.current!;
+    const lens = lensRef.current!;
     let x = window.innerWidth / 2;
     let y = window.innerHeight / 2;
     let tx = x, ty = y;
@@ -49,6 +52,11 @@ export default function PointerTracker() {
           dotRef.current.style.boxShadow = "0 0 2px rgba(0,0,0,0.3)";
         }
       }
+      // adjust lens subtlety by theme
+      lens.style.backdropFilter = isDark
+        ? "blur(1.2px) contrast(1.06) brightness(1.05)"
+        : "blur(1.2px) contrast(1.08) brightness(1.02)";
+      (lens.style as any).WebkitBackdropFilter = lens.style.backdropFilter;
     };
     readTheme();
     const mql = matchMedia("(prefers-color-scheme: dark)");
@@ -139,6 +147,7 @@ export default function PointerTracker() {
       el.style.transform = `translate(${x - base}px, ${y - base}px)`;
       // Scale only the inner ring so the center dot stays perfectly centered
       ring.style.transform = `scale(${scale})`;
+      lens.style.transform = `scale(${scale})`;
       rid = requestAnimationFrame(loop);
     };
     rid = requestAnimationFrame(loop);
@@ -179,6 +188,24 @@ export default function PointerTracker() {
           boxShadow: "0 0 24px rgba(0,0,0,0.08)",
           mixBlendMode: "multiply",
           transition: "border-color 120ms ease",
+          transformOrigin: "center",
+        }}
+      />
+      {/* lens: backdrop-filter based, clipped by the circle size for a glass/magnifier feel */}
+      <div
+        ref={lensRef}
+        aria-hidden
+        style={{
+          position: "absolute",
+          left: 0,
+          top: 0,
+          width: 28,
+          height: 28,
+          borderRadius: 999,
+          // initial subtle lens; themed in effect via readTheme()
+          backdropFilter: "blur(1.2px) contrast(1.06) brightness(1.03)",
+          WebkitBackdropFilter: "blur(1.2px) contrast(1.06) brightness(1.03)",
+          overflow: "hidden",
           transformOrigin: "center",
         }}
       />
