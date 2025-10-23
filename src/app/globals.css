@@ -453,3 +453,9 @@ body {
   .sig.is-started .sig-text { animation: sig-draw 6.5s linear forwards; }
   .sig.is-started .sig-text:nth-of-type(2) { animation-delay: 0.8s; }
 }
+
+/* Wordmark color mapping: pure black on light, pure white on dark */
+:root.force-light .wm,
+:root:not(.time-dark):not(.force-dark) .wm { color: #000000; }
+:root.time-dark .wm,
+:root.force-dark .wm { color: #ffffff; }

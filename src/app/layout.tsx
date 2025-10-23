@@ -88,7 +88,7 @@ export default function RootLayout({
         <header className="sticky top-0 z-20 backdrop-blur border-b" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="h-14 flex items-center justify-between gap-3">
-              <Link href="/" className="hover:opacity-90 transition" aria-label="Home">
+              <Link href="/" className="wm hover:opacity-90 transition" aria-label="Home">
                 <WordmarkExpressive />
               </Link>
               <nav className="hidden md:flex items-center gap-6 text-sm" aria-label="Primary">
