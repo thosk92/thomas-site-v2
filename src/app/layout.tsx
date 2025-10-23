@@ -12,7 +12,7 @@ import GeoPrefetch from "@/components/GeoPrefetch";
 import ScrollReveal from "@/components/ScrollReveal";
 import LightThreadsSwitcher from "@/components/backgrounds/LightThreadsSwitcher";
 import MotionToggle from "@/components/MotionToggle";
-import Wordmark from "@/components/Wordmark";
+import WordmarkExpressive from "@/components/WordmarkExpressive";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
@@ -89,7 +89,7 @@ export default function RootLayout({
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="h-14 flex items-center justify-between gap-3">
               <Link href="/" className="hover:opacity-90 transition" aria-label="Home">
-                <Wordmark />
+                <WordmarkExpressive />
               </Link>
               <nav className="hidden md:flex items-center gap-6 text-sm" aria-label="Primary">
                 <a href="#about" className="hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 75%, transparent)" }}>About</a>

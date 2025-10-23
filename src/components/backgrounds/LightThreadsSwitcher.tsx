@@ -50,8 +50,10 @@ function initialIsDark(forceTheme?: "light" | "dark"): boolean {
 
 function getInitialMotion(): boolean {
   if (typeof window === "undefined") return true;
-  const stored = window.localStorage.getItem("motion-enabled");
-  if (stored === "false") return false;
+  // Respect system accessibility: if user requests reduced motion, start disabled.
+  const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+  if (mql && mql.matches) return false;
+  // Otherwise, start enabled regardless of past stored preferences.
   return true;
 }
 function readMotion(): boolean {

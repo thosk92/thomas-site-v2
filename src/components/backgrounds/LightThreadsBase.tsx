@@ -48,7 +48,7 @@ export default function LightThreadsBase({ palette, motionEnabled = true }: Prop
     const shouldAnimate = motionEnabled && !prefersReduce;
 
     // Thread system
-    const THREADS = 6; // total threads
+    const THREADS = 8; // total threads (was 6)
     const POINTS = 6;  // control points per thread
 
     // Each thread has control points in normalized space [0..1]
@@ -60,8 +60,8 @@ export default function LightThreadsBase({ palette, motionEnabled = true }: Prop
         px: 0,
         py: 0,
         phase: rand(seed * 11 + j) * Math.PI * 2,
-        speed: 0.08 + 0.05 * rand(seed * 17 + j),
-        amp: 0.015 + 0.02 * rand(seed * 19 + j),
+        speed: 0.1 + 0.06 * rand(seed * 17 + j),
+        amp: 0.02 + 0.025 * rand(seed * 19 + j),
       }));
       return { points, seed, offset: rand(seed) * 1000 };
     });
@@ -106,9 +106,9 @@ export default function LightThreadsBase({ palette, motionEnabled = true }: Prop
         // Draw smooth curve
         ctx.save();
         ctx.shadowColor = palette.glow;
-        ctx.shadowBlur = Math.max(4, Math.min(18, Math.floor(Math.max(w, h) * 0.012)));
+        ctx.shadowBlur = Math.max(6, Math.min(22, Math.floor(Math.max(w, h) * 0.014)));
         ctx.strokeStyle = color;
-        ctx.globalAlpha = 0.35; // line alpha
+        ctx.globalAlpha = 0.42; // line alpha (was 0.35)
         ctx.lineWidth = baseWidth;
         ctx.beginPath();
 
