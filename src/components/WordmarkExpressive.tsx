@@ -41,10 +41,10 @@ export default function WordmarkExpressive({ className = "" }: { className?: str
         <text
           x="0"
           y="22"
-          fontFamily="var(--font-geist-sans), system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif"
-          fontWeight={900}
-          fontSize="18"
-          letterSpacing="-0.03em"
+          fontFamily="var(--font-gothic), ui-serif, Georgia, serif"
+          fontWeight={700}
+          fontSize="19"
+          letterSpacing="-0.02em"
           fill="currentColor"
         >
           Thomas Zanelli
