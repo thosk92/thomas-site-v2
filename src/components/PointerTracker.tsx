@@ -53,11 +53,17 @@ export default function PointerTracker() {
           dotRef.current.style.boxShadow = "0 0 2px rgba(0,0,0,0.3)";
         }
       }
-      // adjust lens subtlety by theme
-      lens.style.backdropFilter = isDark
-        ? "blur(1.2px) contrast(1.06) brightness(1.05)"
-        : "blur(1.2px) contrast(1.08) brightness(1.02)";
-      lens.style.setProperty("-webkit-backdrop-filter", lens.style.backdropFilter);
+      // adjust lens styling by theme (no blur to avoid text softening)
+      const baseFilter = isDark
+        ? "contrast(1.08) brightness(1.06)"
+        : "contrast(1.06) brightness(1.04)";
+      const activeFilter = isDark
+        ? "contrast(1.14) brightness(1.08)"
+        : "contrast(1.12) brightness(1.06)";
+      lens.dataset.base = baseFilter;
+      lens.dataset.active = activeFilter;
+      lens.style.backdropFilter = baseFilter;
+      lens.style.setProperty("-webkit-backdrop-filter", baseFilter);
     };
     readTheme();
     const mql = matchMedia("(prefers-color-scheme: dark)");
@@ -111,6 +117,9 @@ export default function PointerTracker() {
       if (hoverEl) {
         targetScale = 1.8; // grow a bit more
         lensActive = true;
+        const f = lens.dataset.active || lens.style.backdropFilter;
+        lens.style.backdropFilter = f;
+        lens.style.setProperty("-webkit-backdrop-filter", f);
         if (isDark) {
           // Force white in dark mode
           targetBorderColor = "rgba(255,255,255,0.95)";
@@ -127,6 +136,9 @@ export default function PointerTracker() {
         targetScale = 1;
         targetBorderColor = isDark ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.35)";
         lensActive = false;
+        const f = lens.dataset.base || lens.style.backdropFilter;
+        lens.style.backdropFilter = f;
+        lens.style.setProperty("-webkit-backdrop-filter", f);
       }
     };
     window.addEventListener("mouseover", onOver);
