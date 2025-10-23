@@ -162,13 +162,15 @@ export default function PrinciplesCarousel() {
 
   return (
     <section id="principles" className="relative py-24">
-      {/* pastel glass background */}
+      {/* neutral glass background (no green), theme-aware */}
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-white/40 backdrop-blur-md"
         style={{
           background:
-            "radial-gradient(900px 600px at 15% 30%, rgba(16,185,129,0.10), rgba(250,250,250,0) 60%), radial-gradient(1000px 700px at 85% 70%, rgba(20,184,166,0.10), rgba(250,250,250,0) 55%), rgba(255,255,255,0.40)",
+            "radial-gradient(900px 600px at 15% 30%, color-mix(in oklab, var(--foreground) 7%, transparent), transparent 60%), " +
+            "radial-gradient(1000px 700px at 85% 70%, color-mix(in oklab, var(--foreground) 6%, transparent), transparent 55%), " +
+            "color-mix(in oklab, var(--background) 92%, transparent)",
           WebkitBackdropFilter: "blur(12px)",
           backdropFilter: "blur(12px)",
           willChange: "backdrop-filter"
