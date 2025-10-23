@@ -10,7 +10,8 @@ import LanguageSwitch from "@/components/LanguageSwitch";
 import TimeTheme from "@/components/TimeTheme";
 import GeoPrefetch from "@/components/GeoPrefetch";
 import ScrollReveal from "@/components/ScrollReveal";
-import AuroraMotion from "@/components/AuroraMotion";
+import LightThreadsSwitcher from "@/components/backgrounds/LightThreadsSwitcher";
+import MotionToggle from "@/components/MotionToggle";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 import Link from "next/link";
@@ -80,8 +81,7 @@ export default function RootLayout({
       <body className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased`}>
         <GeoPrefetch />
         <TimeTheme />
-        <div className="aurora-bg" aria-hidden />
-        <AuroraMotion />
+        <LightThreadsSwitcher />
         <ScrollReveal />
         <PointerTracker />
         <header className="sticky top-0 z-20 backdrop-blur border-b" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
@@ -97,6 +97,7 @@ export default function RootLayout({
                 <Suspense fallback={null}>
                   <LanguageSwitch />
                 </Suspense>
+                <MotionToggle />
               </div>
             </div>
           </div>
