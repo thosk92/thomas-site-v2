@@ -13,6 +13,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import AuroraMotion from "@/components/AuroraMotion";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
+import Link from "next/link";
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -86,7 +87,7 @@ export default function RootLayout({
         <header className="sticky top-0 z-20 backdrop-blur border-b" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="h-14 flex items-center justify-between gap-3">
-              <a href="/" className="text-sm font-medium tracking-tight hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 85%, transparent)" }}>Thomas Zanelli</a>
+              <Link href="/" className="text-sm font-medium tracking-tight hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 85%, transparent)" }}>Thomas Zanelli</Link>
               <nav className="hidden md:flex items-center gap-6 text-sm" aria-label="Primary">
                 <a href="#about" className="hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 75%, transparent)" }}>About</a>
                 <a href="#process" className="hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 75%, transparent)" }}>Process</a>
