@@ -76,7 +76,7 @@ export default function LightThreadsBase({ palette, motionEnabled = true }: Prop
     let t = 0;
     let raf = 0;
 
-    function step(dt: number) {
+    function step() {
       // background clear
       ctx.clearRect(0, 0, w, h);
 
@@ -144,7 +144,7 @@ export default function LightThreadsBase({ palette, motionEnabled = true }: Prop
       const dt = (now - last) / 1000;
       last = now;
       t += dt;
-      step(dt);
+      step();
       raf = requestAnimationFrame(animate);
     };
 
@@ -155,7 +155,7 @@ export default function LightThreadsBase({ palette, motionEnabled = true }: Prop
       raf = requestAnimationFrame(animate);
     } else {
       // Render one calm frame when motion is reduced
-      step(0);
+      step();
     }
 
     return () => {

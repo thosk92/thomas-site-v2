@@ -25,6 +25,7 @@ export default function PointerTracker() {
     let borderColor = "rgba(0,0,0,0.35)";
     let targetBorderColor = borderColor;
     let isDark = false;
+    let lensActive = false;
 
     const readTheme = () => {
       const cs = getComputedStyle(document.documentElement);
@@ -56,7 +57,7 @@ export default function PointerTracker() {
       lens.style.backdropFilter = isDark
         ? "blur(1.2px) contrast(1.06) brightness(1.05)"
         : "blur(1.2px) contrast(1.08) brightness(1.02)";
-      (lens.style as any).WebkitBackdropFilter = lens.style.backdropFilter;
+      lens.style.setProperty("-webkit-backdrop-filter", lens.style.backdropFilter);
     };
     readTheme();
     const mql = matchMedia("(prefers-color-scheme: dark)");
@@ -109,6 +110,7 @@ export default function PointerTracker() {
       const hoverEl = t?.closest?.("a, button, [role=button], [data-hoverable]") as HTMLElement | null;
       if (hoverEl) {
         targetScale = 1.8; // grow a bit more
+        lensActive = true;
         if (isDark) {
           // Force white in dark mode
           targetBorderColor = "rgba(255,255,255,0.95)";
@@ -124,6 +126,7 @@ export default function PointerTracker() {
       } else {
         targetScale = 1;
         targetBorderColor = isDark ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.35)";
+        lensActive = false;
       }
     };
     window.addEventListener("mouseover", onOver);
@@ -148,6 +151,7 @@ export default function PointerTracker() {
       // Scale only the inner ring so the center dot stays perfectly centered
       ring.style.transform = `scale(${scale})`;
       lens.style.transform = `scale(${scale})`;
+      lens.style.opacity = lensActive ? "1" : "0";
       rid = requestAnimationFrame(loop);
     };
     rid = requestAnimationFrame(loop);
