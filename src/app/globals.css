@@ -89,7 +89,7 @@ body {
     radial-gradient(36rem 26rem at 88% 14%, color-mix(in oklab, #15803d 5%, transparent), transparent 58%),
     radial-gradient(34rem 28rem at 50% 86%, color-mix(in oklab, #0ea5e9 3%, transparent), transparent 54%),
     var(--background);
-  animation: aurora-drift 45s ease-in-out infinite alternate;
+  animation: aurora-drift 60s ease-in-out infinite alternate;
   will-change: background-position, transform;
   /* default parallax variables (set by AuroraMotion) */
   --aurora-x-a: 0px;
@@ -127,11 +127,11 @@ body {
   background-size: 140% 100%, 160% 100%;
   background-position: 0% 0%, 20% 0%;
   transform-origin: 20% 20%;
-  animation: aurora-sweep-a 48s linear infinite, aurora-orbit-a 55s ease-in-out infinite alternate;
+  animation: aurora-sweep-a 60s linear infinite, aurora-orbit-a 70s ease-in-out infinite alternate;
   mask-image: radial-gradient(120% 120% at 20% 15%, #000 45%, transparent 80%);
   --aurora-x-a: 0px;
   --aurora-y-a: 0px;
-  opacity: 0.65;
+  opacity: 0.5;
   transform: translate3d(var(--aurora-x-a), var(--aurora-y-a), 0) skewX(-6deg) rotate(-4deg);
 }
 
@@ -148,7 +148,7 @@ body {
   background-size: 120% 100%, 180% 100%;
   background-position: 10% 0%, 60% 0%;
   transform-origin: 80% 80%;
-  animation: aurora-sweep-b 60s linear infinite reverse, aurora-orbit-b 65s ease-in-out infinite alternate;
+  animation: aurora-sweep-b 80s linear infinite reverse, aurora-orbit-b 85s ease-in-out infinite alternate;
   mask-image: radial-gradient(120% 120% at 80% 85%, #000 45%, transparent 82%);
   --aurora-x-b: 0px;
   --aurora-y-b: 0px;
@@ -178,17 +178,17 @@ body {
 :root.force-dark .aurora-bg::before {
   background:
     repeating-linear-gradient(90deg,
-      color-mix(in oklab, #16a34a 9%, transparent) 0 6px,
+      color-mix(in oklab, #16a34a 7%, transparent) 0 6px,
       transparent 6px 26px),
     repeating-linear-gradient(90deg,
-      color-mix(in oklab, #22d3ee 5%, transparent) 0 4px,
+      color-mix(in oklab, #22d3ee 4%, transparent) 0 4px,
       transparent 4px 32px);
   background-size: 140% 100%, 160% 100%;
   background-position: 0% 0%, 20% 0%;
   transform-origin: 20% 20%;
-  animation: aurora-sweep-a 48s linear infinite, aurora-orbit-a 55s ease-in-out infinite alternate;
+  animation: aurora-sweep-a 60s linear infinite, aurora-orbit-a 70s ease-in-out infinite alternate;
   mask-image: radial-gradient(120% 120% at 20% 15%, #000 50%, transparent 85%);
-  opacity: 0.7;
+  opacity: 0.6;
   /* parallax offsets set via JS (AuroraMotion) */
   --aurora-x-a: 0px;
   --aurora-y-a: 0px;
@@ -200,17 +200,17 @@ body {
 :root.force-dark .aurora-bg::after {
   background:
     repeating-linear-gradient(90deg,
-      color-mix(in oklab, #15803d 8%, transparent) 0 8px,
+      color-mix(in oklab, #15803d 6%, transparent) 0 8px,
       transparent 8px 28px),
     repeating-linear-gradient(90deg,
-      color-mix(in oklab, #38bdf8 4%, transparent) 0 5px,
+      color-mix(in oklab, #38bdf8 3%, transparent) 0 5px,
       transparent 5px 36px);
   background-size: 120% 100%, 180% 100%;
   background-position: 10% 0%, 60% 0%;
   transform-origin: 80% 80%;
-  animation: aurora-sweep-b 60s linear infinite reverse, aurora-orbit-b 65s ease-in-out infinite alternate;
+  animation: aurora-sweep-b 80s linear infinite reverse, aurora-orbit-b 85s ease-in-out infinite alternate;
   mask-image: radial-gradient(120% 120% at 80% 85%, #000 50%, transparent 85%);
-  opacity: 0.68;
+  opacity: 0.55;
   --aurora-x-b: 0px;
   --aurora-y-b: 0px;
   transform: translate3d(var(--aurora-x-b), var(--aurora-y-b), 0) skewX(5deg) rotate(3deg);

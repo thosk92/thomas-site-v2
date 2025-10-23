@@ -83,11 +83,23 @@ export default function RootLayout({
         <AuroraMotion />
         <ScrollReveal />
         <PointerTracker />
-        <div className="fixed top-4 right-4 z-20 flex items-center gap-2">
-          <Suspense fallback={null}>
-            <LanguageSwitch />
-          </Suspense>
-        </div>
+        <header className="sticky top-0 z-20 backdrop-blur border-b" style={{ borderColor: "color-mix(in oklab,var(--foreground) 10%, transparent)" }}>
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <div className="h-14 flex items-center justify-between gap-3">
+              <a href="/" className="text-sm font-medium tracking-tight hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 85%, transparent)" }}>Thomas Zanelli</a>
+              <nav className="hidden md:flex items-center gap-6 text-sm" aria-label="Primary">
+                <a href="#about" className="hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 75%, transparent)" }}>About</a>
+                <a href="#process" className="hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 75%, transparent)" }}>Process</a>
+                <a href="#contact" className="hover:opacity-80 transition" style={{ color: "color-mix(in oklab,var(--foreground) 75%, transparent)" }}>Contact</a>
+              </nav>
+              <div className="flex items-center gap-2">
+                <Suspense fallback={null}>
+                  <LanguageSwitch />
+                </Suspense>
+              </div>
+            </div>
+          </div>
+        </header>
         <div className="relative z-10 min-h-screen">{children}</div>
         <SpeedInsights />
         <Analytics />

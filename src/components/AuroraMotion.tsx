@@ -20,8 +20,8 @@ export default function AuroraMotion() {
       const nx = (e.clientX / vw) * 2 - 1; // -1..1
       const ny = (e.clientY / vh) * 2 - 1;
       // target in px: small parallax offsets
-      targetX = nx * 18; // px
-      targetY = ny * 12; // px
+      targetX = nx * 10; // px (reduced)
+      targetY = ny * 7;  // px (reduced)
     };
 
     // Mobile: use device orientation if available
@@ -30,17 +30,17 @@ export default function AuroraMotion() {
       const gamma = (e.gamma ?? 0); // left/right tilt [-90,90]
       const nx = Math.max(-1, Math.min(1, gamma / 45));
       const ny = Math.max(-1, Math.min(1, beta / 60));
-      targetX = nx * 14;
-      targetY = ny * 10;
+      targetX = nx * 9;  // reduced
+      targetY = ny * 6;  // reduced
     };
 
     const tick = () => {
       // smooth
-      xA += (targetX - xA) * 0.06;
-      yA += (targetY - yA) * 0.06;
+      xA += (targetX - xA) * 0.05;
+      yA += (targetY - yA) * 0.05;
       // opposite/parallax for B
-      xB += ((-targetX * 0.8) - xB) * 0.06;
-      yB += ((-targetY * 0.6) - yB) * 0.06;
+      xB += ((-targetX * 0.6) - xB) * 0.05;
+      yB += ((-targetY * 0.45) - yB) * 0.05;
       el.style.setProperty("--aurora-x-a", `${xA}px`);
       el.style.setProperty("--aurora-y-a", `${yA}px`);
       el.style.setProperty("--aurora-x-b", `${xB}px`);
