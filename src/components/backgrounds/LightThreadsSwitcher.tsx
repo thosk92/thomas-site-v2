@@ -50,10 +50,12 @@ function initialIsDark(forceTheme?: "light" | "dark"): boolean {
 
 function getInitialMotion(): boolean {
   if (typeof window === "undefined") return true;
-  // Respect system accessibility: if user requests reduced motion, start disabled.
+  // On small devices, always start with motion ON for initial impression.
+  if (window.innerWidth <= 768) return true;
+  // Otherwise respect system accessibility: if user requests reduced motion, start disabled.
   const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
   if (mql && mql.matches) return false;
-  // Otherwise, start enabled regardless of past stored preferences.
+  // Default enabled on first load regardless of stored preference.
   return true;
 }
 function readMotion(): boolean {

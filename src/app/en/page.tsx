@@ -9,7 +9,6 @@ export default function PageEn() {
     <>
       <main className="relative min-h-[100vh] flex items-center">
         <div className="container mx-auto px-6 sm:px-8">
-          <div data-reveal className="mb-6 text-xl sm:text-2xl md:text-3xl font-medium tracking-tight text-[var(--foreground)]">Thomas Zanelli</div>
           <h1 data-reveal className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-[-0.015em] max-w-6xl">
             I design digital spaces that feel human.
           </h1>

@@ -47,8 +47,9 @@ export default function LightThreadsBase({ palette, motionEnabled = true }: Prop
     const prefersReduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const shouldAnimate = motionEnabled && !prefersReduce;
 
-    // Thread system
-    const THREADS = 8; // total threads (was 6)
+    // Thread system (responsive by initial viewport size)
+    const initialWidth = wrap.clientWidth;
+    const THREADS = initialWidth <= 768 ? 5 : 8; // fewer on small screens
     const POINTS = 6;  // control points per thread
 
     // Each thread has control points in normalized space [0..1]
