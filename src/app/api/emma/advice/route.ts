@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -46,44 +47,32 @@ export async function POST(req: NextRequest) {
 
   const systemPrompt = targetLang === "en" ? systemPromptEn : systemPromptIt;
 
+  const client = new OpenAI({ apiKey });
+
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        messages: [
-          { role: "system", content: systemPrompt },
-          {
-            role: "user",
-            content:
-              targetLang === "en"
-                ? "User's text (can be in any language, but you answer in English):\n" + text
-                : "Testo dell'utente (può essere in qualsiasi lingua, ma tu rispondi in italiano):\n" + text,
-          },
-        ],
-        temperature: 0.7,
-        max_tokens: 600,
-      }),
+    const completion = await client.chat.completions.create({
+      model: "gpt-5.1-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content:
+            targetLang === "en"
+              ? "User's text (can be in any language, but you answer in English):\n" + text
+              : "Testo dell'utente (può essere in qualsiasi lingua, ma tu rispondi in italiano):\n" + text,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 600,
     });
 
-    if (!response.ok) {
-      const t = await response.text();
-      console.error("[emma advice] OpenAI error", response.status, t);
-      return new Response("AI request failed", { status: 502 });
-    }
-
-    const data = await response.json();
-    const advice: string | undefined = data.choices?.[0]?.message?.content;
+    const advice: string | null | undefined = completion.choices?.[0]?.message?.content;
 
     if (!advice) {
       return new Response("AI response missing", { status: 502 });
     }
 
-    return Response.json({ advice });
+    return Response.json({ advice: advice.trim() });
   } catch (err) {
     console.error("[emma advice] AI request exception", err);
     return new Response("AI request error", { status: 500 });
