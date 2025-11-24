@@ -83,8 +83,17 @@ export async function POST(req: NextRequest) {
     }
 
     return Response.json({ advice: advice.trim() });
-  } catch (err) {
+  } catch (err: any) {
     console.error("[emma advice] AI request exception", err);
-    return new Response("AI request error", { status: 500 });
+
+    const errorPayload =
+      err?.response?.data ??
+      err?.message ??
+      (typeof err === "string" ? err : "Unknown AI error");
+
+    return new Response(JSON.stringify({ error: errorPayload }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 }
