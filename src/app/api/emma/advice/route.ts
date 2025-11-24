@@ -53,30 +53,34 @@ export async function POST(req: NextRequest) {
 
   const client = new OpenAI({ apiKey });
 
-  const historyMessages = (history ?? []).map((m) => ({
-    role: m.role,
-    content: m.content,
-  }));
+  const historyText = (history ?? [])
+    .map((m) => `${m.role === "user" ? "User" : "EMMA"}: ${m.content}`)
+    .join("\n\n");
+
+  const userBlock =
+    targetLang === "en"
+      ? "User's text (can be in any language, but you answer in English):\n" + text
+      : "Testo dell'utente (può essere in qualsiasi lingua, ma tu rispondi in italiano):\n" + text;
+
+  const inputParts = [systemPrompt];
+  if (historyText) {
+    inputParts.push("\n\nConversation so far:\n" + historyText);
+  }
+  inputParts.push("\n\nNew message:\n" + userBlock);
+
+  const responsesInput = inputParts.join("");
 
   try {
-    const completion = await client.chat.completions.create({
-      model: "gpt-5.1-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...historyMessages,
-        {
-          role: "user",
-          content:
-            targetLang === "en"
-              ? "User's text (can be in any language, but you answer in English):\n" + text
-              : "Testo dell'utente (può essere in qualsiasi lingua, ma tu rispondi in italiano):\n" + text,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: 600,
+    const response = await client.responses.create({
+      model: "gpt-5-mini",
+      input: responsesInput,
+      reasoning: { effort: "none" },
+      text: { verbosity: "medium" },
     });
 
-    const advice: string | null | undefined = completion.choices?.[0]?.message?.content;
+    type ResponsesResult = { output_text?: string };
+    const plain = response as ResponsesResult;
+    const advice: string | undefined = plain.output_text;
 
     if (!advice) {
       return new Response("AI response missing", { status: 502 });
