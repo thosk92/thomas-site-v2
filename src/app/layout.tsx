@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   title: "EMMA — Clear your mind, one thought at a time",
   description: "A minimal, calming space to declutter your mind, track mood and gently reframe thoughts.",
   icons: {
-    icon: "/emmalogo.png",
+    icon: "/icon.svg",
   },
 };
 
@@ -49,7 +49,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="supported-color-schemes" content="light dark" />
-        <link rel="icon" type="image/png" href="/emmalogo.png" />
+        <link rel="icon" href="/icon.svg" />
       </head>
       <body
         className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased bg-[#F6F6F6] text-[#575757] overflow-x-hidden`}
