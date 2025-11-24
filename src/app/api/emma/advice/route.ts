@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
     const response = await client.responses.create({
       model: "gpt-5-mini",
       input: responsesInput,
-      reasoning: { effort: "none" },
+      reasoning: { effort: "minimal" },
       text: { verbosity: "medium" },
     });
 
