@@ -7,7 +7,11 @@ export async function POST(req: NextRequest) {
     return new Response("AI not configured", { status: 500 });
   }
 
-  let body: { text?: string; lang?: "it" | "en" };
+  let body: {
+    text?: string;
+    lang?: "it" | "en";
+    history?: { role: "user" | "assistant"; content: string }[];
+  };
 
   try {
     body = await req.json();
@@ -15,7 +19,7 @@ export async function POST(req: NextRequest) {
     return new Response("Invalid JSON body", { status: 400 });
   }
 
-  const { text, lang } = body;
+  const { text, lang, history } = body;
 
   if (!text || typeof text !== "string") {
     return new Response("Missing text", { status: 400 });
@@ -49,11 +53,17 @@ export async function POST(req: NextRequest) {
 
   const client = new OpenAI({ apiKey });
 
+  const historyMessages = (history ?? []).map((m) => ({
+    role: m.role,
+    content: m.content,
+  }));
+
   try {
     const completion = await client.chat.completions.create({
       model: "gpt-5.1-mini",
       messages: [
         { role: "system", content: systemPrompt },
+        ...historyMessages,
         {
           role: "user",
           content:

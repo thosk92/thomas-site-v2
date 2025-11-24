@@ -5,11 +5,16 @@ import { useState, useCallback } from "react";
 type Mode = "home" | "session";
 type Lang = "it" | "en";
 
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
 export default function EmmaHome() {
   const [mode, setMode] = useState<Mode>("home");
   const [lang, setLang] = useState<Lang>("it");
   const [text, setText] = useState("");
-  const [advice, setAdvice] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,14 +28,13 @@ export default function EmmaHome() {
     if (!value) return;
 
     setError(null);
-    setAdvice(null);
     setLoading(true);
 
     try {
       const res = await fetch("/api/emma/advice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: value, lang }),
+        body: JSON.stringify({ text: value, lang, history: messages }),
       });
 
       if (!res.ok) {
@@ -50,7 +54,14 @@ export default function EmmaHome() {
         return;
       }
 
-      setAdvice(data.advice.trim());
+      const assistantReply = data.advice.trim();
+
+      setMessages((prev) => [
+        ...prev,
+        { role: "user", content: value },
+        { role: "assistant", content: assistantReply },
+      ]);
+      setText("");
     } catch (err) {
       console.error("[emma advice] exception", err);
       setError(
@@ -162,12 +173,27 @@ export default function EmmaHome() {
 
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
-      {advice && (
-        <div className="mt-6 rounded-3xl bg-white/90 p-5 text-sm text-slate-800 shadow-[0_16px_60px_rgba(15,23,42,0.16)] sm:p-6 sm:text-base">
-          {advice.split("\n").map((line, idx) => (
-            <p key={idx} className="mb-2 last:mb-0">
-              {line}
-            </p>
+      {messages.length > 0 && (
+        <div className="mt-6 space-y-3 rounded-3xl bg-white/90 p-5 text-sm text-slate-800 shadow-[0_16px_60px_rgba(15,23,42,0.16)] sm:p-6 sm:text-base">
+          {messages.map((m, idx) => (
+            <div
+              key={idx}
+              className={
+                "flex " +
+                (m.role === "user" ? "justify-end" : "justify-start")
+              }
+            >
+              <div
+                className={
+                  "max-w-[85%] rounded-2xl px-4 py-2 whitespace-pre-line " +
+                  (m.role === "user"
+                    ? "bg-[#4f46e5] text-white"
+                    : "bg-slate-100 text-slate-800")
+                }
+              >
+                {m.content}
+              </div>
+            </div>
           ))}
         </div>
       )}
