@@ -56,9 +56,6 @@ export default function ThoughtEditor({ onSaved }: { onSaved?: () => void }) {
 
   function handleSubmit(formData: FormData) {
     const rawText = String(formData.get("rawText") || "").trim();
-    const emotion = String(formData.get("emotion") || "").trim();
-    const intensity = String(formData.get("intensity") || "").trim();
-    const evidence = String(formData.get("evidence") || "").trim();
     const reframedText = String(formData.get("reframedText") || "").trim();
     if (!rawText || !reframedText) return;
     addThoughtEntry({ id: uid(), date: todayISO(), rawText, reframedText });
