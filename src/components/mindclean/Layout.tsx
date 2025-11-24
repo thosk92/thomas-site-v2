@@ -5,8 +5,8 @@ import Image from "next/image";
 export default function MCLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#ffe4f0] via-[#f5e9ff] to-[#b7f7ea] text-[#1F2933] overflow-x-hidden">
-      <div className="mx-auto grid min-h-screen max-w-5xl grid-rows-[auto_1fr] px-5 py-4 sm:px-6 lg:px-10 lg:py-6">
-        <header className="mb-6 flex items-center justify-start pl-2 sm:pl-0">
+      <div className="flex min-h-screen flex-col px-4 py-4 sm:px-4">
+        <header className="mb-6 flex items-center justify-start">
           <div className="flex items-center">
             <button
               type="button"
