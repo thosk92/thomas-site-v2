@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-5.1-mini",
+        model: "gpt-4.1-mini",
         messages: [
           { role: "system", content: systemPrompt },
           {
