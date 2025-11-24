@@ -27,14 +27,19 @@ export default function EmmaHome() {
     const value = text.trim();
     if (!value) return;
 
+    const historyForApi = messages;
+
     setError(null);
     setLoading(true);
+
+    // Show the user's message in the chat immediately for a more fluid experience
+    setMessages((prev) => [...prev, { role: "user", content: value }]);
 
     try {
       const res = await fetch("/api/emma/advice", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: value, lang, history: messages }),
+        body: JSON.stringify({ text: value, lang, history: historyForApi }),
       });
 
       if (!res.ok) {
@@ -58,7 +63,6 @@ export default function EmmaHome() {
 
       setMessages((prev) => [
         ...prev,
-        { role: "user", content: value },
         { role: "assistant", content: assistantReply },
       ]);
       setText("");
@@ -98,7 +102,7 @@ export default function EmmaHome() {
 
   if (mode === "home") {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-10 text-center flex flex-col items-center">
+      <div className="mx-auto max-w-3xl w-full px-4 py-10 text-center flex flex-col items-center overflow-x-hidden">
         <div className="mb-6 flex w-full items-center justify-end">
           <div className="inline-flex rounded-full bg-white/80 p-1 text-xs font-medium text-slate-700 shadow-sm">
             <button
@@ -145,7 +149,7 @@ export default function EmmaHome() {
   const followup = messages.length > 0;
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
+    <div className="mx-auto max-w-3xl w-full px-4 py-8 sm:py-10 overflow-x-hidden">
       <div className="mb-6 space-y-2 text-left">
         <h1 className="text-2xl font-semibold tracking-tight text-[#1F3A5F] sm:text-3xl">
           {sessionTitle}
