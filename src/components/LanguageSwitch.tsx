@@ -27,7 +27,7 @@ export default function LanguageSwitch() {
       className="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-white transition"
       style={{ borderColor: "color-mix(in oklab,var(--foreground) 20%, transparent)", background: "rgba(255,255,255,0.7)" }}
       prefetch={false}
-      aria-label={isIt ? "Switch to English" : "Passa all'italiano"}
+      aria-label={isIt ? "Switch to English" : "Switch to Italian"}
     >
       {isIt ? "English" : "Italiano"}
     </Link>

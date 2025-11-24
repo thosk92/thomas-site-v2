@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="EMMA icon">
+  <defs>
+    <linearGradient id="mc-cloud" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#3FD2C7" />
+      <stop offset="100%" stop-color="#1CB5B2" />
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="#1F3A5F" />
+  <path
+    d="M22 40h18.5c4.2 0 7.5-3.3 7.5-7.5S44.7 25 40.5 25c-.5 0-1 .1-1.5.2C37.8 22.1 34.7 20 31 20c-4.6 0-8.4 3.5-8.9 8.1C19.1 28 17.5 29.5 17.5 31.5 17.5 35.6 19.9 40 22 40z"
+    fill="url(#mc-cloud)"
+  />
+  <circle cx="44" cy="18" r="2.4" fill="#3FD2C7" />
+  <circle cx="49" cy="23" r="1.8" fill="#3FD2C7" />
+  <circle cx="40" cy="22" r="1.4" fill="#3FD2C7" />
+</svg>

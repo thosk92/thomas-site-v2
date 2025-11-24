@@ -454,6 +454,32 @@ body {
   .sig.is-started .sig-text:nth-of-type(2) { animation-delay: 0.8s; }
 }
 
+/* EMMA CTA: gentle breathing effect */
+.mc-cta {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.75);
+  animation: mc-breathe 3.6s ease-in-out infinite;
+}
+
+@keyframes mc-breathe {
+  0%   { transform: scale(1);      box-shadow: 0 16px 50px rgba(31,58,95,0.45); }
+  25%  { transform: scale(1.05);   box-shadow: 0 26px 85px rgba(31,58,95,0.85); }
+  55%  { transform: scale(1.02);   box-shadow: 0 22px 70px rgba(31,58,95,0.6);  }
+  100% { transform: scale(1);      box-shadow: 0 16px 50px rgba(31,58,95,0.45); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mc-cta { animation: none; }
+}
+
+/* EMMA CTA label outline for readability on gradients */
+.mc-cta-label {
+  text-shadow:
+    0 0 2px rgba(0,0,0,0.30),
+    0 0 6px rgba(0,0,0,0.45);
+}
+
 /* Wordmark color mapping: pure black on light, pure white on dark */
 :root.force-light .wm,
 :root:not(.time-dark):not(.force-dark) .wm { color: #000000; }
