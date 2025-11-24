@@ -151,7 +151,7 @@ export default function EmmaHome() {
         <button
           type="button"
           onClick={startSession}
-          className="mc-cta inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#4f46e5] px-8 py-4 text-base font-semibold text-white shadow-[0_18px_60px_rgba(31,58,95,0.75)] transition-transform transition-shadow duration-300 ease-out hover:scale-[1.05] hover:shadow-[0_22px_80px_rgba(31,58,95,0.9)] sm:max-w-sm sm:text-lg"
+          className="mc-cta inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#4f46e5] px-8 py-4 text-base font-semibold text-white shadow-lg transition-transform transition-shadow duration-300 ease-out hover:scale-[1.05] hover:shadow-xl sm:max-w-sm sm:text-lg"
         >
           {homeCta}
         </button>
