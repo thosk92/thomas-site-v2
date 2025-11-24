@@ -28,12 +28,15 @@ export default function EmmaHome() {
     if (!value) return;
 
     const historyForApi = messages;
+    const isFirstMessage = messages.length === 0;
 
     setError(null);
     setLoading(true);
 
-    // Show the user's message in the chat immediately for a more fluid experience
-    setMessages((prev) => [...prev, { role: "user", content: value }]);
+    // Show the user's message in the chat immediately only from the second turn onwards
+    if (!isFirstMessage) {
+      setMessages((prev) => [...prev, { role: "user", content: value }]);
+    }
 
     try {
       const res = await fetch("/api/emma/advice", {
@@ -61,10 +64,20 @@ export default function EmmaHome() {
 
       const assistantReply = data.advice.trim();
 
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: assistantReply },
-      ]);
+      setMessages((prev) => {
+        // For the very first message, we add both user and assistant together
+        if (isFirstMessage) {
+          return [
+            { role: "user", content: value },
+            { role: "assistant", content: assistantReply },
+          ];
+        }
+        // From the second message onwards, we already pushed the user optimistically
+        return [
+          ...prev,
+          { role: "assistant", content: assistantReply },
+        ];
+      });
       setText("");
     } catch (err) {
       console.error("[emma advice] exception", err);
@@ -160,7 +173,7 @@ export default function EmmaHome() {
       </div>
 
       {messages.length > 0 && (
-        <div className="mb-4 space-y-3 rounded-3xl bg-white/90 p-5 text-sm text-slate-800 shadow-[0_16px_60px_rgba(15,23,42,0.16)] sm:p-6 sm:text-base">
+        <div className="mb-4 space-y-3 text-sm text-slate-800 sm:text-base">
           {messages.map((m, idx) => (
             <div
               key={idx}
