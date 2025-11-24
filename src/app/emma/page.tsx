@@ -98,7 +98,7 @@ export default function EmmaHome() {
 
   if (mode === "home") {
     return (
-      <div className="mx-auto flex h-full max-w-3xl flex-col items-center justify-center px-4 text-center">
+      <div className="mx-auto max-w-3xl px-4 py-10 text-center flex flex-col items-center">
         <div className="mb-6 flex w-full items-center justify-end">
           <div className="inline-flex rounded-full bg-white/80 p-1 text-xs font-medium text-slate-700 shadow-sm">
             <button
@@ -142,6 +142,8 @@ export default function EmmaHome() {
     );
   }
 
+  const followup = messages.length > 0;
+
   return (
     <div className="mx-auto flex h-full max-w-3xl flex-col justify-center px-4 py-8 sm:py-10">
       <div className="mb-6 space-y-2 text-left">
@@ -153,28 +155,8 @@ export default function EmmaHome() {
         </p>
       </div>
 
-      <form onSubmit={handleAskAdvice} className="space-y-4">
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          rows={5}
-          className="w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm shadow-[0_10px_35px_rgba(15,23,42,0.08)] focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
-          placeholder={textareaPlaceholder}
-        />
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex w-full items-center justify-center rounded-full bg-[#4f46e5] px-8 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,58,95,0.65)] transition-transform transition-shadow duration-200 ease-out hover:scale-[1.02] hover:shadow-[0_18px_55px_rgba(31,58,95,0.8)] disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
-        >
-          {loading ? loadingLabel : askCta}
-        </button>
-      </form>
-
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-
       {messages.length > 0 && (
-        <div className="mt-6 space-y-3 rounded-3xl bg-white/90 p-5 text-sm text-slate-800 shadow-[0_16px_60px_rgba(15,23,42,0.16)] sm:p-6 sm:text-base">
+        <div className="mb-4 space-y-3 rounded-3xl bg-white/90 p-5 text-sm text-slate-800 shadow-[0_16px_60px_rgba(15,23,42,0.16)] sm:p-6 sm:text-base">
           {messages.map((m, idx) => (
             <div
               key={idx}
@@ -197,6 +179,26 @@ export default function EmmaHome() {
           ))}
         </div>
       )}
+
+      <form onSubmit={handleAskAdvice} className="space-y-4 mt-2">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          rows={followup ? 3 : 5}
+          className="w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm shadow-[0_10px_35px_rgba(15,23,42,0.08)] focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
+          placeholder={followup ? (lang === "en" ? "Ask EMMA a follow-up question…" : "Fai un'altra domanda a EMMA…") : textareaPlaceholder}
+        />
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex w-full items-center justify-center rounded-full bg-[#4f46e5] px-8 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_rgba(31,58,95,0.65)] transition-transform transition-shadow duration-200 ease-out hover:scale-[1.02] hover:shadow-[0_18px_55px_rgba(31,58,95,0.8)] disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
+        >
+          {loading ? loadingLabel : askCta}
+        </button>
+      </form>
+
+      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
     </div>
   );
 }
