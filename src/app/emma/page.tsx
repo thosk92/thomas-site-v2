@@ -202,7 +202,7 @@ export default function EmmaHome() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={followup ? 3 : 5}
-          className="w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm shadow-[0_10px_35px_rgba(15,23,42,0.08)] focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
+          className="w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
           placeholder={followup ? (lang === "en" ? "Ask EMMA a follow-up question…" : "Fai un'altra domanda a EMMA…") : textareaPlaceholder}
         />
 
