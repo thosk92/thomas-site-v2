@@ -145,7 +145,7 @@ export default function EmmaHome() {
   const followup = messages.length > 0;
 
   return (
-    <div className="mx-auto flex h-full max-w-3xl flex-col justify-center px-4 py-8 sm:py-10">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:py-10">
       <div className="mb-6 space-y-2 text-left">
         <h1 className="text-2xl font-semibold tracking-tight text-[#1F3A5F] sm:text-3xl">
           {sessionTitle}
