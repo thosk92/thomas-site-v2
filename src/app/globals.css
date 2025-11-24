@@ -454,23 +454,12 @@ body {
   .sig.is-started .sig-text:nth-of-type(2) { animation-delay: 0.8s; }
 }
 
-/* EMMA CTA: gentle breathing effect */
+/* EMMA CTA: clean, without surrounding glow */
 .mc-cta {
-  position: relative;
-  overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.75);
-  animation: mc-breathe 3.6s ease-in-out infinite;
-}
-
-@keyframes mc-breathe {
-  0%   { transform: scale(1);      box-shadow: 0 16px 50px rgba(31,58,95,0.45); }
-  25%  { transform: scale(1.05);   box-shadow: 0 26px 85px rgba(31,58,95,0.85); }
-  55%  { transform: scale(1.02);   box-shadow: 0 22px 70px rgba(31,58,95,0.6);  }
-  100% { transform: scale(1);      box-shadow: 0 16px 50px rgba(31,58,95,0.45); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mc-cta { animation: none; }
+	position: relative;
+	overflow: hidden;
+	border: none;
+	box-shadow: none;
 }
 
 /* EMMA CTA label outline for readability on gradients */
