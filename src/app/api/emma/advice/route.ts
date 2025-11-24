@@ -83,13 +83,14 @@ export async function POST(req: NextRequest) {
     }
 
     return Response.json({ advice: advice.trim() });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error("[emma advice] AI request exception", err);
 
+    const anyErr = err as { response?: { data?: unknown }; message?: string } | string | undefined;
     const errorPayload =
-      err?.response?.data ??
-      err?.message ??
-      (typeof err === "string" ? err : "Unknown AI error");
+      (typeof anyErr === "object" && anyErr && "response" in anyErr && (anyErr as any).response?.data) ??
+      (typeof anyErr === "object" && anyErr && "message" in anyErr && (anyErr as any).message) ??
+      (typeof anyErr === "string" ? anyErr : "Unknown AI error");
 
     return new Response(JSON.stringify({ error: errorPayload }), {
       status: 500,
