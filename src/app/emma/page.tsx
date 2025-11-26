@@ -13,7 +13,7 @@ type ChatMessage = {
 
 export default function EmmaHome() {
   const [mode, setMode] = useState<Mode>("home");
-  const [lang, setLang] = useState<Lang>("it");
+  const [lang, setLang] = useState<Lang>("en");
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
