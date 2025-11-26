@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import OpenAI from "openai";
 
+export const runtime = "edge";
+
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -89,9 +91,8 @@ export async function POST(req: NextRequest) {
 
   try {
     const stream = await client.responses.stream({
-      model: "gpt-5-mini",
+      model: "gpt-5.1-mini",
       input: responsesInput,
-      reasoning: { effort: "minimal" },
       text: { verbosity: "medium" },
     });
 
@@ -99,8 +100,9 @@ export async function POST(req: NextRequest) {
 
     return new Response(readable, {
       headers: {
-        "Content-Type": "text/plain; charset=utf-8",
+        "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache",
+        Connection: "keep-alive",
       },
     });
   } catch (err: unknown) {
