@@ -87,6 +87,17 @@ export async function POST(req: NextRequest) {
 
   const responsesInput = inputParts.join("");
 
+  // Prefer gpt-5.1-mini, but automatically fall back to gpt-5-mini if unavailable
+  let model: "gpt-5.1-mini" | "gpt-5-mini" = "gpt-5.1-mini";
+  try {
+    await client.responses.create({
+      model,
+      input: "test",
+    });
+  } catch {
+    model = "gpt-5-mini";
+  }
+
   try {
     const stream = new ReadableStream<Uint8Array>({
       async start(controller) {
@@ -94,7 +105,7 @@ export async function POST(req: NextRequest) {
 
         try {
           const response = await client.responses.stream({
-            model: "gpt-5-mini", // use this model because it's guaranteed to work
+            model,
             input: responsesInput,
           });
 
