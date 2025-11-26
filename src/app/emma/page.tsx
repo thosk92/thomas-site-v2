@@ -130,7 +130,7 @@ export default function EmmaHome() {
 
   if (mode === "home") {
     return (
-      <div className="mx-auto max-w-3xl w-full px-4 py-10 text-center flex flex-col items-center overflow-x-hidden">
+      <div className="mx-auto w-full max-w-md sm:max-w-lg px-6 py-10 text-center flex flex-col items-center overflow-x-hidden">
         <div className="mb-6 flex w-full items-center justify-end">
           <div className="inline-flex rounded-full bg-white/80 p-1 text-xs font-medium text-slate-700 shadow-sm">
             <button
@@ -177,7 +177,7 @@ export default function EmmaHome() {
   const followup = messages.length > 0;
 
   return (
-    <div className="mx-auto max-w-3xl w-full px-4 py-8 sm:py-10 overflow-x-hidden">
+    <div className="mx-auto w-full max-w-md sm:max-w-lg px-6 py-8 sm:py-10 overflow-x-hidden">
       <div className="mb-4 space-y-2 text-left">
         <h1 className="text-2xl font-semibold tracking-tight text-[#1F3A5F] sm:text-3xl">
           {sessionTitle}
