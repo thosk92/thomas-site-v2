@@ -96,9 +96,7 @@ export async function POST(req: NextRequest) {
       text: { verbosity: "medium" },
     });
 
-    const readable = (stream as unknown as { toReadableStream: () => ReadableStream }).toReadableStream();
-
-    return new Response(readable, {
+    return new Response(stream as unknown as ReadableStream, {
       headers: {
         "Content-Type": "text/event-stream; charset=utf-8",
         "Cache-Control": "no-cache",
