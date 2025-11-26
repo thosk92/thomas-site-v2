@@ -88,22 +88,21 @@ export async function POST(req: NextRequest) {
   const responsesInput = inputParts.join("");
 
   try {
-    const response = await client.responses.create({
+    const stream = await client.responses.stream({
       model: "gpt-5-mini",
       input: responsesInput,
       reasoning: { effort: "minimal" },
       text: { verbosity: "medium" },
     });
 
-    type ResponsesResult = { output_text?: string };
-    const plain = response as ResponsesResult;
-    const advice: string | undefined = plain.output_text;
+    const readable = (stream as unknown as { toReadableStream: () => ReadableStream }).toReadableStream();
 
-    if (!advice) {
-      return new Response("AI response missing", { status: 502 });
-    }
-
-    return Response.json({ advice: advice.trim() });
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+      },
+    });
   } catch (err: unknown) {
     console.error("[emma advice] AI request exception", err);
 
