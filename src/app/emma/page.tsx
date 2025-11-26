@@ -166,7 +166,7 @@ export default function EmmaHome() {
         <button
           type="button"
           onClick={startSession}
-          className="mc-cta inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#4f46e5] px-8 py-4 text-base font-semibold text-white transition-transform duration-300 ease-out hover:scale-[1.05] sm:max-w-sm sm:text-lg"
+          className="mc-cta inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#4f46e5] px-8 py-4 text-base font-semibold text-white sm:max-w-sm sm:text-lg"
         >
           {homeCta}
         </button>
@@ -241,7 +241,7 @@ export default function EmmaHome() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex w-full items-center justify-center rounded-full bg-[#4f46e5] px-8 py-3 text-sm font-semibold text-white transition-transform duration-200 ease-out hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
+          className="inline-flex w-full items-center justify-center rounded-full bg-[#4f46e5] px-8 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
         >
           {loading ? loadingLabel : askCta}
         </button>
