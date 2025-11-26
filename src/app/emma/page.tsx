@@ -47,7 +47,8 @@ export default function EmmaHome() {
         body: JSON.stringify({ text: value, lang, history: historyForApi }),
       });
 
-      if (!res.ok || !res.body) {
+      // Gestisci solo risposte non OK come errore
+      if (!res.ok) {
         const t = await res.text().catch(() => "");
         console.error("[emma advice] error", res.status, t);
         setError(
@@ -55,6 +56,34 @@ export default function EmmaHome() {
             ? "I can't generate advice right now. Please try again in a moment."
             : "Al momento non riesco a generare un consiglio. Riprova tra poco.",
         );
+        return;
+      }
+
+      // Se lo streaming non è disponibile, leggi l'intera risposta come testo singolo
+      if (!res.body) {
+        const full = await res.text().catch(() => "");
+        if (!full.trim()) {
+          setError(
+            lang === "en"
+              ? "EMMA's reply is empty. Please try again."
+              : "La risposta di EMMA è vuota. Riprova.",
+          );
+          return;
+        }
+
+        setMessages((prev) => {
+          if (!prev.length) return prev;
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+          if (updated[lastIndex]?.role === "assistant") {
+            updated[lastIndex] = {
+              ...updated[lastIndex],
+              content: full.trim(),
+            };
+          }
+          return updated;
+        });
+        setText("");
         return;
       }
 

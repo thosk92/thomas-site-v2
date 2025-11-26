@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import OpenAI from "openai";
 
+export const runtime = "edge";
+
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   console.log("[emma reframe] has OPENAI_API_KEY:", !!apiKey);
@@ -41,23 +43,23 @@ export async function POST(req: NextRequest) {
 
   const client = new OpenAI({ apiKey });
 
+  const input =
+    systemPrompt +
+    "\n\nUser context:\n" +
+    userContext +
+    "\n\nWrite exactly one reframed version of the thought in 2–3 short sentences, with a calm and encouraging tone.";
+
   try {
-    const completion = await client.chat.completions.create({
+    const response = await client.responses.create({
       model: "gpt-5.1-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        {
-          role: "user",
-          content:
-            userContext +
-            "\n\nWrite exactly one reframed version of the thought in 2–3 short sentences, with a calm and encouraging tone.",
-        },
-      ],
+      input,
       temperature: 0.7,
-      max_tokens: 220,
+      max_output_tokens: 220,
     });
 
-    const suggestion: string | null | undefined = completion.choices?.[0]?.message?.content;
+    type ResponsesResult = { output_text?: string };
+    const plain = response as ResponsesResult;
+    const suggestion: string | undefined = plain.output_text;
 
     if (!suggestion) {
       return new Response("AI response missing", { status: 502 });

@@ -29,7 +29,7 @@ const script = Great_Vibes({
 });
 
 export const metadata: Metadata = {
-  title: "EMMA — Clear your mind, one thought at a time",
+  title: "EMMA – Emotional Multimodal Mobile Assistant",
   description: "A minimal, calming space to declutter your mind, track mood and gently reframe thoughts.",
   icons: {
     icon: "/icon.svg",
