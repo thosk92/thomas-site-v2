@@ -229,6 +229,15 @@ export default function EmmaHome() {
           onChange={(e) => setText(e.target.value)}
           rows={followup ? 3 : 5}
           className="w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              const form = e.currentTarget.form;
+              if (form) {
+                form.requestSubmit();
+              }
+            }
+          }}
           placeholder={
             followup
               ? lang === "en"
