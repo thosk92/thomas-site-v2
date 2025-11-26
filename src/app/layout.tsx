@@ -29,10 +29,22 @@ const script = Great_Vibes({
 });
 
 export const metadata: Metadata = {
-  title: "EMMA – Emotional Multimodal Mobile Assistant",
+  title: "EMMA – Emotional Mindful Messaging Assistant",
   description: "A minimal, calming space to declutter your mind, track mood and gently reframe thoughts.",
   icons: {
     icon: "/icon.svg",
+  },
+  openGraph: {
+    title: "EMMA – Emotional Mindful Messaging Assistant",
+    description: "A minimal, calming space to declutter your mind, track mood and gently reframe thoughts.",
+    images: [
+      {
+        url: "/emma-og.png",
+        width: 1200,
+        height: 630,
+        alt: "EMMA – Emotional Mindful Messaging Assistant",
+      },
+    ],
   },
 };
 
