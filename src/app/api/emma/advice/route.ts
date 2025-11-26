@@ -1,8 +1,6 @@
 import { NextRequest } from "next/server";
 import OpenAI from "openai";
 
-export const runtime = "edge";
-
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -90,19 +88,21 @@ export async function POST(req: NextRequest) {
   const responsesInput = inputParts.join("");
 
   try {
-    const stream = await client.responses.stream({
+    const response = await client.responses.create({
       model: "gpt-5.1-mini",
       input: responsesInput,
       text: { verbosity: "medium" },
     });
 
-    return new Response(stream as unknown as ReadableStream, {
-      headers: {
-        "Content-Type": "text/event-stream; charset=utf-8",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
-    });
+    type ResponsesResult = { output_text?: string };
+    const plain = response as ResponsesResult;
+    const advice: string | undefined = plain.output_text;
+
+    if (!advice) {
+      return new Response("AI response missing", { status: 502 });
+    }
+
+    return Response.json({ advice: advice.trim() });
   } catch (err: unknown) {
     console.error("[emma advice] AI request exception", err);
 

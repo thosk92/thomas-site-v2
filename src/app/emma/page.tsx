@@ -47,7 +47,6 @@ export default function EmmaHome() {
         body: JSON.stringify({ text: value, lang, history: historyForApi }),
       });
 
-      // Gestisci solo risposte non OK come errore
       if (!res.ok) {
         const t = await res.text().catch(() => "");
         console.error("[emma advice] error", res.status, t);
@@ -59,65 +58,34 @@ export default function EmmaHome() {
         return;
       }
 
-      // Se lo streaming non è disponibile, leggi l'intera risposta come testo singolo
-      if (!res.body) {
-        const full = await res.text().catch(() => "");
-        if (!full.trim()) {
-          setError(
-            lang === "en"
-              ? "EMMA's reply is empty. Please try again."
-              : "La risposta di EMMA è vuota. Riprova.",
-          );
-          return;
-        }
+      const data = (await res.json().catch(async () => ({ advice: await res.text() }))) as {
+        advice?: string;
+      };
 
-        setMessages((prev) => {
-          if (!prev.length) return prev;
-          const updated = [...prev];
-          const lastIndex = updated.length - 1;
-          if (updated[lastIndex]?.role === "assistant") {
-            updated[lastIndex] = {
-              ...updated[lastIndex],
-              content: full.trim(),
-            };
-          }
-          return updated;
-        });
-        setText("");
-        return;
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let assistantText = "";
-
-      while (true) {
-        const { value: chunk, done } = await reader.read();
-        if (done) break;
-        assistantText += decoder.decode(chunk, { stream: true });
-
-        const current = assistantText;
-        setMessages((prev) => {
-          if (!prev.length) return prev;
-          const updated = [...prev];
-          // Last message is the assistant placeholder we appended earlier
-          const lastIndex = updated.length - 1;
-          if (updated[lastIndex]?.role === "assistant") {
-            updated[lastIndex] = { ...updated[lastIndex], content: current };
-          }
-          return updated;
-        });
-      }
-
-      // Flush any remaining decoded text
-      assistantText += decoder.decode();
-      if (assistantText.trim().length === 0) {
+      if (!data.advice || !data.advice.trim()) {
         setError(
           lang === "en"
             ? "EMMA's reply is empty. Please try again."
             : "La risposta di EMMA è vuota. Riprova.",
         );
+        return;
       }
+
+      const assistantReply = data.advice.trim();
+
+      setMessages((prev) => {
+        if (!prev.length) return prev;
+        const updated = [...prev];
+        const lastIndex = updated.length - 1;
+        if (updated[lastIndex]?.role === "assistant") {
+          updated[lastIndex] = {
+            ...updated[lastIndex],
+            content: assistantReply,
+          };
+        }
+        return updated;
+      });
+
       setText("");
     } catch (err) {
       console.error("[emma advice] exception", err);
