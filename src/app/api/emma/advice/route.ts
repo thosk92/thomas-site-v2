@@ -3,6 +3,10 @@ import OpenAI from "openai";
 
 export const runtime = "edge";
 
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -33,10 +37,8 @@ export async function POST(req: NextRequest) {
     "Sei EMMA, un consigliere personale empatico e umano.\n" +
     "L'utente ti scrive ciò che lo preoccupa.\n" +
     "Rispondi sempre in modo rassicurante, gentile e non giudicante.\n" +
-    "Dividi SEMPRE la risposta in tre sezioni con questi titoli esatti:\n" +
-    "1. Cosa stai provando – valida le emozioni, spiega che sono normali.\n" +
-    "2. Cosa puoi fare adesso – dai 2–5 passi concreti, realistici e semplici.\n" +
-    "3. Come vederla in prospettiva – mostra un punto di vista più calmo e positivo.\n" +
+    "Puoi validare le emozioni, proporre alcuni passi concreti e aiutare a vedere la situazione in prospettiva,\n" +
+    "ma fallo in modo naturale, come in una chat, senza usare schemi numerati o una struttura rigida.\n" +
     "Non dare diagnosi mediche o psicologiche. Se emergono temi gravi (violenza, abuso, autolesionismo), suggerisci in modo gentile di parlarne con un adulto di fiducia o un professionista.\n" +
     "Rispondi SEMPRE in italiano.";
 
@@ -44,10 +46,8 @@ export async function POST(req: NextRequest) {
     "You are EMMA, a warm and empathetic personal advisor.\n" +
     "The user tells you what is worrying them.\n" +
     "Always answer in a reassuring, kind and non-judgmental way.\n" +
-    "ALWAYS divide your reply into three sections with these exact headings:\n" +
-    "1. What you are feeling – validate the emotions and explain they are normal.\n" +
-    "2. What you can do now – give 2–5 concrete, realistic and simple steps.\n" +
-    "3. How to see it in perspective – show a calmer and more positive point of view.\n" +
+    "You can validate the emotions, suggest a few concrete, realistic and simple steps, and help them see things in perspective,\n" +
+    "but do it in a natural chat style, without numbered lists or a rigid 1/2/3 structure.\n" +
     "Do not give medical or psychological diagnoses. If serious topics appear (violence, abuse, self-harm), gently suggest talking to a trusted adult or a professional.\n" +
     "ALWAYS answer in English.";
 
@@ -69,8 +69,6 @@ export async function POST(req: NextRequest) {
   const systemPrompt = hasHistory
     ? targetLang === "en" ? followupPromptEn : followupPromptIt
     : targetLang === "en" ? firstReplyPromptEn : firstReplyPromptIt;
-
-  const client = new OpenAI({ apiKey });
 
   const historyText = (history ?? [])
     .map((m) => `${m.role === "user" ? "User" : "EMMA"}: ${m.content}`)
@@ -96,7 +94,7 @@ export async function POST(req: NextRequest) {
 
         try {
           const response = await client.responses.stream({
-            model: "gpt-5.1-mini",
+            model: "gpt-5-mini", // use this model because it's guaranteed to work
             input: responsesInput,
           });
 
@@ -105,13 +103,10 @@ export async function POST(req: NextRequest) {
             delta?: string;
           };
 
+          // VERY IMPORTANT: stream ONLY text deltas
           for await (const event of response as AsyncIterable<OutputTextDeltaEvent>) {
-            // Stream ONLY text deltas
-            if (event && event.type === "response.output_text.delta") {
-              const delta = event.delta;
-              if (typeof delta === "string" && delta.length > 0) {
-                controller.enqueue(encoder.encode(delta));
-              }
+            if (event && event.type === "response.output_text.delta" && typeof event.delta === "string") {
+              controller.enqueue(encoder.encode(event.delta));
             }
           }
         } catch (streamErr) {
