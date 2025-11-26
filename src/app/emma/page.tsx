@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useCallback } from "react";
 
 type Mode = "home" | "session";
@@ -109,7 +110,7 @@ export default function EmmaHome() {
     lang === "en"
       ? "Write your thought or worry here…\nExample: 'Lately I feel a bit left out by my friends and I don't know how to handle it.'"
       : "Scrivi qui il tuo pensiero o la tua preoccupazione…\nEsempio: 'Ultimamente mi sento un po' escluso dagli altri e non so bene come gestirla.'";
-  const askCta = lang === "en" ? "Ask for advice" : "Chiedi un consiglio";
+  const askCta = lang === "en" ? "Ask Emma" : "Chiedi a EMMA";
   const loadingLabel =
     lang === "en" ? "EMMA is thinking about an answer for you…" : "EMMA sta pensando alla risposta per te…";
 
@@ -163,7 +164,7 @@ export default function EmmaHome() {
 
   return (
     <div className="mx-auto max-w-3xl w-full px-4 py-8 sm:py-10 overflow-x-hidden">
-      <div className="mb-6 space-y-2 text-left">
+      <div className="mb-4 space-y-2 text-left">
         <h1 className="text-2xl font-semibold tracking-tight text-[#1F3A5F] sm:text-3xl">
           {sessionTitle}
         </h1>
@@ -171,6 +172,17 @@ export default function EmmaHome() {
           {sessionSubtitle}
         </p>
       </div>
+
+      {!messages.length && (
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 shadow-sm">
+            <Image src="/emmalogo.png" alt="EMMA" width={20} height={20} className="h-5 w-5 object-contain" />
+          </div>
+          <p className="text-sm text-slate-700 sm:text-base">
+            {lang === "en" ? "Hi, I’m EMMA. Tell me what’s going on." : "Ciao, sono EMMA. Raccontami cosa sta succedendo."}
+          </p>
+        </div>
+      )}
 
       {messages.length > 0 && (
         <div className="mb-4 space-y-3 text-sm text-slate-800 sm:text-base">
@@ -184,9 +196,9 @@ export default function EmmaHome() {
             >
               <div
                 className={
-                  "max-w-[85%] rounded-2xl px-4 py-2 whitespace-pre-line " +
+                  "max-w-[85%] rounded-2xl px-4 py-2 whitespace-pre-line emma-bubble " +
                   (m.role === "user"
-                    ? "bg-[#4f46e5] text-white"
+                    ? "bg-[#6366f1] text-white"
                     : "bg-slate-100 text-slate-800")
                 }
               >
@@ -197,13 +209,19 @@ export default function EmmaHome() {
         </div>
       )}
 
-      <form onSubmit={handleAskAdvice} className="space-y-4 mt-2">
+      <form onSubmit={handleAskAdvice} className="space-y-4 mt-3">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           rows={followup ? 3 : 5}
           className="w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
-          placeholder={followup ? (lang === "en" ? "Ask EMMA a follow-up question…" : "Fai un'altra domanda a EMMA…") : textareaPlaceholder}
+          placeholder={
+            followup
+              ? lang === "en"
+                ? "Tell me what’s on your mind…"
+                : "Dimmi cosa hai in mente…"
+              : textareaPlaceholder
+          }
         />
 
         <button
