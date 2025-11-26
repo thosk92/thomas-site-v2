@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import OpenAI from "openai";
 
+export const runtime = "edge";
+
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -88,21 +90,47 @@ export async function POST(req: NextRequest) {
   const responsesInput = inputParts.join("");
 
   try {
-    const response = await client.responses.create({
-      model: "gpt-5.1-mini",
-      input: responsesInput,
-      text: { verbosity: "medium" },
+    const stream = new ReadableStream<Uint8Array>({
+      async start(controller) {
+        const encoder = new TextEncoder();
+
+        try {
+          const response = await client.responses.stream({
+            model: "gpt-5.1-mini",
+            input: responsesInput,
+          });
+
+          type OutputTextDeltaEvent = {
+            type?: string;
+            delta?: string;
+          };
+
+          for await (const event of response as AsyncIterable<OutputTextDeltaEvent>) {
+            // Stream ONLY text deltas
+            if (event && event.type === "response.output_text.delta") {
+              const delta = event.delta;
+              if (typeof delta === "string" && delta.length > 0) {
+                controller.enqueue(encoder.encode(delta));
+              }
+            }
+          }
+        } catch (streamErr) {
+          console.error("[emma advice] stream error", streamErr);
+          controller.error(streamErr);
+          return;
+        }
+
+        controller.close();
+      },
     });
 
-    type ResponsesResult = { output_text?: string };
-    const plain = response as ResponsesResult;
-    const advice: string | undefined = plain.output_text;
-
-    if (!advice) {
-      return new Response("AI response missing", { status: 502 });
-    }
-
-    return Response.json({ advice: advice.trim() });
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
+    });
   } catch (err: unknown) {
     console.error("[emma advice] AI request exception", err);
 

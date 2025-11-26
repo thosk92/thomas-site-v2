@@ -47,7 +47,7 @@ export default function EmmaHome() {
         body: JSON.stringify({ text: value, lang, history: historyForApi }),
       });
 
-      if (!res.ok) {
+      if (!res.ok || !res.body) {
         const t = await res.text().catch(() => "");
         console.error("[emma advice] error", res.status, t);
         setError(
@@ -58,11 +58,33 @@ export default function EmmaHome() {
         return;
       }
 
-      const data = (await res.json().catch(async () => ({ advice: await res.text() }))) as {
-        advice?: string;
-      };
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantText = "";
 
-      if (!data.advice || !data.advice.trim()) {
+      while (true) {
+        const { value: chunk, done } = await reader.read();
+        if (done) break;
+        assistantText += decoder.decode(chunk, { stream: true });
+
+        const current = assistantText;
+        setMessages((prev) => {
+          if (!prev.length) return prev;
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+          if (updated[lastIndex]?.role === "assistant") {
+            updated[lastIndex] = {
+              ...updated[lastIndex],
+              content: current,
+            };
+          }
+          return updated;
+        });
+      }
+
+      // flush finale
+      assistantText += decoder.decode();
+      if (!assistantText.trim()) {
         setError(
           lang === "en"
             ? "EMMA's reply is empty. Please try again."
@@ -70,21 +92,6 @@ export default function EmmaHome() {
         );
         return;
       }
-
-      const assistantReply = data.advice.trim();
-
-      setMessages((prev) => {
-        if (!prev.length) return prev;
-        const updated = [...prev];
-        const lastIndex = updated.length - 1;
-        if (updated[lastIndex]?.role === "assistant") {
-          updated[lastIndex] = {
-            ...updated[lastIndex],
-            content: assistantReply,
-          };
-        }
-        return updated;
-      });
 
       setText("");
     } catch (err) {
