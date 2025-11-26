@@ -30,6 +30,9 @@ export default function EmmaHome() {
 
     const historyForApi = messages;
 
+    // clear input immediately after sending
+    setText("");
+
     setError(null);
     setLoading(true);
 
@@ -92,8 +95,6 @@ export default function EmmaHome() {
         );
         return;
       }
-
-      setText("");
     } catch (err) {
       console.error("[emma advice] exception", err);
       setError(
