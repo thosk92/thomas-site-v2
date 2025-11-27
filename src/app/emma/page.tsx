@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useCallback } from "react";
-import { useChat } from "ai/react";
+import { useChat } from "ai";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";

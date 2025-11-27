@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { OpenAIStream, StreamingTextResponse } from "ai";
+import { streamText } from "ai";
 
 export const runtime = "edge";
 
@@ -62,24 +62,23 @@ const emmaSystemPromptBase =
 export async function POST(req: Request) {
   try {
     const { messages } = (await req.json()) as {
-      messages: { role: string; content: string }[];
+      messages?: { role: string; content: string }[];
     };
 
     const messagesWithSystem = [
       { role: "system", content: emmaSystemPromptBase },
-      ...(messages ?? []),
+      ...((messages ?? []) as { role: string; content: string }[]),
     ];
 
-    const response = await client.chat.completions.create({
+    const result = await streamText({
       model: "gpt-5.1-mini",
-      stream: true,
-      messages: messagesWithSystem,
+      messages: messagesWithSystem as any,
+      api: client,
       temperature: 0.8,
-      max_tokens: 600,
+      maxTokens: 600,
     });
 
-    const stream = OpenAIStream(response);
-    return new StreamingTextResponse(stream);
+    return result.toAIStreamResponse();
   } catch (error) {
     console.error("MODEL ERROR:", error);
     return new Response(
