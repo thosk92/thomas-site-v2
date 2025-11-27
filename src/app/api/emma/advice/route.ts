@@ -104,62 +104,33 @@ export async function POST(req: NextRequest) {
   const emmaSystemPrompt = emmaSystemPromptBase;
 
   try {
-    const stream = new ReadableStream<Uint8Array>({
-      async start(controller) {
-        const encoder = new TextEncoder();
-
-        try {
-          const response = await client.responses.stream({
-            model: "gpt-5.1-mini",
-            input: [
-              {
-                role: "system",
-                content: emmaSystemPrompt,
-              },
-              {
-                role: "user",
-                content: userMessageWithContext,
-              },
-            ],
-          });
-
-          type OutputTextDeltaEvent = {
-            type?: string;
-            delta?: string;
-          };
-
-          let sawDelta = false;
-
-          // VERY IMPORTANT: stream ONLY text deltas
-          for await (const event of response as AsyncIterable<OutputTextDeltaEvent>) {
-            // Debug log to inspect the event types coming from the Responses API
-            console.log("[emma advice] stream event", event?.type);
-
-            if (event && event.type === "response.output_text.delta" && typeof event.delta === "string") {
-              sawDelta = true;
-              controller.enqueue(encoder.encode(event.delta));
-            }
-          }
-
-          if (!sawDelta) {
-            console.warn("[emma advice] no text delta events received from stream");
-            const fallback =
-              targetLang === "it"
-                ? "Al momento non riesco a generare una risposta completa, ma sono qui per ascoltarti: prova a scrivermi di nuovo o con qualche dettaglio in più."
-                : "I couldn’t generate a full reply right now, but I’m here with you – try writing to me again or with a bit more detail.";
-            controller.enqueue(encoder.encode(fallback));
-          }
-        } catch (streamErr) {
-          console.error("[emma advice] stream error", streamErr);
-          controller.error(streamErr);
-          return;
-        }
-
-        controller.close();
-      },
+    const response = await client.responses.create({
+      model: "gpt-5.1-mini",
+      input: [
+        {
+          role: "system",
+          content: emmaSystemPrompt,
+        },
+        {
+          role: "user",
+          content: userMessageWithContext,
+        },
+      ],
     });
 
-    return new Response(stream, {
+    type ResponsesResult = { output_text?: string };
+    const plain = response as ResponsesResult;
+    let reply: string | undefined = plain.output_text;
+
+    if (!reply || !reply.trim()) {
+      console.warn("[emma advice] missing or empty output_text, using fallback");
+      reply =
+        targetLang === "it"
+          ? "Al momento non riesco a generare una risposta completa, ma sono qui per ascoltarti: prova a scrivermi di nuovo o con qualche dettaglio in più."
+          : "I couldn’t generate a full reply right now, but I’m here with you – try writing to me again or with a bit more detail.";
+    }
+
+    return new Response(reply, {
       headers: {
         "Content-Type": "text/plain; charset=utf-8",
         "Cache-Control": "no-cache",
