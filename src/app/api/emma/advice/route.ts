@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import OpenAI from "openai";
 import { streamText } from "ai";
-import { openai } from "@ai-sdk/openai";
 
 export const runtime = "edge";
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const emmaSystemPromptBase = `You are EMMA (Emotional Mindful Messaging Assistant), a warm, supportive, emotionally intelligent companion.
 
@@ -88,14 +92,15 @@ export async function POST(req: Request) {
       text;
 
     const result = await streamText({
-      model: openai("gpt-5.1-mini"),
+      model: "gpt-5.1-mini",
       messages: [
         { role: "system", content: emmaSystemPromptBase },
         { role: "user", content: userMessage },
       ],
+      provider: client,
       temperature: 0.8,
       maxTokens: 600,
-    });
+    } as any);
 
     return result.toTextStreamResponse();
   } catch (err) {
