@@ -61,24 +61,61 @@ const emmaSystemPromptBase =
 
 export async function POST(req: Request) {
   try {
-    const { messages } = (await req.json()) as {
-      messages?: { role: string; content: string }[];
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return new Response("AI not configured", { status: 500 });
+    }
+
+    let body: {
+      text?: string;
+      lang?: "it" | "en";
+      history?: { role: "user" | "assistant"; content: string }[];
     };
 
-    const messagesWithSystem = [
-      { role: "system", content: emmaSystemPromptBase },
-      ...((messages ?? []) as { role: string; content: string }[]),
-    ];
+    try {
+      body = (await req.json()) as typeof body;
+    } catch {
+      return new Response("Invalid JSON body", { status: 400 });
+    }
 
-    const result = await streamText({
+    const { text, lang, history } = body;
+
+    if (!text || typeof text !== "string") {
+      return new Response("Missing text", { status: 400 });
+    }
+
+    const targetLang: "it" | "en" = lang === "it" ? "it" : "en";
+
+    const hasHistory = (history ?? []).length > 0;
+
+    const conversationSoFar = (history ?? [])
+      .map((m) => `${m.role === "user" ? "User" : "EMMA"}: ${m.content}`)
+      .join("\n\n");
+
+    const guidanceBlock = hasHistory
+      ? "This is an ongoing conversation. Keep emotional continuity with what the user said before."
+      : "This is the first message from the user in this conversation. Start gently and invite them to continue if they want.";
+
+    const input =
+      emmaSystemPromptBase +
+      "\n\n" +
+      guidanceBlock +
+      (conversationSoFar ? "\n\nConversation so far:\n" + conversationSoFar : "") +
+      "\n\nLatest user message:\nUser: " +
+      text;
+
+    const result = await (streamText as any)({
       model: "gpt-5.1-mini",
-      messages: messagesWithSystem as any,
       api: client,
+      messages: [
+        { role: "system", content: emmaSystemPromptBase },
+        { role: "user", content: input },
+      ],
       temperature: 0.8,
       maxTokens: 600,
     });
 
-    return result.toAIStreamResponse();
+    return result.toTextStreamResponse();
   } catch (error) {
     console.error("MODEL ERROR:", error);
     return new Response(

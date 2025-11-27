@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useState, useCallback } from "react";
-import { useChat } from "ai";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";
@@ -10,31 +9,100 @@ type Lang = "it" | "en";
 export default function EmmaHome() {
   const [mode, setMode] = useState<Mode>("home");
   const [lang, setLang] = useState<Lang>("en");
+  const [text, setText] = useState("");
+  const [messages, setMessages] = useState<
+    { role: "user" | "assistant"; content: string }[]
+  >([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const {
-    messages,
-    input,
-    setInput,
-    handleSubmit,
-    isLoading,
-  } = useChat({
-    api: "/api/emma/advice",
-    stream: true,
-    body: { lang },
-    onError(err) {
+  const startSession = useCallback(() => {
+    setMode("session");
+  }, []);
+
+  async function handleAskAdvice(e: React.FormEvent) {
+    e.preventDefault();
+    const value = text.trim();
+    if (!value) return;
+
+    const historyForApi = messages;
+
+    // clear input immediately after sending
+    setText("");
+
+    setError(null);
+    setLoading(true);
+
+    // Show the user's message in the chat immediately and prepare an empty assistant bubble
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: value },
+      { role: "assistant", content: "" },
+    ]);
+
+    try {
+      const res = await fetch("/api/emma/advice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: value, lang, history: historyForApi }),
+      });
+
+      if (!res.ok || !res.body) {
+        const t = await res.text().catch(() => "");
+        console.error("[emma advice] error", res.status, t);
+        setError(
+          lang === "en"
+            ? "I can't generate advice right now. Please try again in a moment."
+            : "Al momento non riesco a generare un consiglio. Riprova tra poco.",
+        );
+        return;
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantText = "";
+
+      while (true) {
+        const { value: chunk, done } = await reader.read();
+        if (done) break;
+        assistantText += decoder.decode(chunk, { stream: true });
+
+        const current = assistantText;
+        setMessages((prev) => {
+          if (!prev.length) return prev;
+          const updated = [...prev];
+          const lastIndex = updated.length - 1;
+          if (updated[lastIndex]?.role === "assistant") {
+            updated[lastIndex] = {
+              ...updated[lastIndex],
+              content: current,
+            };
+          }
+          return updated;
+        });
+      }
+
+      // flush finale
+      assistantText += decoder.decode();
+      if (!assistantText.trim()) {
+        setError(
+          lang === "en"
+            ? "EMMA's reply is empty. Please try again."
+            : "La risposta di EMMA è vuota. Riprova.",
+        );
+        return;
+      }
+    } catch (err) {
       console.error("[emma advice] exception", err);
       setError(
         lang === "en"
           ? "An error occurred while calling the AI."
           : "Si è verificato un errore chiamando l'AI.",
       );
-    },
-  });
-
-  const startSession = useCallback(() => {
-    setMode("session");
-  }, []);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const homeTitle =
     lang === "en" ? "What would you like to talk about today?" : "Di cosa vuoi parlare oggi?";
@@ -130,13 +198,11 @@ export default function EmmaHome() {
 
       {messages.length > 0 && (
         <div className="mb-4 space-y-3 text-sm text-slate-800 sm:text-base">
-          {messages.map((m, idx) => (
-            <div
-              key={idx}
-              className={
-                "flex " +
-                (m.role === "user" ? "justify-end" : "justify-start")
-              }
+          {messages.map(
+            (
+              m: { role: "user" | "assistant"; content: string },
+              idx: number,
+            ) => (
             >
               <div
                 className={
@@ -153,18 +219,10 @@ export default function EmmaHome() {
         </div>
       )}
 
-      <form
-        onSubmit={(e) => {
-          setError(null);
-          handleSubmit(e, {
-            body: { lang },
-          });
-        }}
-        className="space-y-4 mt-3"
-      >
+      <form onSubmit={handleAskAdvice} className="space-y-4 mt-3">
         <textarea
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           rows={followup ? 3 : 5}
           className="w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
           onKeyDown={(e) => {
@@ -187,10 +245,10 @@ export default function EmmaHome() {
 
         <button
           type="submit"
-          disabled={isLoading}
+          disabled={loading}
           className="inline-flex w-full items-center justify-center rounded-full bg-[#4f46e5] px-8 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
         >
-          {isLoading ? loadingLabel : askCta}
+          {loading ? loadingLabel : askCta}
         </button>
       </form>
 
