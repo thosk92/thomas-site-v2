@@ -91,31 +91,22 @@ export async function POST(req: NextRequest) {
     .map((m) => `${m.role === "user" ? "User" : "EMMA"}: ${m.content}`)
     .join("\n\n");
 
-  const userMessageWithContext = [
-    hasHistory
-      ? "This is an ongoing conversation. Keep emotional continuity with what the user said before."
-      : "This is the first message from the user in this conversation. Start gently and invite them to continue if they want.",
-    conversationSoFar ? "\n\nConversation so far:\n" + conversationSoFar : "",
-    "\n\nLatest user message:\nUser: " + text,
-  ]
-    .filter(Boolean)
-    .join("");
+  const guidanceBlock = hasHistory
+    ? "This is an ongoing conversation. Keep emotional continuity with what the user said before."
+    : "This is the first message from the user in this conversation. Start gently and invite them to continue if they want.";
 
-  const emmaSystemPrompt = emmaSystemPromptBase;
+  const input =
+    emmaSystemPromptBase +
+    "\n\n" +
+    guidanceBlock +
+    (conversationSoFar ? "\n\nConversation so far:\n" + conversationSoFar : "") +
+    "\n\nLatest user message:\nUser: " +
+    text;
 
   try {
     const response = await client.responses.create({
       model: "gpt-5.1-mini",
-      input: [
-        {
-          role: "system",
-          content: emmaSystemPrompt,
-        },
-        {
-          role: "user",
-          content: userMessageWithContext,
-        },
-      ],
+      input,
     });
 
     type ResponsesResult = { output_text?: string };
