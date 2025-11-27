@@ -198,11 +198,13 @@ export default function EmmaHome() {
 
       {messages.length > 0 && (
         <div className="mb-4 space-y-3 text-sm text-slate-800 sm:text-base">
-          {messages.map(
-            (
-              m: { role: "user" | "assistant"; content: string },
-              idx: number,
-            ) => (
+          {messages.map((m, idx) => (
+            <div
+              key={idx}
+              className={
+                "flex " +
+                (m.role === "user" ? "justify-end" : "justify-start")
+              }
             >
               <div
                 className={
