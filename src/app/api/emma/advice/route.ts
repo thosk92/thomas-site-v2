@@ -91,8 +91,7 @@ export async function POST(req: Request) {
       "\n\nLatest user message:\nUser: " +
       text;
 
-    const result = await streamText({
-      api: client,
+    const result = await (streamText as any)(client, {
       model: "gpt-5.1-mini",
       messages: [
         { role: "system", content: emmaSystemPromptBase },
