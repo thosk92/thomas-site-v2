@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import OpenAI from "openai";
-import { streamText } from "ai";
 
 export const runtime = "edge";
 
@@ -73,8 +72,9 @@ export async function POST(req: Request) {
       history?: { role: string; content: string }[];
     };
 
-    if (!text || typeof text !== "string")
+    if (!text || typeof text !== "string") {
       return new Response("Missing text", { status: 400 });
+    }
 
     const guidanceBlock =
       (history ?? []).length > 0
@@ -91,18 +91,42 @@ export async function POST(req: Request) {
       "\n\nLatest user message:\nUser: " +
       text;
 
-    const result = await streamText({
-      model: "gpt-5.1-mini",
-      messages: [
-        { role: "system", content: emmaSystemPromptBase },
-        { role: "user", content: userMessage },
-      ],
-      provider: client,
-      temperature: 0.8,
-      maxTokens: 600,
-    } as any);
+    const encoder = new TextEncoder();
 
-    return result.toTextStreamResponse();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          const completion = await client.chat.completions.create({
+            model: "gpt-5.1-mini",
+            stream: true,
+            temperature: 0.8,
+            max_tokens: 600,
+            messages: [
+              { role: "system", content: emmaSystemPromptBase },
+              { role: "user", content: userMessage },
+            ],
+          });
+
+          for await (const chunk of completion) {
+            const content = chunk.choices[0]?.delta?.content || "";
+            if (content) {
+              controller.enqueue(encoder.encode(content));
+            }
+          }
+
+          controller.close();
+        } catch (error) {
+          console.error("STREAM ERROR:", error);
+          controller.error(error);
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    });
   } catch (err) {
     console.error("MODEL ERROR:", err);
     return new Response("AI error", { status: 500 });
