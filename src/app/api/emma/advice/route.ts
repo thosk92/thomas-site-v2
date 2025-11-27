@@ -97,7 +97,7 @@ export async function POST(req: Request) {
       async start(controller) {
         try {
           const completion = await client.chat.completions.create({
-            model: "gpt-5.1-mini",
+            model: "gpt-4.1-mini",
             stream: true,
             temperature: 0.8,
             max_tokens: 600,
@@ -110,6 +110,7 @@ export async function POST(req: Request) {
           for await (const chunk of completion) {
             const content = chunk.choices[0]?.delta?.content || "";
             if (content) {
+              console.log("EMMA CHUNK:", content);
               controller.enqueue(encoder.encode(content));
             }
           }
