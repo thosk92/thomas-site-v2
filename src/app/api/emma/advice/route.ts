@@ -1,5 +1,5 @@
-import { NextRequest } from "next/server";
 import OpenAI from "openai";
+import { OpenAIStream, StreamingTextResponse } from "ai";
 
 export const runtime = "edge";
 
@@ -59,94 +59,36 @@ const emmaSystemPromptBase =
   "- Help the user feel seen, calmer and a bit more in control.\n" +
   "- Offer realistic, gentle next steps without overwhelming them.";
 
-export async function POST(req: NextRequest) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return new Response("AI not configured", { status: 500 });
-  }
-
-  let body: {
-    text?: string;
-    lang?: "it" | "en";
-    history?: { role: "user" | "assistant"; content: string }[];
-  };
-
+export async function POST(req: Request) {
   try {
-    body = await req.json();
-  } catch {
-    return new Response("Invalid JSON body", { status: 400 });
-  }
+    const { messages } = (await req.json()) as {
+      messages: { role: string; content: string }[];
+    };
 
-  const { text, lang, history } = body;
+    const messagesWithSystem = [
+      { role: "system", content: emmaSystemPromptBase },
+      ...(messages ?? []),
+    ];
 
-  if (!text || typeof text !== "string") {
-    return new Response("Missing text", { status: 400 });
-  }
-
-  const targetLang: "it" | "en" = lang === "it" ? "it" : "en";
-
-  const hasHistory = (history ?? []).length > 0;
-
-  const conversationSoFar = (history ?? [])
-    .map((m) => `${m.role === "user" ? "User" : "EMMA"}: ${m.content}`)
-    .join("\n\n");
-
-  const guidanceBlock = hasHistory
-    ? "This is an ongoing conversation. Keep emotional continuity with what the user said before."
-    : "This is the first message from the user in this conversation. Start gently and invite them to continue if they want.";
-
-  const input =
-    emmaSystemPromptBase +
-    "\n\n" +
-    guidanceBlock +
-    (conversationSoFar ? "\n\nConversation so far:\n" + conversationSoFar : "") +
-    "\n\nLatest user message:\nUser: " +
-    text;
-
-  try {
-    const response = await client.responses.create({
-      model: "gpt-4.1-mini",
-      input,
+    const response = await client.chat.completions.create({
+      model: "gpt-5.1-mini",
+      stream: true,
+      messages: messagesWithSystem,
+      temperature: 0.8,
+      max_tokens: 600,
     });
 
-    type ResponsesResult = { output_text?: string };
-    const plain = response as ResponsesResult;
-    let reply: string | undefined = plain.output_text;
-
-    if (!reply || !reply.trim()) {
-      console.warn("[emma advice] missing or empty output_text, using fallback");
-      reply =
-        targetLang === "it"
-          ? "Al momento non riesco a generare una risposta completa, ma sono qui per ascoltarti: prova a scrivermi di nuovo o con qualche dettaglio in più."
-          : "I couldn’t generate a full reply right now, but I’m here with you – try writing to me again or with a bit more detail.";
-    }
-
-    return new Response(reply, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
-    });
-  } catch (err: unknown) {
-    console.error("[emma advice] AI request exception", err);
-
-    let errorPayload: unknown = "Unknown AI error";
-
-    if (typeof err === "string") {
-      errorPayload = err;
-    } else if (typeof err === "object" && err !== null) {
-      const maybeErr = err as { response?: { data?: unknown }; message?: string };
-      if (maybeErr.response && "data" in maybeErr.response) {
-        errorPayload = maybeErr.response.data;
-      } else if (maybeErr.message) {
-        errorPayload = maybeErr.message;
-      }
-    }
-
-    return new Response(JSON.stringify({ error: errorPayload }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    const stream = OpenAIStream(response);
+    return new StreamingTextResponse(stream);
+  } catch (error) {
+    console.error("MODEL ERROR:", error);
+    return new Response(
+      JSON.stringify({
+        error: true,
+        message:
+          "gpt-5.1-mini failed to load. Verify the model name and OpenAI version.",
+      }),
+      { status: 500 },
+    );
   }
 }
