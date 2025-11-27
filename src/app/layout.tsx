@@ -3,6 +3,7 @@ import { Space_Grotesk } from "next/font/google";
 import { UnifrakturCook, Great_Vibes } from "next/font/google";
 import { Roboto_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const grotesk = Space_Grotesk({
@@ -69,6 +70,7 @@ export default function RootLayout({
       >
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
