@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
           // VERY IMPORTANT: stream ONLY text deltas
           for await (const event of response as AsyncIterable<OutputTextDeltaEvent>) {
             // Debug log to inspect the event types coming from the Responses API
-            console.log("[emma advice] stream event", (event as any)?.type);
+            console.log("[emma advice] stream event", event?.type);
 
             if (event && event.type === "response.output_text.delta" && typeof event.delta === "string") {
               sawDelta = true;
