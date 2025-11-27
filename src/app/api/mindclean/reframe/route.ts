@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const response = await client.responses.create({
-      model: "gpt-5.1-mini",
+      model: "gpt-4.1-mini",
       input,
       temperature: 0.7,
       max_output_tokens: 220,
