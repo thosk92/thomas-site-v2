@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { UnifrakturCook, Great_Vibes } from "next/font/google";
 import { Roboto_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const grotesk = Space_Grotesk({
@@ -67,6 +68,7 @@ export default function RootLayout({
         className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased bg-[#F6F6F6] text-[#575757] overflow-x-hidden`}
       >
         {children}
+        <Analytics />
       </body>
     </html>
   );
