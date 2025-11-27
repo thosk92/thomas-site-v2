@@ -83,6 +83,8 @@ export async function POST(req: NextRequest) {
     return new Response("Missing text", { status: 400 });
   }
 
+  const targetLang: "it" | "en" = lang === "it" ? "it" : "en";
+
   const hasHistory = (history ?? []).length > 0;
 
   const conversationSoFar = (history ?? [])
@@ -126,11 +128,26 @@ export async function POST(req: NextRequest) {
             delta?: string;
           };
 
+          let sawDelta = false;
+
           // VERY IMPORTANT: stream ONLY text deltas
           for await (const event of response as AsyncIterable<OutputTextDeltaEvent>) {
+            // Debug log to inspect the event types coming from the Responses API
+            console.log("[emma advice] stream event", (event as any)?.type);
+
             if (event && event.type === "response.output_text.delta" && typeof event.delta === "string") {
+              sawDelta = true;
               controller.enqueue(encoder.encode(event.delta));
             }
+          }
+
+          if (!sawDelta) {
+            console.warn("[emma advice] no text delta events received from stream");
+            const fallback =
+              targetLang === "it"
+                ? "Al momento non riesco a generare una risposta completa, ma sono qui per ascoltarti: prova a scrivermi di nuovo o con qualche dettaglio in più."
+                : "I couldn’t generate a full reply right now, but I’m here with you – try writing to me again or with a bit more detail.";
+            controller.enqueue(encoder.encode(fallback));
           }
         } catch (streamErr) {
           console.error("[emma advice] stream error", streamErr);
