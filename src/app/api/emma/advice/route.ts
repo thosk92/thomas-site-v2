@@ -31,10 +31,6 @@ import OpenAI from "openai";
 
 export const runtime = "edge";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
-
 const emmaSystemPromptBase = `You are EMMA, an emotional AI companion.
 
 TONE & PRESENCE:
@@ -48,6 +44,12 @@ TONE & PRESENCE:
   and only occasional questions.
 - Always speak as a female persona, using feminine first-person
   language in any gendered language.
+
+LANGUAGE QUALITY:
+- When replying in Italian, use natural, contemporary and conversational Italian:
+  short sentences, correct grammar, no literal translations from English.
+- Prefer the second person singular "tu" and talk as an empathetic friend, not a manual.
+- When replying in English, use clear, simple, natural English with correct grammar.
 
 NATURAL FLOW:
 - Sound spontaneous, never mechanical.
@@ -80,6 +82,10 @@ export async function POST(req: Request) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return new Response("AI not configured", { status: 500 });
 
+    const client = new OpenAI({
+      apiKey,
+    });
+
     const body = await req.json().catch(() => null);
     if (!body) return new Response("Invalid JSON body", { status: 400 });
 
@@ -97,7 +103,7 @@ export async function POST(req: Request) {
       lang === "en"
         ? "Respond always and only in English, even if the user mixes languages. Use clear, simple, natural English with correct grammar and no obvious syntax errors."
         : lang === "it"
-          ? "Rispondi sempre e solo in italiano, anche se l'utente mescola più lingue. Usa un italiano naturale, corretto e semplice, evitando traduzioni letterali dall'inglese e frasi innaturali."
+          ? "Rispondi sempre e solo in italiano, anche se l'utente mescola più lingue. Usa un italiano naturale, scorrevole e corretto, parlando alla seconda persona singolare ('tu') e evitando traduzioni letterali o frasi innaturali."
           : "You can answer in the same language the user is using, preferring Italian or English based on the input.";
 
     const guidanceBlock =

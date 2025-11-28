@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
 
 type Mode = "home" | "session";
@@ -242,8 +241,6 @@ export default function EmmaHome() {
       </div>
     );
   }
-
-  const followup = messages.length > 0;
 
   return (
     <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">

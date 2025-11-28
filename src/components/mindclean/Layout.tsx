@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-
 export default function MCLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen emma-immersive-bg text-white overflow-x-hidden">
