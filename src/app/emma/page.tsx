@@ -165,19 +165,16 @@ export default function EmmaHome() {
 
   if (mode === "home") {
     return (
-      <div className="emma-gradient-bg flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
-        <div className="mx-auto flex w-full max-w-[420px] flex-col">
-          <header className="mb-6 flex items-center justify-between">
-            <div className="emma-logo-breath flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-sm">
-              <Image src="/emmalogo.png" alt="EMMA" width={20} height={20} className="h-5 w-5 object-contain" />
-            </div>
-            <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
+      <div className="emma-immersive-bg flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
+        <div className="mx-auto flex w-full max-w-[420px] flex-col text-center text-white">
+          <header className="mb-6 flex items-center justify-end">
+            <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
               <button
                 type="button"
                 onClick={() => setLang("en")}
                 className={
                   "rounded-full px-3 py-1 transition-colors " +
-                  (lang === "en" ? "bg-[#4f46e5] text-white" : "text-slate-700 hover:bg-slate-100")
+                  (lang === "en" ? "bg-white text-[#1D2150]" : "text-white/80 hover:bg-white/10")
                 }
               >
                 EN
@@ -187,7 +184,7 @@ export default function EmmaHome() {
                 onClick={() => setLang("it")}
                 className={
                   "rounded-full px-3 py-1 transition-colors " +
-                  (lang === "it" ? "bg-[#4f46e5] text-white" : "text-slate-700 hover:bg-slate-100")
+                  (lang === "it" ? "bg-white text-[#1D2150]" : "text-white/80 hover:bg-white/10")
                 }
               >
                 IT
@@ -195,15 +192,15 @@ export default function EmmaHome() {
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col items-center text-center gap-6">
-            <div className="flex flex-col items-center gap-2">
-              <p className="text-[13px] text-slate-700">
+          <main className="flex flex-1 flex-col items-center gap-5">
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-[15px] text-white/90">
                 {lang === "en" ? "Hi, I’m EMMA 🫶" : "Ciao, sono EMMA 🫶"}
               </p>
-              <h1 className="text-[22px] font-semibold tracking-tight text-[#1F3A5F]">
+              <h1 className="text-[24px] font-semibold leading-snug text-white">
                 {homeTitle}
               </h1>
-              <p className="max-w-[90%] text-[15px] text-[#505050]">
+              <p className="max-w-[90%] text-[16px] text-white/80">
                 {homeSubtitle}
               </p>
             </div>
@@ -214,23 +211,23 @@ export default function EmmaHome() {
                   key={pill}
                   type="button"
                   onClick={() => handleSelectExample(pill)}
-                  className="rounded-full bg-white/85 px-3 py-2 text-[14px] text-slate-700 shadow-sm hover:bg-white emma-btn-soft"
+                  className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[15px] text-white/90 backdrop-blur-sm hover:bg-white/15 emma-btn-soft"
                 >
                   {pill}
                 </button>
               ))}
             </div>
 
-            <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-600">
-              <span className="rounded-full bg-white/80 px-2 py-1 shadow-sm">{lang === "en" ? "Private & Anonymous" : "Privato e anonimo"}</span>
-              <span className="rounded-full bg-white/80 px-2 py-1 shadow-sm">{lang === "en" ? "No account needed" : "Nessun account"}</span>
-              <span className="rounded-full bg-white/80 px-2 py-1 shadow-sm">{lang === "en" ? "Safe space" : "Uno spazio sicuro"}</span>
-            </div>
+            <p className="text-[13px] text-white/70">
+              {lang === "en"
+                ? "Private & anonymous · No account needed · Safe space"
+                : "Privato e anonimo · Nessun account · Spazio sicuro"}
+            </p>
 
             <button
               type="button"
               onClick={startSession}
-              className="mc-cta emma-btn-soft inline-flex w-full items-center justify-center rounded-[18px] bg-[#5d4dfc] px-6 py-3 text-sm font-semibold text-white shadow-sm sm:text-base"
+              className="mc-cta emma-btn-soft mt-1 inline-flex w-full items-center justify-center rounded-full bg-[#6C63FF] px-6 py-3 text-[16px] font-semibold text-white shadow-[0_2px_12px_rgba(108,99,255,0.35)]"
             >
               {homeCta}
             </button>
