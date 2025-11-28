@@ -509,8 +509,8 @@ body {
     radial-gradient(120% 140% at 10% 0%, rgba(187, 170, 252, 0.30), transparent 60%),
     radial-gradient(100% 120% at 90% 0%, rgba(108, 99, 255, 0.38), transparent 65%),
     radial-gradient(140% 160% at 50% 110%, rgba(24, 34, 92, 0.95), #1D2150);
+  background-color: #1D2150;
   background-repeat: no-repeat;
-  background-attachment: fixed;
 }
 
 .emma-immersive-bg::before {

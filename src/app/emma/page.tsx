@@ -165,7 +165,7 @@ export default function EmmaHome() {
 
   if (mode === "home") {
     return (
-      <div className="emma-immersive-bg flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
+      <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
         <div className="mx-auto flex w-full max-w-[460px] flex-col text-center text-white">
           <header className="mb-6 flex items-center justify-end">
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
@@ -241,7 +241,7 @@ export default function EmmaHome() {
   const followup = messages.length > 0;
 
   return (
-    <div className="emma-immersive-bg flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
+    <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
       <div className="mx-auto flex w-full max-w-[420px] flex-col text-white">
         <header className="mb-6 flex items-center justify-between">
           <div className="emma-logo-breath flex h-9 w-9 items-center justify-center">
