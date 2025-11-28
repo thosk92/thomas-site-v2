@@ -271,10 +271,10 @@ export default function EmmaHome() {
         </header>
 
         <div className="mb-6 space-y-2 text-left text-white">
-          <p className="text-[13px] text-white/80">
+          <p className="text-[13px] text-white/90">
             {lang === "en" ? "I’m here, take your time." : "Sono qui, prenditi il tuo tempo."}
           </p>
-          <h1 className="text-[22px] font-semibold tracking-tight text-[#1F3A5F]">
+          <h1 className="text-[22px] font-semibold tracking-tight text-white">
             {sessionTitle}
           </h1>
           <p className="max-w-[90%] text-[15px] text-white/80">
@@ -321,7 +321,7 @@ export default function EmmaHome() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
-            className="emma-input-fade w-full rounded-[18px] border border-slate-200/80 bg-white/90 p-4 text-sm shadow-sm focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
+            className="emma-input-fade w-full rounded-[18px] border border-slate-200/80 bg-white/90 p-4 text-sm shadow-sm placeholder-slate-500 focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
