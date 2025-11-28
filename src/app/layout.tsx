@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#F6F6F6",
+  themeColor: "#5d4dfc",
 };
 
 export default function RootLayout({
@@ -64,6 +64,14 @@ export default function RootLayout({
       <head>
         <meta name="supported-color-schemes" content="light dark" />
         <link rel="icon" href="/icon.svg" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#5d4dfc" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta
+          name="apple-mobile-web-app-status-bar-style"
+          content="black-translucent"
+        />
+        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body
         className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased bg-[#F6F6F6] text-[#575757] overflow-x-hidden`}

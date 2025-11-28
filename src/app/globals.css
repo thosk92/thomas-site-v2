@@ -489,3 +489,85 @@ body {
 :root:not(.time-dark):not(.force-dark) .wm { color: #000000; }
 :root.time-dark .wm,
 :root.force-dark .wm { color: #ffffff; }
+
+/* EMMA mobile-first pastel gradient background */
+.emma-gradient-bg {
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f7dce7 0%, #d5f7ed 100%);
+  animation: emma-gradient-shift 10s ease-in-out infinite alternate;
+}
+
+@keyframes emma-gradient-shift {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 5%; }
+}
+
+/* EMMA logo breathing animation */
+.emma-logo-breath {
+  animation: emma-breath 4s ease-in-out infinite;
+}
+
+@keyframes emma-breath {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* EMMA CTA/button soft tap scale */
+.emma-btn-soft {
+  transition: transform 160ms ease-out, box-shadow 160ms ease-out;
+}
+
+.emma-btn-soft:active {
+  transform: scale(1.03);
+}
+
+/* EMMA input fade-in */
+.emma-input-fade {
+  animation: emma-input-in 220ms ease-out;
+}
+
+@keyframes emma-input-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* EMMA typing indicator (3 pulsing dots) */
+.emma-typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.emma-typing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 9999px;
+  background-color: rgba(71, 85, 105, 0.7);
+  animation: emma-typing-pulse 1s ease-in-out infinite;
+}
+
+.emma-typing-dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.emma-typing-dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes emma-typing-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-2px);
+  }
+}
