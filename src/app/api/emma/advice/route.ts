@@ -83,14 +83,22 @@ export async function POST(req: Request) {
     const body = await req.json().catch(() => null);
     if (!body) return new Response("Invalid JSON body", { status: 400 });
 
-    const { text, history } = body as {
+    const { text, history, lang } = body as {
       text?: string;
       history?: { role: string; content: string }[];
+      lang?: "en" | "it";
     };
 
     if (!text || typeof text !== "string") {
       return new Response("Missing text", { status: 400 });
     }
+
+    const languageDirective =
+      lang === "en"
+        ? "Respond always and only in English, even if the user mixes languages. Use clear, simple, natural English with correct grammar and no obvious syntax errors."
+        : lang === "it"
+          ? "Rispondi sempre e solo in italiano, anche se l'utente mescola più lingue. Usa un italiano naturale, corretto e semplice, evitando traduzioni letterali dall'inglese e frasi innaturali."
+          : "You can answer in the same language the user is using, preferring Italian or English based on the input.";
 
     const guidanceBlock =
       (history ?? []).length > 0
@@ -118,7 +126,7 @@ export async function POST(req: Request) {
             temperature: 0.8,
             max_tokens: 600,
             messages: [
-              { role: "system", content: emmaSystemPromptBase },
+              { role: "system", content: emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective },
               { role: "user", content: userMessage },
             ],
           });
