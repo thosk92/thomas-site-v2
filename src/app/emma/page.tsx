@@ -196,7 +196,6 @@ export default function EmmaHome() {
             <div className="flex flex-col items-center gap-3">
               <p className="text-[16px] text-white/90">
                 {lang === "en" ? "Hi, I’m EMMA" : "Ciao, sono EMMA"}
-                <span className="ml-1">❤</span>
               </p>
               <h1 className="text-[26px] font-semibold leading-snug text-white">
                 {homeTitle}
@@ -249,10 +248,7 @@ export default function EmmaHome() {
   return (
     <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
       <div className="mx-auto flex w-full max-w-[420px] flex-col text-white">
-        <header className="mb-6 flex items-center justify-between">
-          <div className="emma-logo-breath flex h-9 w-9 items-center justify-center">
-            <Image src="/logo-emma-bianco.png" alt="EMMA" width={20} height={20} className="h-5 w-5 object-contain" />
-          </div>
+        <header className="mb-6 flex items-center justify-end">
           <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
             <button
               type="button"
