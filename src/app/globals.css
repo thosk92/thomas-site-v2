@@ -513,6 +513,19 @@ body {
   background-attachment: fixed;
 }
 
+.emma-immersive-bg::before {
+  content: "";
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 42vh;
+  background:
+    radial-gradient(60% 120% at 0% 100%, rgba(42, 53, 120, 0.96), transparent 60%),
+    radial-gradient(70% 130% at 100% 100%, rgba(39, 52, 130, 0.96), transparent 65%),
+    radial-gradient(100% 160% at 50% 110%, rgba(25, 38, 102, 0.98), transparent 55%);
+  opacity: 0.98;
+  pointer-events: none;
+}
+
 /* EMMA logo breathing animation */
 .emma-logo-breath {
   animation: emma-breath 4s ease-in-out infinite;
