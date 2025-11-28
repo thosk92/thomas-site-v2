@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";
@@ -15,6 +15,14 @@ export default function EmmaHome() {
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [messages]);
 
   const startSession = useCallback(() => {
     setMode("session");
@@ -197,7 +205,7 @@ export default function EmmaHome() {
       )}
 
       {messages.length > 0 && (
-        <div className="mb-4 space-y-3 text-sm text-slate-800 sm:text-base">
+        <div className="mb-4 space-y-3 text-sm text-slate-800 sm:text-base max-h-[60vh] overflow-y-auto">
           {messages.map((m, idx) => (
             <div
               key={idx}
@@ -218,6 +226,7 @@ export default function EmmaHome() {
               </div>
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
       )}
 
