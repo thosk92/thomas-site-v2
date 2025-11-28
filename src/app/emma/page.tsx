@@ -169,13 +169,13 @@ export default function EmmaHome() {
         <div className="mx-auto flex w-full max-w-[460px] flex-col text-center text-white">
           <header className="mb-6 flex items-center justify-between">
             <div className="flex items-center">
-              <div className="emma-logo-breath flex h-9 w-9 items-center justify-center">
+              <div className="emma-logo-breath flex h-11 w-11 items-center justify-center">
                 <Image
                   src="/logo-emma-bianco.png"
                   alt="EMMA"
-                  width={20}
-                  height={20}
-                  className="h-5 w-5 object-contain"
+                  width={28}
+                  height={28}
+                  className="h-7 w-7 object-contain"
                 />
               </div>
             </div>
@@ -260,13 +260,13 @@ export default function EmmaHome() {
       <div className="mx-auto flex w-full max-w-[420px] flex-col text-white">
         <header className="mb-6 flex items-center justify-between">
           <div className="flex items-center">
-            <div className="emma-logo-breath flex h-9 w-9 items-center justify-center">
+            <div className="emma-logo-breath flex h-11 w-11 items-center justify-center">
               <Image
                 src="/logo-emma-bianco.png"
                 alt="EMMA"
-                width={20}
-                height={20}
-                className="h-5 w-5 object-contain"
+                width={28}
+                height={28}
+                className="h-7 w-7 object-contain"
               />
             </div>
           </div>
