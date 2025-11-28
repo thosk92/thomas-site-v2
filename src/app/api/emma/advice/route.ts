@@ -121,7 +121,7 @@ export async function POST(req: Request) {
       async start(controller) {
         try {
           const completion = await client.chat.completions.create({
-            model: "gpt-4.1-mini",
+            model: "gpt-5-mini",
             stream: true,
             temperature: 0.8,
             max_tokens: 600,
