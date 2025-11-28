@@ -167,18 +167,7 @@ export default function EmmaHome() {
     return (
       <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
         <div className="mx-auto flex w-full max-w-[460px] flex-col text-center text-white">
-          <header className="mb-6 flex items-center justify-between">
-            <div className="flex items-center">
-              <div className="emma-logo-breath flex h-11 w-11 items-center justify-center">
-                <Image
-                  src="/logo-emma-bianco.png"
-                  alt="EMMA"
-                  width={28}
-                  height={28}
-                  className="h-7 w-7 object-contain"
-                />
-              </div>
-            </div>
+          <header className="mb-6 flex items-center justify-end">
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
               <button
                 type="button"
@@ -258,18 +247,7 @@ export default function EmmaHome() {
   return (
     <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
       <div className="mx-auto flex w-full max-w-[420px] flex-col text-white">
-        <header className="mb-6 flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="emma-logo-breath flex h-11 w-11 items-center justify-center">
-              <Image
-                src="/logo-emma-bianco.png"
-                alt="EMMA"
-                width={28}
-                height={28}
-                className="h-7 w-7 object-contain"
-              />
-            </div>
-          </div>
+        <header className="mb-6 flex items-center justify-end">
           <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
             <button
               type="button"

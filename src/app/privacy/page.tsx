@@ -2,9 +2,15 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-[#0b1024] text-slate-100 flex items-center justify-center px-4 py-10">
       <div className="w-full max-w-[720px] rounded-3xl bg-white/5 px-6 py-7 sm:px-10 sm:py-10 shadow-[0_18px_60px_rgba(15,23,42,0.55)] backdrop-blur-md border border-white/10">
+        <div className="mb-3 flex items-center justify-between text-[12px] text-slate-200/80">
+          <a href="/emma" className="underline-offset-2 hover:underline">
+            ← EMMA home
+          </a>
+          <span className="uppercase tracking-[0.18em] text-indigo-200/90">EMMA</span>
+        </div>
+
         <div className="mb-6 text-center">
-          <p className="text-[13px] uppercase tracking-[0.18em] text-indigo-200/90">EMMA</p>
-          <h1 className="mt-1 text-[22px] sm:text-[24px] font-semibold text-white">
+          <h1 className="text-[22px] sm:text-[24px] font-semibold text-white">
             Privacy &amp; Data Use
           </h1>
           <p className="mt-2 text-[13px] text-slate-200/80">
