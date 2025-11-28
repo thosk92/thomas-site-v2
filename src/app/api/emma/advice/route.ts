@@ -120,22 +120,29 @@ export async function POST(req: Request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const completion = await client.chat.completions.create({
+          const responseStream = await client.responses.create({
             model: "gpt-5-mini",
             stream: true,
-            temperature: 0.8,
-            max_tokens: 600,
-            messages: [
-              { role: "system", content: emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective },
-              { role: "user", content: userMessage },
+            input: [
+              {
+                role: "system",
+                content: emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective,
+              },
+              {
+                role: "user",
+                content: userMessage,
+              },
             ],
           });
 
-          for await (const chunk of completion) {
-            const content = chunk.choices[0]?.delta?.content || "";
-            if (content) {
-              console.log("EMMA CHUNK:", content);
-              controller.enqueue(encoder.encode(content));
+          for await (const event of responseStream) {
+            if (event.type === "response.output_text.delta") {
+              const delta = (event as any).delta;
+              const content = typeof delta === "string" ? delta : delta?.text || "";
+              if (content) {
+                console.log("EMMA CHUNK:", content);
+                controller.enqueue(encoder.encode(content));
+              }
             }
           }
 
