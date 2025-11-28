@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
 
 type Mode = "home" | "session";
@@ -166,7 +167,18 @@ export default function EmmaHome() {
     return (
       <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
         <div className="mx-auto flex w-full max-w-[460px] flex-col text-center text-white">
-          <header className="mb-6 flex items-center justify-end">
+          <header className="mb-6 flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="emma-logo-breath flex h-9 w-9 items-center justify-center">
+                <Image
+                  src="/logo-emma-bianco.png"
+                  alt="EMMA"
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 object-contain"
+                />
+              </div>
+            </div>
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
               <button
                 type="button"
@@ -242,10 +254,22 @@ export default function EmmaHome() {
     );
   }
 
+  // Session view
   return (
     <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
       <div className="mx-auto flex w-full max-w-[420px] flex-col text-white">
-        <header className="mb-6 flex items-center justify-end">
+        <header className="mb-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="emma-logo-breath flex h-9 w-9 items-center justify-center">
+              <Image
+                src="/logo-emma-bianco.png"
+                alt="EMMA"
+                width={20}
+                height={20}
+                className="h-5 w-5 object-contain"
+              />
+            </div>
+          </div>
           <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
             <button
               type="button"

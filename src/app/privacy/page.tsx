@@ -15,7 +15,7 @@ export default function PrivacyPage() {
         <div className="space-y-8 text-[14px] leading-relaxed">
           {/* ITALIANO */}
           <section className="space-y-2">
-            <p className="text-[13px] font-semibold text-indigo-200/90">🇮🇹 PRIVACY &amp; DATA USE — Versione Italiana (COMPLETA)</p>
+            <p className="text-[13px] font-semibold text-indigo-200/90">IT · Privacy &amp; data use</p>
             <h2 className="text-[15px] font-semibold text-white">Privacy &amp; Data Use</h2>
             <p className="text-slate-100/85">
               Come EMMA gestisce i tuoi dati, spiegato in modo semplice.
@@ -145,7 +145,7 @@ export default function PrivacyPage() {
 
           {/* ENGLISH */}
           <section className="space-y-2 pt-4 border-t border-white/10">
-            <p className="text-[13px] font-semibold text-indigo-200/90">🇬🇧 PRIVACY &amp; DATA USE — English Version (COMPLETE)</p>
+            <p className="text-[13px] font-semibold text-indigo-200/90">EN · Privacy &amp; data use</p>
             <h2 className="text-[15px] font-semibold text-white">Privacy &amp; Data Use</h2>
             <p className="text-slate-100/85">
               How EMMA handles your data, explained simply.
