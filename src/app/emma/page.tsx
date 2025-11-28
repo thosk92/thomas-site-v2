@@ -228,11 +228,17 @@ export default function EmmaHome() {
             <button
               type="button"
               onClick={startSession}
-              className="mc-cta emma-btn-soft mt-1 inline-flex w-full items-center justify-center rounded-full bg-[#6C63FF] px-6 py-3 text-[16px] font-semibold text-white shadow-[0_2px_12px_rgba(108,99,255,0.35)]"
+              className="emma-btn-soft mt-2 inline-flex w-full items-center justify-center rounded-full bg-[#4f46e5] px-5 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/40 transition hover:bg-[#4338ca]"
             >
               {homeCta}
             </button>
           </main>
+
+          <footer className="mt-6 text-center text-[11px] text-white/60">
+            <a href="/privacy" className="underline-offset-2 hover:underline">
+              {lang === "en" ? "How we use your data" : "Come usiamo i tuoi dati"}
+            </a>
+          </footer>
         </div>
       </div>
     );
@@ -345,6 +351,12 @@ export default function EmmaHome() {
         </form>
 
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
+
+        <footer className="mt-6 text-center text-[11px] text-white/60">
+          <a href="/privacy" className="underline-offset-2 hover:underline">
+            {lang === "en" ? "How we use your data" : "Come usiamo i tuoi dati"}
+          </a>
+        </footer>
       </div>
     </div>
   );
