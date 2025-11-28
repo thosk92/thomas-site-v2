@@ -165,21 +165,13 @@ export default function EmmaHome() {
 
   if (mode === "home") {
     return (
-      <div className="emma-gradient-bg flex min-h-screen w-full justify-center px-4 py-6 overflow-x-hidden">
-        <div className="mx-auto flex w-full max-w-md flex-col justify-between">
+      <div className="emma-gradient-bg flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
+        <div className="mx-auto flex w-full max-w-[420px] flex-col">
           <header className="mb-6 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="emma-logo-breath flex h-10 w-10 items-center justify-center rounded-full bg-white/80 shadow-md">
-                <Image src="/emmalogo.png" alt="EMMA" width={22} height={22} className="h-6 w-6 object-contain" />
-              </div>
-              <div className="flex flex-col text-left text-xs text-slate-700">
-                <span className="font-semibold text-slate-800">
-                  {lang === "en" ? "Hi, I’m EMMA 🫶" : "Ciao, sono EMMA 🫶"}
-                </span>
-                <span>{lang === "en" ? "You can tell me anything." : "Puoi raccontarmi quello che vuoi."}</span>
-              </div>
+            <div className="emma-logo-breath flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-sm">
+              <Image src="/emmalogo.png" alt="EMMA" width={20} height={20} className="h-5 w-5 object-contain" />
             </div>
-            <div className="inline-flex rounded-full bg-white/80 p-1 text-xs font-medium text-slate-700 shadow-sm">
+            <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
               <button
                 type="button"
                 onClick={() => setLang("en")}
@@ -203,28 +195,33 @@ export default function EmmaHome() {
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col items-center text-center">
-            <h1 className="mb-3 text-2xl font-semibold tracking-tight text-[#1F3A5F] sm:text-3xl">
-              {homeTitle}
-            </h1>
-            <p className="mb-4 max-w-md text-sm text-slate-700 sm:text-base">
-              {homeSubtitle}
-            </p>
+          <main className="flex flex-1 flex-col items-center text-center gap-6">
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-[13px] text-slate-700">
+                {lang === "en" ? "Hi, I’m EMMA 🫶" : "Ciao, sono EMMA 🫶"}
+              </p>
+              <h1 className="text-[22px] font-semibold tracking-tight text-[#1F3A5F]">
+                {homeTitle}
+              </h1>
+              <p className="max-w-[90%] text-[15px] text-[#505050]">
+                {homeSubtitle}
+              </p>
+            </div>
 
-            <div className="mb-4 flex w-full flex-wrap justify-center gap-2">
+            <div className="flex w-full flex-wrap justify-center gap-2">
               {examplePills.map((pill) => (
                 <button
                   key={pill}
                   type="button"
                   onClick={() => handleSelectExample(pill)}
-                  className="rounded-full bg-white/85 px-3 py-1 text-xs text-slate-700 shadow-sm hover:bg-white emma-btn-soft"
+                  className="rounded-full bg-white/85 px-3 py-2 text-[14px] text-slate-700 shadow-sm hover:bg-white emma-btn-soft"
                 >
                   {pill}
                 </button>
               ))}
             </div>
 
-            <div className="mb-6 flex flex-wrap items-center justify-center gap-2 text-[10px] text-slate-600">
+            <div className="flex flex-wrap items-center justify-center gap-2 text-[11px] text-slate-600">
               <span className="rounded-full bg-white/80 px-2 py-1 shadow-sm">{lang === "en" ? "Private & Anonymous" : "Privato e anonimo"}</span>
               <span className="rounded-full bg-white/80 px-2 py-1 shadow-sm">{lang === "en" ? "No account needed" : "Nessun account"}</span>
               <span className="rounded-full bg-white/80 px-2 py-1 shadow-sm">{lang === "en" ? "Safe space" : "Uno spazio sicuro"}</span>
@@ -233,7 +230,7 @@ export default function EmmaHome() {
             <button
               type="button"
               onClick={startSession}
-              className="mc-cta emma-btn-soft inline-flex w-full max-w-xs items-center justify-center rounded-full bg-[#5d4dfc] px-8 py-4 text-base font-semibold text-white shadow-md sm:max-w-sm sm:text-lg"
+              className="mc-cta emma-btn-soft inline-flex w-full items-center justify-center rounded-[18px] bg-[#5d4dfc] px-6 py-3 text-sm font-semibold text-white shadow-sm sm:text-base"
             >
               {homeCta}
             </button>
@@ -246,21 +243,13 @@ export default function EmmaHome() {
   const followup = messages.length > 0;
 
   return (
-    <div className="emma-gradient-bg flex min-h-screen w-full justify-center px-4 py-6 overflow-x-hidden">
-      <div className="mx-auto flex w-full max-w-md flex-col">
-        <header className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="emma-logo-breath flex h-10 w-10 items-center justify-center rounded-full bg-white/80 shadow-md">
-              <Image src="/emmalogo.png" alt="EMMA" width={22} height={22} className="h-6 w-6 object-contain" />
-            </div>
-            <div className="flex flex-col text-left text-xs text-slate-700">
-              <span className="font-semibold text-slate-800">
-                {lang === "en" ? "Hi, I’m EMMA 🫶" : "Ciao, sono EMMA 🫶"}
-              </span>
-              <span>{lang === "en" ? "Take a breath, I’m here." : "Fai un respiro, sono qui con te."}</span>
-            </div>
+    <div className="emma-gradient-bg flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
+      <div className="mx-auto flex w-full max-w-[420px] flex-col">
+        <header className="mb-6 flex items-center justify-between">
+          <div className="emma-logo-breath flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-sm">
+            <Image src="/emmalogo.png" alt="EMMA" width={20} height={20} className="h-5 w-5 object-contain" />
           </div>
-          <div className="inline-flex rounded-full bg-white/80 p-1 text-xs font-medium text-slate-700 shadow-sm">
+          <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
             <button
               type="button"
               onClick={() => setLang("en")}
@@ -284,23 +273,20 @@ export default function EmmaHome() {
           </div>
         </header>
 
-        <div className="mb-4 space-y-2 text-left">
-          <h1 className="text-2xl font-semibold tracking-tight text-[#1F3A5F] sm:text-3xl">
+        <div className="mb-6 space-y-2 text-left">
+          <p className="text-[13px] text-slate-700">
+            {lang === "en" ? "I’m here, take your time." : "Sono qui, prenditi il tuo tempo."}
+          </p>
+          <h1 className="text-[22px] font-semibold tracking-tight text-[#1F3A5F]">
             {sessionTitle}
           </h1>
-          <p className="max-w-xl text-sm text-slate-700 sm:text-base">
+          <p className="max-w-[90%] text-[15px] text-[#505050]">
             {sessionSubtitle}
           </p>
         </div>
 
-        {!messages.length && (
-          <div className="mb-4 text-sm text-slate-700 sm:text-base">
-            {lang === "en" ? "I’m here, take your time." : "Sono qui, prenditi il tuo tempo."}
-          </div>
-        )}
-
         {messages.length > 0 && (
-          <div className="mb-4 space-y-3 text-sm text-slate-800 sm:text-base max-h-[60vh] overflow-y-auto no-scrollbar">
+          <div className="mb-6 space-y-3 text-[15px] text-slate-800 max-h-[60vh] overflow-y-auto no-scrollbar">
             {messages.map((m, idx) => (
               <div
                 key={idx}
@@ -311,10 +297,10 @@ export default function EmmaHome() {
               >
                 <div
                   className={
-                    "max-w-[85%] rounded-2xl px-4 py-2 whitespace-pre-line emma-bubble " +
+                    "max-w-[85%] rounded-[18px] px-4 py-3 whitespace-pre-line emma-bubble " +
                     (m.role === "user"
                       ? "bg-[#dfe8ff] text-slate-900"
-                      : "bg-[#ece8ff] text-slate-900")
+                      : "bg-[#F2EDFF] text-slate-900")
                   }
                 >
                   {m.content}
@@ -332,13 +318,13 @@ export default function EmmaHome() {
           </div>
         )}
 
-        <form onSubmit={handleAskAdvice} className="space-y-3 mt-2">
+        <form onSubmit={handleAskAdvice} className="mt-2 space-y-3">
           <textarea
             ref={textareaRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
-            className="emma-input-fade w-full rounded-3xl border border-slate-200/80 bg-white/90 p-4 text-sm shadow-sm focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
+            className="emma-input-fade w-full rounded-[18px] border border-slate-200/80 bg-white/90 p-4 text-sm shadow-sm focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -354,7 +340,7 @@ export default function EmmaHome() {
           <button
             type="submit"
             disabled={loading}
-            className="emma-btn-soft inline-flex w-full items-center justify-center rounded-full bg-[#5d4dfc] px-8 py-3 text-sm font-semibold text-white shadow-md disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
+            className="emma-btn-soft inline-flex w-full items-center justify-center rounded-[18px] bg-[#5d4dfc] px-6 py-3 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
           >
             {loading ? loadingLabel : askCta}
           </button>

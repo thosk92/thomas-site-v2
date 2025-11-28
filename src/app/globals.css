@@ -493,7 +493,7 @@ body {
 /* EMMA mobile-first pastel gradient background */
 .emma-gradient-bg {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f7dce7 0%, #d5f7ed 100%);
+  background: linear-gradient(180deg, #F7EEF4 0%, #E9F6F2 100%);
   animation: emma-gradient-shift 10s ease-in-out infinite alternate;
 }
 
