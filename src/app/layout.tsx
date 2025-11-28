@@ -74,7 +74,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body
-        className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased bg-[#F6F6F6] text-[#575757] overflow-x-hidden`}
+        className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased bg-[#1D2150] text-[#F8FAFC] overflow-x-hidden`}
       >
         {children}
         <Analytics />

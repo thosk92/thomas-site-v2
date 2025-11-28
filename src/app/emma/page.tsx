@@ -166,7 +166,7 @@ export default function EmmaHome() {
   if (mode === "home") {
     return (
       <div className="emma-immersive-bg flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
-        <div className="mx-auto flex w-full max-w-[420px] flex-col text-center text-white">
+        <div className="mx-auto flex w-full max-w-[460px] flex-col text-center text-white">
           <header className="mb-6 flex items-center justify-end">
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
               <button
@@ -192,26 +192,27 @@ export default function EmmaHome() {
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col items-center gap-5">
+          <main className="flex flex-1 flex-col items-center gap-6">
             <div className="flex flex-col items-center gap-3">
-              <p className="text-[15px] text-white/90">
-                {lang === "en" ? "Hi, I’m EMMA 🫶" : "Ciao, sono EMMA 🫶"}
+              <p className="text-[16px] text-white/90">
+                {lang === "en" ? "Hi, I’m EMMA" : "Ciao, sono EMMA"}
+                <span className="ml-1">❤</span>
               </p>
-              <h1 className="text-[24px] font-semibold leading-snug text-white">
+              <h1 className="text-[26px] font-semibold leading-snug text-white">
                 {homeTitle}
               </h1>
-              <p className="max-w-[90%] text-[16px] text-white/80">
+              <p className="max-w-[92%] text-[16px] leading-relaxed text-white/80">
                 {homeSubtitle}
               </p>
             </div>
 
-            <div className="flex w-full flex-wrap justify-center gap-2">
+            <div className="flex w-full flex-wrap justify-center gap-3">
               {examplePills.map((pill) => (
                 <button
                   key={pill}
                   type="button"
                   onClick={() => handleSelectExample(pill)}
-                  className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-[15px] text-white/90 backdrop-blur-sm hover:bg-white/15 emma-btn-soft"
+                  className="rounded-full border border-white/15 bg-white/10 px-5 py-2 text-[15px] text-white/90 backdrop-blur-sm hover:bg-white/20 emma-btn-soft"
                 >
                   {pill}
                 </button>
@@ -321,7 +322,7 @@ export default function EmmaHome() {
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
-            className="emma-input-fade w-full rounded-[18px] border border-slate-200/80 bg-white/90 p-4 text-sm shadow-sm placeholder-slate-500 focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
+            className="emma-input-fade w-full rounded-[18px] border border-slate-200/80 bg-white/90 p-4 text-sm text-slate-900 shadow-sm placeholder-slate-500 focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
