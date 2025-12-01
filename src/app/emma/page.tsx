@@ -122,37 +122,39 @@ export default function EmmaHome() {
 
   const homeTitle =
     lang === "en"
-      ? "What would you like to talk about today?"
-      : "Di cosa ti piacerebbe parlare oggi?";
+      ? "What do you need today?"
+      : "Di cosa hai bisogno oggi?";
   const homeSubtitle =
     lang === "en"
-      ? "Tell me what you’re going through: I’m here to listen."
-      : "Raccontami cosa stai vivendo: sono qui per ascoltarti.";
+      ? "Emma helps you understand what you’re going through and gives you words and guidance when something overwhelms you or leaves you stuck."
+      : "Emma ti aiuta a capire cosa stai vivendo e ti offre parole e soluzioni quando qualcosa ti fa stare male o ti lascia spiazzato.";
   const homeCta = lang === "en" ? "Talk to EMMA" : "Parla con EMMA";
 
   const sessionTitle =
-    lang === "en" ? "Write what is worrying you" : "Scrivi cosa ti preoccupa";
+    lang === "en" ? "Write what’s weighing on you" : "Scrivi cosa ti pesa addosso";
   const sessionSubtitle =
     lang === "en"
-      ? "Use simple words, as if you were telling a friend."
-      : "Usa parole semplici, come se lo raccontassi a un’amica.";
+      ? "Emma will help you understand it and find a way forward."
+      : "Emma ti aiuterà a capirlo e a trovare un modo per affrontarlo.";
   const textareaPlaceholder =
     lang === "en"
-      ? "Tell me what’s on your mind…"
-      : "Dimmi cosa ti passa per la testa…";
+      ? "Tell me what’s going on…"
+      : "Dimmi cosa sta succedendo…";
   const askCta = lang === "en" ? "Talk to EMMA" : "Parla con EMMA";
   const loadingLabel =
     lang === "en" ? "EMMA is thinking about an answer for you…" : "EMMA sta pensando alla risposta per te…";
 
   const examplePillsEn = [
-    "I feel overwhelmed lately",
-    "I don't know how to handle something",
-    "I feel left out by friends",
+    "I feel overwhelmed",
+    "I don’t know how to handle something",
+    "Something is making me anxious",
+    "I feel left out",
   ];
 
   const examplePillsIt = [
-    "Mi sento un po’ sopraffatto",
-    "Non so come gestire una cosa",
+    "Mi sento sopraffatto",
+    "Non so come gestire una situazione",
+    "Qualcosa mi fa stare male",
     "Mi sento escluso",
   ];
 
