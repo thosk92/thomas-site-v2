@@ -374,7 +374,7 @@ export default function EmmaHome() {
           <button
             type="submit"
             disabled={loading}
-            className="emma-btn-soft button-cta disabled:cursor-not-allowed disabled:opacity-70 mx-auto max-w-[320px]"
+            className="emma-btn-soft mx-auto inline-flex w-full max-w-[320px] items-center justify-center rounded-full bg-[#4f46e5] px-6 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/40 transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? loadingLabel : askCta}
           </button>
