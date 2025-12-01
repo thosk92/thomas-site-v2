@@ -510,25 +510,12 @@ body {
 /* EMMA immersive homepage background (deep, calm, app-like) */
 .emma-immersive-bg {
   min-height: 100vh;
-  background:
-    radial-gradient(120% 140% at 10% 0%, rgba(187, 170, 252, 0.30), transparent 60%),
-    radial-gradient(100% 120% at 90% 0%, rgba(108, 99, 255, 0.38), transparent 65%),
-    radial-gradient(140% 160% at 50% 110%, rgba(24, 34, 92, 0.95), #1D2150);
-  background-color: #1D2150;
+  background: radial-gradient(circle at top right, #6c73ff 0%, #3e458c 45%, #222653 100%);
   background-repeat: no-repeat;
 }
 
 .emma-immersive-bg::before {
-  content: "";
-  position: fixed;
-  inset: auto 0 0 0;
-  height: 42vh;
-  background:
-    radial-gradient(60% 120% at 0% 100%, rgba(42, 53, 120, 0.96), transparent 60%),
-    radial-gradient(70% 130% at 100% 100%, rgba(39, 52, 130, 0.96), transparent 65%),
-    radial-gradient(100% 160% at 50% 110%, rgba(25, 38, 102, 0.98), transparent 55%);
-  opacity: 0.98;
-  pointer-events: none;
+  content: none;
 }
 
 /* EMMA logo breathing animation */
@@ -540,6 +527,24 @@ body {
   0% { transform: scale(1); }
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
+}
+
+/* EMMA logo subtle glow */
+.logo-glow {
+  position: relative;
+}
+
+.logo-glow::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 110px;
+  height: 110px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0));
+  transform: translate(-50%, -50%);
+  filter: blur(40px);
+  z-index: -1;
 }
 
 /* EMMA CTA/button soft tap scale */

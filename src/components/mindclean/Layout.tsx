@@ -9,7 +9,7 @@ export default function MCLayout({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen flex-col px-4 py-1 sm:px-4 sm:py-3">
         <header className="mb-0 sm:mb-1 flex items-center justify-center">
           <Link href="/" className="flex items-center justify-center">
-            <div className="emma-logo-breath flex h-32 w-32 sm:h-40 sm:w-40 items-center justify-center">
+            <div className="logo-glow emma-logo-breath flex h-32 w-32 sm:h-40 sm:w-40 items-center justify-center">
               <Image
                 src="/logo-emma-bianco.png"
                 alt="EMMA home"

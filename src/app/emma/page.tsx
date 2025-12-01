@@ -15,6 +15,7 @@ export default function EmmaHome() {
   >([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showDataSheet, setShowDataSheet] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -167,8 +168,8 @@ export default function EmmaHome() {
 
   if (mode === "home") {
     return (
-      <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
-        <div className="mx-auto flex w-full max-w-[460px] flex-col text-center text-white">
+      <div className="flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
+        <div className="mx-auto flex w-full max-w-[480px] flex-col text-center text-white pt-24 pb-10">
           <header className="mb-6 flex items-center justify-end">
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
               <button
@@ -196,13 +197,13 @@ export default function EmmaHome() {
 
           <main className="flex flex-1 flex-col items-center gap-6">
             <div className="flex flex-col items-center gap-3">
-              <p className="text-[16px] text-white/90">
+              <p className="text-[14px] font-light text-[#C9CEFF]">
                 {lang === "en" ? "Hi, I’m EMMA" : "Ciao, sono EMMA"}
               </p>
-              <h1 className="text-[26px] font-semibold leading-snug text-white">
+              <h1 className="text-[30px] font-semibold leading-snug text-white">
                 {homeTitle}
               </h1>
-              <p className="max-w-[92%] text-[16px] leading-relaxed text-white/80">
+              <p className="max-w-[92%] text-[16px] leading-relaxed text-[#C9CEFF]">
                 {homeSubtitle}
               </p>
             </div>
@@ -220,7 +221,7 @@ export default function EmmaHome() {
               ))}
             </div>
 
-            <p className="text-[13px] text-white/70">
+            <p className="footer-info">
               {lang === "en"
                 ? "Private & anonymous · No account needed · Safe space"
                 : "Privato e anonimo · Nessun account · Spazio sicuro"}
@@ -236,10 +237,42 @@ export default function EmmaHome() {
           </main>
 
           <footer className="mt-6 text-center text-[11px] text-white/60">
-            <a href="/privacy" className="underline-offset-2 hover:underline">
+            <button
+              type="button"
+              onClick={() => setShowDataSheet(true)}
+              className="underline-offset-2 hover:underline"
+            >
               {lang === "en" ? "How we use your data" : "Come usiamo i tuoi dati"}
-            </a>
+            </button>
           </footer>
+
+          {showDataSheet && (
+            <div className="emma-bottom-sheet-overlay" onClick={() => setShowDataSheet(false)}>
+              <div
+                className="emma-bottom-sheet"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="mb-3 flex items-center justify-between text-[12px] text-slate-200/80">
+                  <button
+                    type="button"
+                    onClick={() => setShowDataSheet(false)}
+                    className="text-sm text-white/70 hover:text-white"
+                  >
+                    {lang === "en" ? "Close" : "Chiudi"}
+                  </button>
+                  <span className="uppercase tracking-[0.18em] text-indigo-200/90">EMMA</span>
+                </div>
+                <h2 className="mb-2 text-[18px] font-semibold text-white">
+                  {lang === "en" ? "How we use your data" : "Come usiamo i tuoi dati"}
+                </h2>
+                <p className="text-[14px] leading-relaxed text-slate-100/90">
+                  {lang === "en"
+                    ? "EMMA stores only what is necessary to respond to your message. Your conversations are not used to profile you or show advertising. You can close this app at any time and your current session will end."
+                    : "EMMA conserva solo ciò che serve per rispondere al tuo messaggio. Le tue conversazioni non vengono usate per profilarti o mostrarti pubblicità. Puoi chiudere l’app in qualsiasi momento e la tua sessione attuale terminerà."}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
@@ -247,8 +280,8 @@ export default function EmmaHome() {
 
   // Session view
   return (
-    <div className="flex min-h-screen w-full justify-center px-4 py-8 overflow-x-hidden">
-      <div className="mx-auto flex w-full max-w-[420px] flex-col text-white">
+    <div className="flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
+      <div className="mx-auto flex w-full max-w-[480px] flex-col text-white pt-20 pb-8">
         <header className="mb-6 flex items-center justify-end">
           <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
             <button
@@ -275,13 +308,13 @@ export default function EmmaHome() {
         </header>
 
         <div className="mb-6 space-y-2 text-left text-white">
-          <p className="text-[13px] text-white/90">
-            {lang === "en" ? "I’m here, take your time." : "Sono qui, prenditi il tuo tempo."}
+          <p className="text-[14px] font-light text-[#C9CEFF]">
+            {lang === "en" ? "I’m here. Start when you’re ready." : "Sono qui. Inizia quando vuoi."}
           </p>
-          <h1 className="text-[22px] font-semibold tracking-tight text-white">
+          <h1 className="text-[28px] font-semibold tracking-tight text-white">
             {sessionTitle}
           </h1>
-          <p className="max-w-[90%] text-[15px] text-white/80">
+          <p className="max-w-[90%] text-[16px] text-[#C9CEFF]">
             {sessionSubtitle}
           </p>
         </div>
@@ -319,13 +352,13 @@ export default function EmmaHome() {
           </div>
         )}
 
-        <form onSubmit={handleAskAdvice} className="mt-2 space-y-3">
+        <form onSubmit={handleAskAdvice} className="mt-9 space-y-5">
           <textarea
             ref={textareaRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
-            className="emma-input-fade w-full rounded-[18px] border border-slate-200/80 bg-white/90 p-4 text-sm text-slate-900 shadow-sm placeholder-slate-500 focus:border-[#a5b4fc] focus:outline-none focus:ring-2 focus:ring-[#c7d2fe] sm:text-base"
+            className="emma-input-fade emma-textarea"
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -341,7 +374,7 @@ export default function EmmaHome() {
           <button
             type="submit"
             disabled={loading}
-            className="emma-btn-soft inline-flex w-full items-center justify-center rounded-[18px] bg-[#5d4dfc] px-6 py-3 text-sm font-semibold text-white shadow-sm disabled:cursor-not-allowed disabled:opacity-70 sm:text-base"
+            className="emma-btn-soft button-cta disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? loadingLabel : askCta}
           </button>
@@ -350,10 +383,42 @@ export default function EmmaHome() {
         {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
 
         <footer className="mt-6 text-center text-[11px] text-white/60">
-          <a href="/privacy" className="underline-offset-2 hover:underline">
+          <button
+            type="button"
+            onClick={() => setShowDataSheet(true)}
+            className="underline-offset-2 hover:underline"
+          >
             {lang === "en" ? "How we use your data" : "Come usiamo i tuoi dati"}
-          </a>
+          </button>
         </footer>
+
+        {showDataSheet && (
+          <div className="emma-bottom-sheet-overlay" onClick={() => setShowDataSheet(false)}>
+            <div
+              className="emma-bottom-sheet"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-3 flex items-center justify-between text-[12px] text-slate-200/80">
+                <button
+                  type="button"
+                  onClick={() => setShowDataSheet(false)}
+                  className="text-sm text-white/70 hover:text-white"
+                >
+                  {lang === "en" ? "Close" : "Chiudi"}
+                </button>
+                <span className="uppercase tracking-[0.18em] text-indigo-200/90">EMMA</span>
+              </div>
+              <h2 className="mb-2 text-[18px] font-semibold text-white">
+                {lang === "en" ? "How we use your data" : "Come usiamo i tuoi dati"}
+              </h2>
+              <p className="text-[14px] leading-relaxed text-slate-100/90">
+                {lang === "en"
+                  ? "EMMA stores only what is necessary to respond to your message. Your conversations are not used to profile you or show advertising. You can close this app at any time and your current session will end."
+                  : "EMMA conserva solo ciò che serve per rispondere al tuo messaggio. Le tue conversazioni non vengono usate per profilarti o mostrarti pubblicità. Puoi chiudere l’app in qualsiasi momento e la tua sessione attuale terminerà."}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
