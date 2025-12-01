@@ -21,7 +21,7 @@ export default function MCLayout({ children }: { children: React.ReactNode }) {
           </Link>
         </header>
 
-        <main className="-mt-10 sm:-mt-12 pb-4 sm:pb-6">
+        <main className="-mt-16 sm:-mt-20 pb-4 sm:pb-6">
           {children}
         </main>
       </div>
