@@ -572,6 +572,24 @@ body {
   }
 }
 
+/* EMMA textarea */
+.emma-textarea {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+  border-radius: 18px;
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 16px;
+  color: #111827;
+  width: 100%;
+  resize: none;
+  min-height: 120px;
+}
+
+.emma-textarea::placeholder {
+  color: rgba(15, 23, 42, 0.5);
+}
+
 /* EMMA typing indicator (3 pulsing dots) */
 .emma-typing {
   display: inline-flex;

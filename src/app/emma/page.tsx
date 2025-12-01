@@ -281,7 +281,7 @@ export default function EmmaHome() {
   // Session view
   return (
     <div className="flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
-      <div className="mx-auto flex w-full max-w-[480px] flex-col text-white pt-20 pb-8">
+      <div className="mx-auto flex w-full max-w-[480px] flex-col bg-white text-slate-900 pt-20 pb-8 rounded-3xl shadow-[0_18px_60px_rgba(15,23,42,0.55)] px-5">
         <header className="mb-6 flex items-center justify-end">
           <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
             <button
@@ -307,14 +307,14 @@ export default function EmmaHome() {
           </div>
         </header>
 
-        <div className="mb-6 space-y-2 text-left text-white">
-          <p className="text-[14px] font-light text-[#C9CEFF]">
+        <div className="mb-6 space-y-2 text-left">
+          <p className="text-[14px] font-light text-slate-500">
             {lang === "en" ? "I’m here. Start when you’re ready." : "Sono qui. Inizia quando vuoi."}
           </p>
-          <h1 className="text-[28px] font-semibold tracking-tight text-white">
+          <h1 className="text-[28px] font-semibold tracking-tight text-slate-900">
             {sessionTitle}
           </h1>
-          <p className="max-w-[90%] text-[16px] text-[#C9CEFF]">
+          <p className="max-w-[90%] text-[16px] text-slate-600">
             {sessionSubtitle}
           </p>
         </div>
