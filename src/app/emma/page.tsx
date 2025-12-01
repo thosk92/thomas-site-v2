@@ -352,7 +352,7 @@ export default function EmmaHome() {
           </div>
         )}
 
-        <form onSubmit={handleAskAdvice} className="mt-9 space-y-5">
+        <form onSubmit={handleAskAdvice} className="mt-9 flex flex-col items-center space-y-5">
           <textarea
             ref={textareaRef}
             value={text}
