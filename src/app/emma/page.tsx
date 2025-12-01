@@ -126,8 +126,8 @@ export default function EmmaHome() {
       : "Di cosa ti piacerebbe parlare oggi?";
   const homeSubtitle =
     lang === "en"
-      ? "Whatever is on your mind, you don’t have to carry it alone. EMMA is here to listen with calm and kindness."
-      : "Qualunque cosa tu stia portando dentro, non devi farlo da solo. Sono qui per ascoltarti con calma e gentilezza.";
+      ? "Tell me what you’re going through: I’m here to listen."
+      : "Raccontami cosa stai vivendo: sono qui per ascoltarti.";
   const homeCta = lang === "en" ? "Talk to EMMA" : "Parla con EMMA";
 
   const sessionTitle =
