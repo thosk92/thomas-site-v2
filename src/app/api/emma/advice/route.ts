@@ -192,30 +192,8 @@ export async function POST(req: Request) {
       async start(controller) {
         const encoder = new TextEncoder();
 
-        //
-        // 1) FAST START — micro-frammento immediato (GPT-4.1-mini)
-        //
-        try {
-          const warmup = await client.responses.create({
-            model: "gpt-4.1-mini",
-            input:
-              "Emit ONLY a very short natural starter (max 3–5 characters), like: 'Ok —', 'Alright…', 'Va bene —'. No other text.",
-          });
-
-          const starter =
-            (warmup.output_text as any)?.trim().slice(0, 12) || "Ok —";
-
-          controller.enqueue(encoder.encode(starter + " "));
-        } catch (err) {
-          // fallback: se 4.1-mini fallisce, comunque rispondi subito
-          controller.enqueue(encoder.encode("Ok — "));
-        }
-
-        //
-        // 2) MAIN ANSWER — GPT-5-mini (risposta completa EMMA)
-        //
-        const finalResponse = await client.responses.create({
-          model: "gpt-5-mini",
+        const response = await client.responses.create({
+          model: "gpt-4.1-mini",
           stream: true,
           input: [
             {
@@ -232,10 +210,7 @@ export async function POST(req: Request) {
           ],
         });
 
-        //
-        // STREAMMING GPT-5-MINI
-        //
-        for await (const chunk of finalResponse) {
+        for await (const chunk of response) {
           if (chunk.type === "response.output_text.delta") {
             const delta = chunk.delta as any;
             const content =
