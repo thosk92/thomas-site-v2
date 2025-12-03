@@ -212,7 +212,8 @@ export async function POST(req: Request) {
 
         for await (const chunk of response) {
           if (chunk.type === "response.output_text.delta") {
-            const content = chunk.delta?.text ?? chunk.delta ?? "";
+            const delta = chunk.delta as any;
+            const content = typeof delta === "string" ? delta : delta?.text || "";
             if (content) controller.enqueue(encoder.encode(content));
           }
         }
