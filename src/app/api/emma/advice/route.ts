@@ -215,7 +215,16 @@ export async function POST(req: Request) {
             const delta = chunk.delta as any;
             const content =
               typeof delta === "string" ? delta : delta?.text || "";
-            if (content) controller.enqueue(encoder.encode(content));
+
+            if (content) {
+              // fluidità costante
+              const finalText = content;
+
+              for (const char of finalText) {
+                await new Promise((r) => setTimeout(r, 35)); // 35ms → fluido e morbido
+                controller.enqueue(encoder.encode(char));
+              }
+            }
           }
         }
 
