@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,7 +8,6 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
 export const revalidate = 0;
-export const dynamic = "force-dynamic";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
