@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { supabaseBrowser } from "@/lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import AppleSignIn from "../../../apple-account-sign-in.png";
 import GoogleLogo from "../../../g-logo.png";
 
@@ -170,7 +170,7 @@ export default function EmmaHome() {
   };
 
   function handleGoogleLogin() {
-    supabaseBrowser.auth.signInWithOAuth({
+    supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: "https://www.emmapp.io/emma",
@@ -179,7 +179,7 @@ export default function EmmaHome() {
   }
 
   function handleAppleLogin() {
-    supabaseBrowser.auth.signInWithOAuth({
+    supabase.auth.signInWithOAuth({
       provider: "apple",
       options: {
         redirectTo: "https://www.emmapp.io/emma",
