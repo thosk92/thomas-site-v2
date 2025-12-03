@@ -38,7 +38,7 @@ export default function HomePage() {
   if (loading) return null;
 
   return (
-    <div className="flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
+    <div className="emma-immersive-bg flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
       <div
         className="mx-auto flex w-full max-w-[480px] flex-col text-center text-white pt-16 pb-10"
         style={{ minHeight: "calc(100vh - 56px)" }}

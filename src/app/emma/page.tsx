@@ -186,10 +186,13 @@ export default function EmmaHome() {
             <div className="text-left text-[11px] text-[#C9CEFF]">
               {user ? (
                 <p>
-                  Stai usando EMMA come <span className="font-semibold">{user.email}</span>
+                  {lang === "en" ? "You are using EMMA as " : "Stai usando EMMA come "}
+                  <span className="font-semibold">{user.email}</span>
                 </p>
               ) : (
-                <p>Stai usando EMMA come ospite</p>
+                <p>
+                  {lang === "en" ? "You are using EMMA as a guest" : "Stai usando EMMA come ospite"}
+                </p>
               )}
             </div>
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
@@ -307,10 +310,13 @@ export default function EmmaHome() {
           <div className="text-left text-[11px] text-[#C9CEFF]">
             {user ? (
               <p>
-                Stai usando EMMA come <span className="font-semibold">{user.email}</span>
+                {lang === "en" ? "You are using EMMA as " : "Stai usando EMMA come "}
+                <span className="font-semibold">{user.email}</span>
               </p>
             ) : (
-              <p>Stai usando EMMA come ospite</p>
+              <p>
+                {lang === "en" ? "You are using EMMA as a guest" : "Stai usando EMMA come ospite"}
+              </p>
             )}
           </div>
           <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
