@@ -30,6 +30,7 @@
 import OpenAI from "openai";
 
 export const runtime = "edge";
+export const preferredRegion = "fra1";
 
 const emmaSystemPromptBase = `🚀 SYSTEM PROMPT DEFINITIVO — EMMA (IT/EN)
 ➜ Copia e incolla tutto, ESATTAMENTE così com’è.
