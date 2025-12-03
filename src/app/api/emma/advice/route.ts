@@ -193,7 +193,7 @@ export async function POST(req: Request) {
         const encoder = new TextEncoder();
 
         const response = await client.responses.create({
-          model: "gpt-5-mini",
+          model: "gpt-4.1-mini",
           stream: true,
           input: [
             {
