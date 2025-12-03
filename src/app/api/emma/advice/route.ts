@@ -27,11 +27,10 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { streamText } from "ai";
 import OpenAI from "openai";
 
 export const runtime = "edge";
-export const preferredRegion = "fra1";
+export const regions = ["fra1"];
 
 const emmaSystemPromptBase = `🚀 SYSTEM PROMPT DEFINITIVO — EMMA (IT/EN)
 ➜ Copia e incolla tutto, ESATTAMENTE così com’è.
@@ -164,62 +163,72 @@ export async function POST(req: Request) {
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) return new Response("AI not configured", { status: 500 });
 
-    const client = new OpenAI({
-      apiKey,
-    });
+    const client = new OpenAI({ apiKey });
 
-    const body = await req.json().catch(() => null);
-    if (!body) return new Response("Invalid JSON body", { status: 400 });
+    const { text, history, lang } = await req.json();
 
-    const { text, history, lang } = body as {
-      text?: string;
-      history?: { role: string; content: string }[];
-      lang?: "en" | "it";
-    };
-
-    if (!text || typeof text !== "string") {
-      return new Response("Missing text", { status: 400 });
-    }
+    if (!text) return new Response("Missing text", { status: 400 });
 
     const languageDirective =
       lang === "en"
-        ? "Respond always and only in English, even if the user mixes languages. Use clear, simple, natural English with correct grammar and no obvious syntax errors."
+        ? "Respond always and only in English."
         : lang === "it"
-          ? "Rispondi sempre e solo in italiano, anche se l'utente mescola più lingue. Usa un italiano naturale, scorrevole e corretto, parlando alla seconda persona singolare ('tu') e evitando traduzioni letterali o frasi innaturali."
-          : "You can answer in the same language the user is using, preferring Italian or English based on the input.";
-
-    const guidanceBlock =
-      (history ?? []).length > 0
-        ? "This is an ongoing conversation. Keep emotional continuity."
-        : "First message. Be gentle and inviting.";
+          ? "Rispondi sempre e solo in italiano."
+          : "Mirror the user's language.";
 
     const conversationSoFar = (history ?? [])
       .map((m: any) => `${m.role === "user" ? "User" : "EMMA"}: ${m.content}`)
       .join("\n\n");
 
     const userMessage =
-      guidanceBlock +
+      (history?.length
+        ? "This is an ongoing conversation. Keep emotional continuity."
+        : "First message. Be gentle and inviting.") +
       (conversationSoFar ? "\n\nConversation so far:\n" + conversationSoFar : "") +
       "\n\nLatest user message:\nUser: " +
       text;
-    const result = await streamText({
-      model: "gpt-5-mini",
-      messages: [
-        {
-          role: "system",
-          content:
-            emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective,
-        },
-        {
-          role: "user",
-          content: userMessage,
-        },
-      ],
+
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
+
+        const response = await client.responses.create({
+          model: "gpt-5-mini",
+          stream: true,
+          input: [
+            {
+              role: "system",
+              content:
+                emmaSystemPromptBase +
+                "\n\nLANGUAGE DIRECTIVE:\n" +
+                languageDirective,
+            },
+            {
+              role: "user",
+              content: userMessage,
+            },
+          ],
+        });
+
+        for await (const chunk of response) {
+          if (chunk.type === "response.output_text.delta") {
+            const content = chunk.delta?.text ?? chunk.delta ?? "";
+            if (content) controller.enqueue(encoder.encode(content));
+          }
+        }
+
+        controller.close();
+      },
     });
 
-    return result.toTextStreamResponse();
+    return new Response(stream, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+      },
+    });
+
   } catch (err) {
-    console.error("MODEL ERROR:", err);
+    console.error("STREAM ERROR:", err);
     return new Response("AI error", { status: 500 });
   }
 }
