@@ -139,8 +139,8 @@ export default function EmmaHome() {
       : "Emma ti aiuterà a capirlo e a trovare un modo per affrontarlo.";
   const textareaPlaceholder =
     lang === "en"
-      ? "Tell me what’s going on…"
-      : "Dimmi cosa sta succedendo…";
+      ? "Write what’s on your mind…"
+      : "Scrivi cosa ti passa per la mente…";
   const askCta = lang === "en" ? "Talk to EMMA" : "Parla con EMMA";
   const loadingLabel =
     lang === "en" ? "EMMA is thinking about an answer for you…" : "EMMA sta pensando alla risposta per te…";
@@ -169,7 +169,10 @@ export default function EmmaHome() {
   if (mode === "home") {
     return (
       <div className="flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
-        <div className="mx-auto flex w-full max-w-[480px] flex-col text-center text-white pt-24 pb-10">
+        <div
+          className="mx-auto flex w-full max-w-[480px] flex-col text-center text-white pt-16 pb-10"
+          style={{ minHeight: "calc(100vh - 56px)" }}
+        >
           <header className="mb-6 flex items-center justify-end">
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
               <button
@@ -195,7 +198,7 @@ export default function EmmaHome() {
             </div>
           </header>
 
-          <main className="flex flex-1 flex-col items-center gap-6">
+          <main className="flex flex-1 flex-col items-center gap-6 pt-4">
             <div className="flex flex-col items-center gap-3">
               <p className="text-[14px] font-light text-[#C9CEFF]">
                 {lang === "en" ? "Hi, I’m EMMA" : "Ciao, sono EMMA"}
