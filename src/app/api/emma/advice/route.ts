@@ -206,13 +206,13 @@ export async function POST(req: Request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const responseStream = await client.responses.create({
+          const responseStream = await client.responses.stream({
             model: "gpt-5-mini",
-            stream: true,
             input: [
               {
                 role: "system",
-                content: emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective,
+                content:
+                  emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective,
               },
               {
                 role: "user",
@@ -221,18 +221,17 @@ export async function POST(req: Request) {
             ],
           });
 
-          for await (const event of responseStream) {
-            if (event.type === "response.output_text.delta") {
-              const delta = (event as any).delta;
-              const content = typeof delta === "string" ? delta : delta?.text || "";
-              if (content) {
-                console.log("EMMA CHUNK:", content);
-                controller.enqueue(encoder.encode(content));
-              }
+          responseStream.on("response.output_text.delta", (event: any) => {
+            const delta = event?.delta;
+            const content = typeof delta === "string" ? delta : delta?.text || "";
+            if (content) {
+              controller.enqueue(encoder.encode(content));
             }
-          }
+          });
 
-          controller.close();
+          responseStream.on("end", () => {
+            controller.close();
+          });
         } catch (error) {
           console.error("STREAM ERROR:", error);
           controller.error(error);
