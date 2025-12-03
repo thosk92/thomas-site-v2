@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 
@@ -8,7 +9,7 @@ export const revalidate = 0;
 export const dynamic = "force-dynamic";
 
 export default function HomePage() {
-  const [user, setUser] = useState<null | any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
