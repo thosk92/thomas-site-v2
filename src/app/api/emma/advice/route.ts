@@ -27,6 +27,7 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { streamText } from "ai";
 import OpenAI from "openai";
 
 export const runtime = "edge";
@@ -201,50 +202,22 @@ export async function POST(req: Request) {
       (conversationSoFar ? "\n\nConversation so far:\n" + conversationSoFar : "") +
       "\n\nLatest user message:\nUser: " +
       text;
-
-    const encoder = new TextEncoder();
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          const responseStream = await client.responses.stream({
-            model: "gpt-5-mini",
-            input: [
-              {
-                role: "system",
-                content:
-                  emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective,
-              },
-              {
-                role: "user",
-                content: userMessage,
-              },
-            ],
-          });
-
-          responseStream.on("response.output_text.delta", (event: any) => {
-            const delta = event?.delta;
-            const content = typeof delta === "string" ? delta : delta?.text || "";
-            if (content) {
-              controller.enqueue(encoder.encode(content));
-            }
-          });
-
-          responseStream.on("end", () => {
-            controller.close();
-          });
-        } catch (error) {
-          console.error("STREAM ERROR:", error);
-          controller.error(error);
-        }
-      },
+    const result = await streamText({
+      model: "gpt-5-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            emmaSystemPromptBase + "\n\nLANGUAGE GUIDANCE:\n" + languageDirective,
+        },
+        {
+          role: "user",
+          content: userMessage,
+        },
+      ],
     });
 
-    return new Response(stream, {
-      headers: {
-        "Content-Type": "text/plain; charset=utf-8",
-      },
-    });
+    return result.toTextStreamResponse();
   } catch (err) {
     console.error("MODEL ERROR:", err);
     return new Response("AI error", { status: 500 });
