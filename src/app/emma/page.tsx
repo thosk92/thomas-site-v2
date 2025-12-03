@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { supabaseBrowser } from "@/lib/supabaseClient";
+import AppleSignIn from "../../../apple-account-sign-in.png";
+import GoogleLogo from "../../../g-logo.png";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";
@@ -176,6 +178,15 @@ export default function EmmaHome() {
     });
   }
 
+  function handleAppleLogin() {
+    supabaseBrowser.auth.signInWithOAuth({
+      provider: "apple",
+      options: {
+        redirectTo: "https://www.emmapp.io/emma",
+      },
+    });
+  }
+
   if (mode === "home") {
     return (
       <div className="flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
@@ -218,6 +229,35 @@ export default function EmmaHome() {
               </h1>
               <p className="max-w-[92%] text-[16px] leading-relaxed text-[#C9CEFF]">
                 {homeSubtitle}
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center w-full mt-4 mb-2">
+              <button
+                onClick={handleGoogleLogin}
+                className="w-full max-w-xs py-3 px-4 rounded-xl bg-white border border-gray-300 shadow-sm flex items-center justify-center gap-2 text-gray-700 text-sm font-medium active:scale-[0.98] transition-all"
+              >
+                <Image
+                  src={GoogleLogo}
+                  alt="Google"
+                  className="w-5 h-5"
+                />
+                Continue with Google
+              </button>
+
+              <button
+                onClick={handleAppleLogin}
+                className="w-full max-w-xs mt-3"
+              >
+                <Image
+                  src={AppleSignIn}
+                  alt="Sign in with Apple"
+                  className="w-full h-auto"
+                />
+              </button>
+
+              <p className="text-xs text-gray-400 mt-2">
+                Accesso opzionale — sincronizza le tue conversazioni
               </p>
             </div>
 
@@ -364,24 +404,6 @@ export default function EmmaHome() {
             <div ref={messagesEndRef} />
           </div>
         )}
-
-        <div className="flex flex-col items-center w-full mt-4 mb-6">
-          <button
-            onClick={handleGoogleLogin}
-            className="w-full max-w-xs py-3 px-4 rounded-xl bg-white border border-gray-300 shadow-sm flex items-center justify-center gap-2 text-gray-700 text-sm font-medium active:scale-[0.98] transition-all"
-          >
-            <img
-              src="/google-icon.svg"
-              alt="Google"
-              className="w-5 h-5"
-            />
-            Continue with Google
-          </button>
-
-          <p className="text-xs text-gray-400 mt-2">
-            Accesso opzionale — sincronizza le tue conversazioni
-          </p>
-        </div>
 
         <form onSubmit={handleAskAdvice} className="mt-9 flex flex-col items-center space-y-5">
           <textarea
