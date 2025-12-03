@@ -203,8 +203,7 @@ export async function POST(req: Request) {
           });
 
           const starter =
-            // @ts-expect-error: output_text is provided by the Responses API
-            warmup.output_text?.trim().slice(0, 12) || "Ok —";
+            (warmup.output_text as any)?.trim().slice(0, 12) || "Ok —";
 
           controller.enqueue(encoder.encode(starter + " "));
         } catch (err) {
