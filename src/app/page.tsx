@@ -1,13 +1,11 @@
-export const dynamic = "force-dynamic";
-
 "use client";
+
+export const dynamic = "force-dynamic";
 
 import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
-
-export const revalidate = 0;
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -16,7 +14,6 @@ export default function HomePage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       const sessionUser = data.session?.user ?? null;
-      setUser(sessionUser);
 
       if (sessionUser) {
         window.location.href = "/chat";
@@ -28,7 +25,6 @@ export default function HomePage() {
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         const sessionUser = session?.user ?? null;
-        setUser(sessionUser);
 
         if (sessionUser) {
           window.location.href = "/chat";
@@ -43,6 +39,7 @@ export default function HomePage() {
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen px-6">
+
       <Image
         src="/emma-logo.png"
         alt="EMMA Logo"
@@ -56,6 +53,8 @@ export default function HomePage() {
       </h1>
 
       <div className="flex flex-col gap-4 w-full max-w-xs">
+
+        {/* GOOGLE */}
         <button
           onClick={() =>
             supabase.auth.signInWithOAuth({
@@ -65,12 +64,12 @@ export default function HomePage() {
               },
             })
           }
-          className="w-full bg-white text-black border border-gray-300 px-4 py-3 rounded-xl flex items-center justify-center gap-3"
         >
           <Image src="/g-logo.png" width={20} height={20} alt="Google Logo" />
           Accedi con Google
         </button>
 
+        {/* APPLE */}
         <button
           onClick={() =>
             supabase.auth.signInWithOAuth({
@@ -80,7 +79,6 @@ export default function HomePage() {
               },
             })
           }
-          className="w-full bg-black text-white px-4 py-3 rounded-xl flex items-center justify-center gap-3"
         >
           <Image
             src="/apple-account-sign-in.png"
@@ -90,6 +88,7 @@ export default function HomePage() {
           />
           Accedi con Apple
         </button>
+
       </div>
     </main>
   );
