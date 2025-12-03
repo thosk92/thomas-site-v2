@@ -6,8 +6,6 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
-import GoogleLogo from "../../g-logo.png";
-import AppleSignIn from "../../apple-account-sign-in.png";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -18,20 +16,20 @@ export default function HomePage() {
       const sessionUser = data.session?.user ?? null;
 
       if (sessionUser) {
-        window.location.href = "/chat";
+        window.location.href = "/emma"; // <<< QUI il redirect corretto
+        return;
       }
 
+      setUser(null);
       setLoading(false);
     });
 
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
-        const sessionUser = session?.user ?? null;
-
-        if (sessionUser) {
-          window.location.href = "/chat";
+        if (session?.user) {
+          window.location.href = "/emma"; // <<< ANCHE QUI
         }
-      },
+      }
     );
 
     return () => subscription.subscription.unsubscribe();
@@ -40,7 +38,7 @@ export default function HomePage() {
   if (loading) return null;
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen px-6 bg-[#1D2150] text-[#F8FAFC]">
+    <main className="flex flex-col items-center justify-center min-h-screen px-6">
 
       <Image
         src="/emma-logo.png"
@@ -58,7 +56,6 @@ export default function HomePage() {
 
         {/* GOOGLE */}
         <button
-          className="w-full bg-white text-black border border-gray-300 px-4 py-3 rounded-xl flex items-center justify-center gap-3"
           onClick={() =>
             supabase.auth.signInWithOAuth({
               provider: "google",
@@ -67,14 +64,14 @@ export default function HomePage() {
               },
             })
           }
+          className="w-full bg-white text-black border border-gray-300 px-4 py-3 rounded-xl flex items-center justify-center gap-3"
         >
-          <Image src={GoogleLogo} width={20} height={20} alt="Google Logo" />
+          <Image src="/g-logo.png" width={20} height={20} alt="Google Logo" />
           Accedi con Google
         </button>
 
         {/* APPLE */}
         <button
-          className="w-full bg-black text-white px-4 py-3 rounded-xl flex items-center justify-center gap-3"
           onClick={() =>
             supabase.auth.signInWithOAuth({
               provider: "apple",
@@ -83,9 +80,10 @@ export default function HomePage() {
               },
             })
           }
+          className="w-full bg-black text-white px-4 py-3 rounded-xl flex items-center justify-center gap-3"
         >
           <Image
-            src={AppleSignIn}
+            src="/apple-account-sign-in.png"
             width={20}
             height={20}
             alt="Apple Logo"

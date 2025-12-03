@@ -11,7 +11,7 @@ export default function CallbackPage() {
       const { data } = await supabase.auth.getSession();
 
       if (data.session?.user) {
-        window.location.href = "/chat";
+        window.location.href = "/emma";
       } else {
         window.location.href = "/";
       }
