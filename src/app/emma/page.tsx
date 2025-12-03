@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
+import { supabaseBrowser } from "@/lib/supabaseClient";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";
@@ -165,6 +166,15 @@ export default function EmmaHome() {
     setMode("session");
     setText(value);
   };
+
+  function handleGoogleLogin() {
+    supabaseBrowser.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "https://www.emmapp.io/emma",
+      },
+    });
+  }
 
   if (mode === "home") {
     return (
@@ -354,6 +364,24 @@ export default function EmmaHome() {
             <div ref={messagesEndRef} />
           </div>
         )}
+
+        <div className="flex flex-col items-center w-full mt-4 mb-6">
+          <button
+            onClick={handleGoogleLogin}
+            className="w-full max-w-xs py-3 px-4 rounded-xl bg-white border border-gray-300 shadow-sm flex items-center justify-center gap-2 text-gray-700 text-sm font-medium active:scale-[0.98] transition-all"
+          >
+            <img
+              src="/google-icon.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
+            Continue with Google
+          </button>
+
+          <p className="text-xs text-gray-400 mt-2">
+            Accesso opzionale — sincronizza le tue conversazioni
+          </p>
+        </div>
 
         <form onSubmit={handleAskAdvice} className="mt-9 flex flex-col items-center space-y-5">
           <textarea
