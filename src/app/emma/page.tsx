@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
+import type { User } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabaseClient";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";
@@ -16,6 +18,7 @@ export default function EmmaHome() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDataSheet, setShowDataSheet] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -25,6 +28,12 @@ export default function EmmaHome() {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   }, [messages]);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+    });
+  }, []);
 
   useEffect(() => {
     const el = textareaRef.current;
@@ -173,7 +182,16 @@ export default function EmmaHome() {
           className="mx-auto flex w-full max-w-[480px] flex-col text-center text-white pt-16 pb-10"
           style={{ minHeight: "calc(100vh - 56px)" }}
         >
-          <header className="mb-6 flex items-center justify-end">
+          <header className="mb-6 flex items-center justify-between">
+            <div className="text-left text-[11px] text-[#C9CEFF]">
+              {user ? (
+                <p>
+                  Stai usando EMMA come <span className="font-semibold">{user.email}</span>
+                </p>
+              ) : (
+                <p>Stai usando EMMA come ospite</p>
+              )}
+            </div>
             <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
               <button
                 type="button"
@@ -285,7 +303,16 @@ export default function EmmaHome() {
   return (
     <div className="flex min-h-screen w-full justify-center px-6 overflow-x-hidden">
       <div className="mx-auto flex w-full max-w-[480px] flex-col text-white pt-20 pb-8">
-        <header className="mb-6 flex items-center justify-end">
+        <header className="mb-6 flex items-center justify-between">
+          <div className="text-left text-[11px] text-[#C9CEFF]">
+            {user ? (
+              <p>
+                Stai usando EMMA come <span className="font-semibold">{user.email}</span>
+              </p>
+            ) : (
+              <p>Stai usando EMMA come ospite</p>
+            )}
+          </div>
           <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
             <button
               type="button"
