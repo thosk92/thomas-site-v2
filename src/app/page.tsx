@@ -53,7 +53,7 @@ export default function HomePage() {
           />
 
           <h1 className="text-[24px] font-semibold mb-2 text-white">
-            Accedi per iniziare la tua esperienza con EMMA
+            Sign in to start your experience with EMMA
           </h1>
 
           <div className="flex flex-col gap-4 w-full max-w-xs mt-2">
@@ -70,7 +70,7 @@ export default function HomePage() {
               }
             >
               <Image src={GoogleLogo} width={20} height={20} alt="Google Logo" />
-              Accedi con Google
+              Sign in with Google
             </button>
 
             {/* GUEST */}
@@ -80,7 +80,7 @@ export default function HomePage() {
                 window.location.href = "/emma";
               }}
             >
-              Continua come ospite
+              Continue as guest
             </button>
           </div>
         </main>
