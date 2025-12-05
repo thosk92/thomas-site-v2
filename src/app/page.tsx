@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import GoogleLogo from "../../g-logo.png";
 import EmmaLogoWhite from "../../logo emma bianco .png";
+import AppleSignIn from "../../apple-account-sign-in.png";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
@@ -71,6 +72,25 @@ export default function HomePage() {
             >
               <Image src={GoogleLogo} width={20} height={20} alt="Google Logo" />
               Sign in with Google
+            </button>
+
+            {/* APPLE */}
+            <button
+              className="w-full mt-1 rounded-xl overflow-hidden"
+              onClick={() =>
+                supabase.auth.signInWithOAuth({
+                  provider: "apple",
+                  options: {
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                  },
+                })
+              }
+            >
+              <Image
+                src={AppleSignIn}
+                alt="Sign in with Apple"
+                className="w-full h-auto"
+              />
             </button>
 
             {/* GUEST */}
