@@ -1,20 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import EmmaHome from "../emma/page";
 
-export default function ChatRedirectPage() {
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      const user = data.session?.user;
-
-      if (!user) {
-        window.location.href = "/";
-      } else {
-        window.location.href = "/emma";
-      }
-    });
-  }, []);
-
-  return null;
+export default function ChatPage() {
+  // Per ora riusiamo la stessa UI di EMMA dentro il layout /chat
+  return <EmmaHome />;
 }
