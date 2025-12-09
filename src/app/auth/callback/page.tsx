@@ -8,21 +8,22 @@ import { supabase } from "@/lib/supabaseClient";
 export default function CallbackPage() {
   useEffect(() => {
     async function checkSession() {
-      const { data } = await supabase.auth.getSession();
+      const { data, error } = await supabase.auth.getSession();
 
-      if (data.session?.user) {
-        window.location.href = "/emma";
-      } else {
-        window.location.href = "/";
-      }
+      // TEMP: non reindirizziamo, solo logghiamo lo stato per debug Apple
+      console.log("/auth/callback session", data, error);
     }
 
     checkSession();
   }, []);
 
   return (
-    <main className="flex items-center justify-center min-h-screen">
-      <p>Caricamento…</p>
+    <main className="flex flex-col items-center justify-center min-h-screen px-4 text-center">
+      <p className="mb-2 font-semibold">OAuth callback</p>
+      <p className="text-sm opacity-80">
+        Debug attivo: la pagina non reindirizza automaticamente. Puoi copiare l&apos;URL dalla barra
+        del browser e incollarlo nella chat.
+      </p>
     </main>
   );
 }
