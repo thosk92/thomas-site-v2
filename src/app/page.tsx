@@ -6,11 +6,14 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import GoogleLogo from "../../g-logo.png";
 import EmmaLogoWhite from "../../logo emma bianco .png";
-import AppleSignIn from "../../apple-account-sign-in.png";
 
 export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -74,24 +77,72 @@ export default function HomePage() {
               Sign in with Google
             </button>
 
-            {/* APPLE */}
-            <button
-              className="w-full mt-1 rounded-xl overflow-hidden"
-              onClick={() =>
-                supabase.auth.signInWithOAuth({
-                  provider: "apple",
-                  options: {
-                    redirectTo: `${window.location.origin}/auth/callback`,
-                  },
-                })
-              }
-            >
-              <Image
-                src={AppleSignIn}
-                alt="Sign in with Apple"
-                className="w-full h-auto"
+            {/* EMAIL / PASSWORD */}
+            <div className="mt-4 flex flex-col gap-2 text-left">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="w-full rounded-lg px-3 py-2 text-sm text-slate-900 border border-white/40 bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
-            </button>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="w-full rounded-lg px-3 py-2 text-sm text-slate-900 border border-white/40 bg-white/90 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              />
+
+              <div className="mt-2 flex flex-col gap-2">
+                <button
+                  disabled={authLoading}
+                  className="w-full rounded-xl bg-white/90 text-slate-900 px-4 py-2 text-sm font-medium hover:bg-white disabled:opacity-70 disabled:cursor-not-allowed"
+                  onClick={async () => {
+                    setAuthError(null);
+                    setAuthLoading(true);
+                    try {
+                      const { error } = await supabase.auth.signInWithPassword({
+                        email,
+                        password,
+                      });
+                      if (error) {
+                        setAuthError(error.message);
+                      }
+                    } finally {
+                      setAuthLoading(false);
+                    }
+                  }}
+                >
+                  Sign in with email
+                </button>
+                <button
+                  disabled={authLoading}
+                  className="w-full rounded-xl border border-white/60 text-white px-4 py-2 text-sm font-medium hover:bg-white/10 disabled:opacity-70 disabled:cursor-not-allowed"
+                  onClick={async () => {
+                    setAuthError(null);
+                    setAuthLoading(true);
+                    try {
+                      const { error } = await supabase.auth.signUp({
+                        email,
+                        password,
+                      });
+                      if (error) {
+                        setAuthError(error.message);
+                      }
+                    } finally {
+                      setAuthLoading(false);
+                    }
+                  }}
+                >
+                  Sign up with email
+                </button>
+              </div>
+
+              {authError && (
+                <p className="mt-1 text-xs text-red-200">{authError}</p>
+              )}
+            </div>
 
             {/* GUEST */}
             <button
