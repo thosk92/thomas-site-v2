@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   } = await supabase.auth.getUser();
 
   let profileBlock = "";
-  let historyBlock: { role: "user" | "assistant"; content: string }[] = [];
+  let historyBlock: OpenAI.Chat.ChatCompletionMessageParam[] = [];
 
   if (user) {
     const profile = await getUserProfile(user.id);
@@ -40,9 +40,9 @@ export async function POST(req: Request) {
 
     if (conversationId) {
       const history = await getHistory(conversationId);
-      historyBlock = history.map((msg: any) => ({
+      historyBlock = history.map((msg: any): OpenAI.Chat.ChatCompletionMessageParam => ({
         role: msg.role === "assistant" ? "assistant" : "user",
-        content: msg.content as string,
+        content: String(msg.content ?? ""),
       }));
     }
   }
@@ -60,7 +60,9 @@ export async function POST(req: Request) {
       role: "system",
       content: baseSystem,
     },
-    ...(profileBlock ? [{ role: "system", content: profileBlock }] : []),
+    ...(profileBlock
+      ? [{ role: "system" as const, content: profileBlock }]
+      : []),
     ...historyBlock,
     { role: "user", content: userInput },
   ];

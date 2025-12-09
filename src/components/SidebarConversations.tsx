@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   getConversations,
   deleteConversation,
@@ -29,7 +29,8 @@ export default function SidebarConversations({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
 
-  async function load() {
+  const load = useCallback(async () => {
+    if (!userId) return;
     setLoading(true);
     try {
       const list = await getConversations(userId);
@@ -37,12 +38,11 @@ export default function SidebarConversations({
     } finally {
       setLoading(false);
     }
-  }
+  }, [userId]);
 
   useEffect(() => {
-    if (!userId) return;
     load();
-  }, [userId]);
+  }, [load]);
 
   return (
     <div className="flex h-full flex-col gap-3 border-r border-white/10 bg-black/70 p-4 text-white">
