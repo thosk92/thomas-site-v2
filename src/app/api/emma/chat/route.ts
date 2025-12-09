@@ -15,7 +15,7 @@ export async function POST(req: Request) {
     conversationId?: string | null;
   };
 
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

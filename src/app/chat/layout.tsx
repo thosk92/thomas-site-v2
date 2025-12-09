@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabaseServerClient";
 import SidebarConversations from "@/components/SidebarConversations";
 
 export default async function ChatLayout({ children }: { children: ReactNode }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
