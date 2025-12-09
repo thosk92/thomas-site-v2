@@ -161,6 +161,9 @@ export default function HomePage() {
                       const { error } = await supabase.auth.signUp({
                         email,
                         password,
+                        options: {
+                          data: { lang },
+                        },
                       });
                       if (error) {
                         setAuthError(error.message);

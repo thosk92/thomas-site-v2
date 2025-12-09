@@ -31,7 +31,14 @@ export default function EmmaHome() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      setUser(data.session?.user ?? null);
+      const sessionUser = data.session?.user ?? null;
+      setUser(sessionUser);
+
+      const metaLang =
+        (sessionUser?.user_metadata?.lang as Lang | undefined) ?? undefined;
+      if (metaLang === "en" || metaLang === "it") {
+        setLang(metaLang);
+      }
     });
   }, []);
 
