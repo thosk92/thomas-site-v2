@@ -5,6 +5,7 @@ import { Roboto_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
+import ServiceWorkerReset from "@/components/ServiceWorkerReset";
 
 const grotesk = Space_Grotesk({
   variable: "--font-geist-sans",
@@ -77,6 +78,7 @@ export default function RootLayout({
         className={`${grotesk.variable} ${robotoMono.variable} ${gothic.variable} ${script.variable} antialiased bg-[#1D2150] text-[#F8FAFC] overflow-x-hidden`}
       >
         {children}
+        <ServiceWorkerReset />
         <Analytics />
         <SpeedInsights />
       </body>

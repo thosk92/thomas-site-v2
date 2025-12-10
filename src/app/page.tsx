@@ -25,7 +25,7 @@ export default function HomePage() {
       const sessionUser = data.session?.user ?? null;
 
       if (sessionUser) {
-        window.location.href = "/emma"; // <<< QUI il redirect corretto
+        window.location.href = "/chat"; // redirect post-login verso area con sidebar
         return;
       }
 
@@ -36,7 +36,7 @@ export default function HomePage() {
     const { data: subscription } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (session?.user) {
-          window.location.href = "/emma"; // <<< ANCHE QUI
+          window.location.href = "/chat";
         }
       }
     );
@@ -252,7 +252,7 @@ export default function HomePage() {
             <button
               className="w-full border border-white/40 px-4 py-3 rounded-xl text-sm font-medium text-white hover:bg-white/10 transition"
               onClick={() => {
-                window.location.href = "/emma";
+                window.location.href = "/chat";
               }}
             >
               {lang === "en" ? "Continue as guest" : "Continua come ospite"}
