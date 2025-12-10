@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import { createConversation } from "@/lib/supabase/conversations";
@@ -11,7 +10,11 @@ import { saveMessage, getMessages } from "@/lib/supabase/messages";
 type Mode = "home" | "session";
 type Lang = "it" | "en";
 
-export default function EmmaHome() {
+export default function EmmaHome({
+  initialConversationId,
+}: {
+  initialConversationId?: string | null;
+} = {}) {
   const [mode, setMode] = useState<Mode>("home");
   const [lang, setLang] = useState<Lang>("en");
   const [text, setText] = useState("");
@@ -26,7 +29,6 @@ export default function EmmaHome() {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -48,8 +50,7 @@ export default function EmmaHome() {
   }, []);
 
   useEffect(() => {
-    const urlConversationId = searchParams.get("conversationId");
-    if (!user || !urlConversationId) {
+    if (!user || !initialConversationId) {
       return;
     }
 
@@ -57,10 +58,10 @@ export default function EmmaHome() {
 
     (async () => {
       try {
-        const dbMessages = await getMessages(urlConversationId);
+        const dbMessages = await getMessages(initialConversationId);
         if (cancelled) return;
 
-        setConversationId(urlConversationId);
+        setConversationId(initialConversationId);
         setMessages(
           dbMessages.map((m) => ({
             role: m.role as "user" | "assistant",
@@ -76,7 +77,7 @@ export default function EmmaHome() {
     return () => {
       cancelled = true;
     };
-  }, [searchParams, user]);
+  }, [initialConversationId, user]);
 
   useEffect(() => {
     const el = textareaRef.current;
