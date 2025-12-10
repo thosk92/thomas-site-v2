@@ -14,6 +14,6 @@ export async function GET(request: Request) {
     }
   }
 
-  const redirectTo = url.searchParams.get("next") || "/emma";
+  const redirectTo = url.searchParams.get("next") || "/chat";
   return NextResponse.redirect(new URL(redirectTo, url.origin));
 }
