@@ -39,6 +39,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+# auth callback output
+*.rtf
 
 # keys
 *.p8

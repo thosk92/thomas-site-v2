@@ -135,12 +135,21 @@ export default function HomePage() {
                     setResetNotice(null);
                     setAuthLoading(true);
                     try {
-                      const { error } = await supabase.auth.signInWithPassword({
+                      const { data, error } = await supabase.auth.signInWithPassword({
                         email,
                         password,
                       });
                       if (error) {
                         setAuthError(error.message);
+                      } else if (data.session) {
+                        await fetch("/api/auth/set-session", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            access_token: data.session.access_token,
+                            refresh_token: data.session.refresh_token,
+                          }),
+                        }).catch(() => {});
                       }
                     } finally {
                       setAuthLoading(false);
@@ -158,7 +167,7 @@ export default function HomePage() {
                     setResetNotice(null);
                     setAuthLoading(true);
                     try {
-                      const { error } = await supabase.auth.signUp({
+                      const { data, error } = await supabase.auth.signUp({
                         email,
                         password,
                         options: {
@@ -168,6 +177,16 @@ export default function HomePage() {
                       if (error) {
                         setAuthError(error.message);
                       } else {
+                        if (data.session) {
+                          await fetch("/api/auth/set-session", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                              access_token: data.session.access_token,
+                              refresh_token: data.session.refresh_token,
+                            }),
+                          }).catch(() => {});
+                        }
                         setSignupNotice(
                           lang === "en"
                             ? "We’ve sent you a verification email. Please check the inbox of the address you used to sign up."
