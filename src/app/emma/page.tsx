@@ -171,6 +171,9 @@ export default function EmmaHome({
           }
           return updated;
         });
+
+        // Piccolo delay per rendere lo streaming più fluido, stile chat
+        await new Promise((resolve) => setTimeout(resolve, 40));
       }
 
       // flush finale
