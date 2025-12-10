@@ -9,6 +9,7 @@ import {
   createConversation,
   updateConversationTitle,
 } from "@/lib/supabase/conversations";
+import { supabase } from "@/lib/supabaseClient";
 
 type Conversation = {
   id: string;
@@ -21,6 +22,7 @@ type Props = {
 };
 
 export default function SidebarConversations({ userId }: Props) {
+  const [resolvedUserId, setResolvedUserId] = useState<string | null | undefined>(userId);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -29,16 +31,26 @@ export default function SidebarConversations({ userId }: Props) {
 
   const activeConversationId = searchParams.get("conversationId");
 
+  useEffect(() => {
+    // Se non abbiamo un userId dal server, proviamo a recuperarlo dal client
+    if (resolvedUserId) return;
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.id) {
+        setResolvedUserId(data.user.id);
+      }
+    });
+  }, [resolvedUserId]);
+
   const load = useCallback(async () => {
-    if (!userId) return;
+    if (!resolvedUserId) return;
     setLoading(true);
     try {
-      const list = await getConversations(userId);
+      const list = await getConversations(resolvedUserId);
       setConversations(list);
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [resolvedUserId]);
 
   useEffect(() => {
     load();
@@ -46,7 +58,7 @@ export default function SidebarConversations({ userId }: Props) {
 
   return (
     <div className="flex h-full flex-col gap-3 border-r border-white/10 bg-black/70 p-4 text-white">
-      {!userId && (
+      {!resolvedUserId && (
         <div className="rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/80">
           Accedi per vedere e salvare le conversazioni.
         </div>
@@ -54,12 +66,12 @@ export default function SidebarConversations({ userId }: Props) {
       <button
         type="button"
         className="w-full rounded-lg bg-white text-slate-900 px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
-        disabled={!userId || creating || loading}
+        disabled={!resolvedUserId || creating || loading}
         onClick={async () => {
-          if (!userId) return;
+          if (!resolvedUserId) return;
           setCreating(true);
           try {
-            const conv = await createConversation(userId, "Nuova conversazione");
+            const conv = await createConversation(resolvedUserId, "Nuova conversazione");
             setConversations((prev) => [conv, ...prev]);
             router.push(`/chat?conversationId=${conv.id}`);
           } catch (err) {
@@ -80,10 +92,12 @@ export default function SidebarConversations({ userId }: Props) {
       </button>
 
       <div className="mt-2 flex-1 space-y-1 overflow-y-auto text-sm">
-        {loading && userId && <p className="text-xs text-slate-300">Caricamento…</p>}
+        {loading && resolvedUserId && <p className="text-xs text-slate-300">Caricamento…</p>}
         {!loading && conversations.length === 0 && (
           <p className="text-xs text-slate-400">
-            {userId ? "Nessuna conversazione salvata." : "Nessuna conversazione: accedi per iniziare a salvarle."}
+            {resolvedUserId
+              ? "Nessuna conversazione salvata."
+              : "Nessuna conversazione: accedi per iniziare a salvarle."}
           </p>
         )}
         {conversations.map((c) => (
@@ -107,7 +121,7 @@ export default function SidebarConversations({ userId }: Props) {
                 className="text-[11px] text-slate-200 hover:text-white"
                 onClick={async (e) => {
                   e.stopPropagation();
-                  if (!userId) return;
+                  if (!resolvedUserId) return;
                   const nextTitle = window.prompt("Rinomina conversazione", c.title ?? "Conversazione");
                   if (nextTitle === null) return;
                   const trimmed = nextTitle.trim();
@@ -132,7 +146,7 @@ export default function SidebarConversations({ userId }: Props) {
                 className="ml-1 text-[11px] text-red-300 hover:text-red-400"
                 onClick={async (e) => {
                   e.stopPropagation();
-                  if (!userId) return;
+                  if (!resolvedUserId) return;
                   setLoading(true);
                   await deleteConversation(c.id);
                   await load();
@@ -150,9 +164,9 @@ export default function SidebarConversations({ userId }: Props) {
           type="button"
           className="mt-2 text-[11px] text-red-400 underline-offset-2 hover:underline"
           onClick={async () => {
-            if (!userId) return;
+            if (!resolvedUserId) return;
             setLoading(true);
-            await deleteAllConversations(userId);
+            await deleteAllConversations(resolvedUserId);
             await load();
           }}
         >
