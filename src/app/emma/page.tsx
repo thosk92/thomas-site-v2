@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
@@ -309,27 +310,45 @@ export default function EmmaHome({
                 </p>
               )}
             </div>
-            <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
-              <button
-                type="button"
-                onClick={() => setLang("en")}
-                className={
-                  "rounded-full px-3 py-1 transition-colors " +
-                  (lang === "en" ? "bg-white text-[#1D2150]" : "text-white/80 hover:bg-white/10")
-                }
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                onClick={() => setLang("it")}
-                className={
-                  "rounded-full px-3 py-1 transition-colors " +
-                  (lang === "it" ? "bg-white text-[#1D2150]" : "text-white/80 hover:bg-white/10")
-                }
-              >
-                IT
-              </button>
+            <div className="flex items-center gap-2">
+              <div className="inline-flex rounded-full bg-white/10 p-1 text-[11px] font-medium text-white/80">
+                <button
+                  type="button"
+                  onClick={() => setLang("en")}
+                  className={
+                    "rounded-full px-3 py-1 transition-colors " +
+                    (lang === "en" ? "bg-white text-[#1D2150]" : "text-white/80 hover:bg-white/10")
+                  }
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLang("it")}
+                  className={
+                    "rounded-full px-3 py-1 transition-colors " +
+                    (lang === "it" ? "bg-white text-[#1D2150]" : "text-white/80 hover:bg-white/10")
+                  }
+                >
+                  IT
+                </button>
+              </div>
+              {user && (
+                <div className="flex items-center gap-2 text-[11px]">
+                  <Link
+                    href="/chat"
+                    className="rounded-full border border-white/25 px-3 py-1 text-white/90 hover:bg-white/10 transition"
+                  >
+                    Storico chat
+                  </Link>
+                  <Link
+                    href="/account"
+                    className="rounded-full border border-white/25 px-3 py-1 text-white/90 hover:bg-white/10 transition"
+                  >
+                    Account
+                  </Link>
+                </div>
+              )}
             </div>
           </header>
 
@@ -433,27 +452,45 @@ export default function EmmaHome({
               </p>
             )}
           </div>
-          <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
-            <button
-              type="button"
-              onClick={() => setLang("en")}
-              className={
-                "rounded-full px-3 py-1 transition-colors " +
-                (lang === "en" ? "bg-[#4f46e5] text-white" : "text-slate-700 hover:bg-slate-100")
-              }
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => setLang("it")}
-              className={
-                "rounded-full px-3 py-1 transition-colors " +
-                (lang === "it" ? "bg-[#4f46e5] text-white" : "text-slate-700 hover:bg-slate-100")
-              }
-            >
-              IT
-            </button>
+          <div className="flex items-center gap-2">
+            <div className="inline-flex rounded-full bg-white/80 p-1 text-[11px] font-medium text-slate-700 shadow-sm">
+              <button
+                type="button"
+                onClick={() => setLang("en")}
+                className={
+                  "rounded-full px-3 py-1 transition-colors " +
+                  (lang === "en" ? "bg-[#4f46e5] text-white" : "text-slate-700 hover:bg-slate-100")
+                }
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang("it")}
+                className={
+                  "rounded-full px-3 py-1 transition-colors " +
+                  (lang === "it" ? "bg-[#4f46e5] text-white" : "text-slate-700 hover:bg-slate-100")
+                }
+              >
+                IT
+              </button>
+            </div>
+            {user && (
+              <div className="flex items-center gap-2 text-[11px]">
+                <Link
+                  href="/chat"
+                  className="rounded-full border border-white/25 px-3 py-1 text-white/90 hover:bg-white/10 transition"
+                >
+                  Storico chat
+                </Link>
+                <Link
+                  href="/account"
+                  className="rounded-full border border-white/25 px-3 py-1 text-white/90 hover:bg-white/10 transition"
+                >
+                  Account
+                </Link>
+              </div>
+            )}
           </div>
         </header>
 
