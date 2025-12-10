@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   getConversations,
   deleteConversation,
@@ -15,19 +16,15 @@ type Conversation = {
 
 type Props = {
   userId: string;
-  activeConversationId: string | null;
-  onSelectConversation: (id: string) => void;
-  onNewConversation: () => void;
 };
 
-export default function SidebarConversations({
-  userId,
-  activeConversationId,
-  onSelectConversation,
-  onNewConversation,
-}: Props) {
+export default function SidebarConversations({ userId }: Props) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const activeConversationId = searchParams.get("conversationId");
 
   const load = useCallback(async () => {
     if (!userId) return;
@@ -50,7 +47,7 @@ export default function SidebarConversations({
         type="button"
         className="w-full rounded-lg bg-white text-slate-900 px-3 py-2 text-sm font-semibold hover:bg-slate-100"
         onClick={() => {
-          onNewConversation();
+          router.push("/chat");
         }}
       >
         + Nuova conversazione
@@ -69,7 +66,9 @@ export default function SidebarConversations({
                 ? "bg-white text-slate-900"
                 : "bg-white/5 text-slate-100 hover:bg-white/10"
             }`}
-            onClick={() => onSelectConversation(c.id)}
+            onClick={() => {
+              router.push(`/chat?conversationId=${c.id}`);
+            }}
           >
             <span className="mr-2 line-clamp-2 flex-1 text-left">
               {c.title || "Conversazione"}

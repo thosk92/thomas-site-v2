@@ -2,10 +2,11 @@
 
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
 import { createConversation } from "@/lib/supabase/conversations";
-import { saveMessage } from "@/lib/supabase/messages";
+import { saveMessage, getMessages } from "@/lib/supabase/messages";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";
@@ -25,6 +26,7 @@ export default function EmmaHome() {
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -44,6 +46,37 @@ export default function EmmaHome() {
       }
     });
   }, []);
+
+  useEffect(() => {
+    const urlConversationId = searchParams.get("conversationId");
+    if (!user || !urlConversationId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const dbMessages = await getMessages(urlConversationId);
+        if (cancelled) return;
+
+        setConversationId(urlConversationId);
+        setMessages(
+          dbMessages.map((m) => ({
+            role: m.role as "user" | "assistant",
+            content: m.content ?? "",
+          })),
+        );
+        setMode("session");
+      } catch (err) {
+        console.error("[emma] failed to load conversation messages", err);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams, user]);
 
   useEffect(() => {
     const el = textareaRef.current;
@@ -115,15 +148,6 @@ export default function EmmaHome() {
         return;
       }
 
-      // Salva il messaggio di EMMA a fine stream
-      if (convId && user) {
-        try {
-          await saveMessage(convId, "assistant", assistantText);
-        } catch (err) {
-          console.error("[emma] failed to save assistant message", err);
-        }
-      }
-
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let assistantText = "";
@@ -157,6 +181,15 @@ export default function EmmaHome() {
             : "La risposta di EMMA è vuota. Riprova.",
         );
         return;
+      }
+
+      // Salva il messaggio di EMMA a fine stream
+      if (convId && user) {
+        try {
+          await saveMessage(convId, "assistant", assistantText);
+        } catch (err) {
+          console.error("[emma] failed to save assistant message", err);
+        }
       }
     } catch (err) {
       console.error("[emma advice] exception", err);
