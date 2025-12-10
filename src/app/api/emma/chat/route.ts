@@ -65,13 +65,15 @@ export async function POST(req: Request) {
 
   const completion = await client.chat.completions.create({
     model: "gpt-4.1-mini",
-    stream: true,
     messages,
+    stream: false,
   });
 
-  return new Response(completion.toReadableStream(), {
+  const content = completion.choices[0]?.message?.content ?? "";
+
+  return new Response(content, {
     headers: {
-      "Content-Type": "text/event-stream",
+      "Content-Type": "text/plain; charset=utf-8",
     },
   });
 }
