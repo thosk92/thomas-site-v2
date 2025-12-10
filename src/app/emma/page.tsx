@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabaseClient";
+import { createConversation } from "@/lib/supabase/conversations";
+import { saveMessage } from "@/lib/supabase/messages";
 
 type Mode = "home" | "session";
 type Lang = "it" | "en";
@@ -19,6 +21,7 @@ export default function EmmaHome() {
   const [error, setError] = useState<string | null>(null);
   const [showDataSheet, setShowDataSheet] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -58,8 +61,6 @@ export default function EmmaHome() {
     const value = text.trim();
     if (!value) return;
 
-    const historyForApi = messages;
-
     // clear input immediately after sending
     setText("");
 
@@ -74,10 +75,33 @@ export default function EmmaHome() {
     ]);
 
     try {
-      const res = await fetch("/api/emma/advice", {
+      let convId = conversationId;
+
+      // Crea una conversazione se l'utente è loggato e non ne esiste ancora una
+      if (!convId && user) {
+        try {
+          const title = value.length > 80 ? `${value.slice(0, 77)}...` : value;
+          const conv = await createConversation(user.id, title);
+          convId = conv.id;
+          setConversationId(conv.id);
+        } catch (err) {
+          console.error("[emma] failed to create conversation", err);
+        }
+      }
+
+      // Salva il messaggio dell'utente se abbiamo una conversazione
+      if (convId && user) {
+        try {
+          await saveMessage(convId, "user", value);
+        } catch (err) {
+          console.error("[emma] failed to save user message", err);
+        }
+      }
+
+      const res = await fetch("/api/emma/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: value, lang, history: historyForApi }),
+        body: JSON.stringify({ userInput: value, conversationId: convId }),
       });
 
       if (!res.ok || !res.body) {
@@ -89,6 +113,15 @@ export default function EmmaHome() {
             : "Al momento non riesco a generare un consiglio. Riprova tra poco.",
         );
         return;
+      }
+
+      // Salva il messaggio di EMMA a fine stream
+      if (convId && user) {
+        try {
+          await saveMessage(convId, "assistant", assistantText);
+        } catch (err) {
+          console.error("[emma] failed to save assistant message", err);
+        }
       }
 
       const reader = res.body.getReader();
