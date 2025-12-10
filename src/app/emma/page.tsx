@@ -151,33 +151,70 @@ export default function EmmaHome({
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
+
+      // Buffer per il rendering progressivo
       let assistantText = "";
+      let renderText = "";
+      const buffer: string[] = [];
+      let isRendering = false;
+
+      const startRenderLoop = () => {
+        if (isRendering) return;
+        isRendering = true;
+
+        const loop = () => {
+          const batch: string[] = [];
+          let take = Math.min(4, buffer.length);
+          while (take-- > 0) {
+            const chunk = buffer.shift();
+            if (chunk) batch.push(chunk);
+          }
+
+          if (batch.length) {
+            renderText += batch.join("");
+            const current = renderText;
+            setMessages((prev) => {
+              if (!prev.length) return prev;
+              const updated = [...prev];
+              const lastIndex = updated.length - 1;
+              if (updated[lastIndex]?.role === "assistant") {
+                updated[lastIndex] = {
+                  ...updated[lastIndex],
+                  content: current,
+                };
+              }
+              return updated;
+            });
+          }
+
+          if (buffer.length > 0) {
+            requestAnimationFrame(loop);
+          } else {
+            isRendering = false;
+          }
+        };
+
+        requestAnimationFrame(loop);
+      };
 
       while (true) {
         const { value: chunk, done } = await reader.read();
         if (done) break;
-        assistantText += decoder.decode(chunk, { stream: true });
-
-        const current = assistantText;
-        setMessages((prev) => {
-          if (!prev.length) return prev;
-          const updated = [...prev];
-          const lastIndex = updated.length - 1;
-          if (updated[lastIndex]?.role === "assistant") {
-            updated[lastIndex] = {
-              ...updated[lastIndex],
-              content: current,
-            };
-          }
-          return updated;
-        });
-
-        // Piccolo delay per rendere lo streaming più fluido, stile chat
-        await new Promise((resolve) => setTimeout(resolve, 40));
+        const decoded = decoder.decode(chunk, { stream: true });
+        if (!decoded) continue;
+        assistantText += decoded;
+        buffer.push(decoded);
+        startRenderLoop();
       }
 
-      // flush finale
-      assistantText += decoder.decode();
+      // flush finale del decoder
+      const flushed = decoder.decode();
+      if (flushed) {
+        assistantText += flushed;
+        buffer.push(flushed);
+        startRenderLoop();
+      }
+
       if (!assistantText.trim()) {
         setError(
           lang === "en"
