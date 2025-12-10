@@ -23,23 +23,65 @@ type Props = {
 
 export default function SidebarConversations({ userId }: Props) {
   const [resolvedUserId, setResolvedUserId] = useState<string | null | undefined>(userId);
+  const [resolvedEmail, setResolvedEmail] = useState<string | null>(null);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const activeConversationId = searchParams.get("conversationId");
 
+  // Sync with userId from props when it changes (SSR -> CSR)
+  useEffect(() => {
+    if (userId && userId !== resolvedUserId) {
+      setResolvedUserId(userId);
+      setAuthReady(true);
+    }
+  }, [userId, resolvedUserId]);
+
   useEffect(() => {
     // Se non abbiamo un userId dal server, proviamo a recuperarlo dal client
     if (resolvedUserId) return;
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user?.id) {
-        setResolvedUserId(data.user.id);
+
+    let active = true;
+
+    const fetchSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      const id = data.session?.user?.id ?? null;
+      const email = data.session?.user?.email ?? null;
+      setResolvedUserId(id);
+      setResolvedEmail(email);
+      setAuthReady(true);
+    };
+
+    fetchSession();
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!active) return;
+      setResolvedUserId(session?.user?.id ?? null);
+      setResolvedEmail(session?.user?.email ?? null);
+      setAuthReady(true);
+    });
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
+  }, [resolvedUserId]);
+
+  useEffect(() => {
+    // Se abbiamo l'utente ma non l'email (es. userId passato da SSR), proviamo a leggerla dalla sessione client
+    if (!resolvedUserId || resolvedEmail) return;
+    supabase.auth.getSession().then(({ data }) => {
+      const email = data.session?.user?.email ?? null;
+      if (email) {
+        setResolvedEmail(email);
       }
     });
-  }, [resolvedUserId]);
+  }, [resolvedUserId, resolvedEmail]);
 
   const load = useCallback(async () => {
     if (!resolvedUserId) return;
@@ -53,12 +95,17 @@ export default function SidebarConversations({ userId }: Props) {
   }, [resolvedUserId]);
 
   useEffect(() => {
+    if (!authReady) return;
     load();
-  }, [load]);
+  }, [authReady, load]);
 
   return (
     <div className="flex h-full flex-col gap-3 border-r border-white/10 bg-black/70 p-4 text-white">
-      {!resolvedUserId && (
+      {authReady && resolvedUserId ? (
+        <div className="rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/80">
+          {resolvedEmail ? `Bentornato, ${resolvedEmail}` : "Bentornato in EMMA"}
+        </div>
+      ) : (
         <div className="rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/80">
           Accedi per vedere e salvare le conversazioni.
         </div>
@@ -85,15 +132,17 @@ export default function SidebarConversations({ userId }: Props) {
       </button>
       <button
         type="button"
-        className="w-full rounded-lg border border-white/15 bg-transparent text-white px-3 py-2 text-sm font-medium hover:bg-white/10"
+        className="w-full cursor-pointer rounded-lg border border-white/15 bg-transparent text-white px-3 py-2 text-sm font-medium hover:bg-white/10"
         onClick={() => router.push("/account")}
       >
         Profilo e preferenze
       </button>
 
       <div className="mt-2 flex-1 space-y-1 overflow-y-auto text-sm">
-        {loading && resolvedUserId && <p className="text-xs text-slate-300">Caricamento…</p>}
-        {!loading && conversations.length === 0 && (
+        {(loading || !authReady) && (
+          <p className="text-xs text-slate-300">Caricamento…</p>
+        )}
+        {!loading && authReady && conversations.length === 0 && (
           <p className="text-xs text-slate-400">
             {resolvedUserId
               ? "Nessuna conversazione salvata."
