@@ -67,6 +67,11 @@ export default function AccountProfileForm({ initialProfile, email }: Props) {
 
   const handleSignOut = async () => {
     setSaving(true);
+    try {
+      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
+    } catch {
+      // ignore
+    }
     await supabase.auth.signOut();
     window.location.href = "/";
   };
