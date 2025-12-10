@@ -39,3 +39,15 @@ export async function deleteAllConversations(userId: string) {
 
   if (error) throw error;
 }
+
+export async function updateConversationTitle(conversationId: string, title: string) {
+  const { data, error } = await supabase
+    .from("conversations")
+    .update({ title })
+    .eq("id", conversationId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
