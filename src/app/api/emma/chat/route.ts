@@ -66,12 +66,28 @@ export async function POST(req: Request) {
   const completion = await client.chat.completions.create({
     model: "gpt-4.1-mini",
     messages,
-    stream: false,
+    stream: true,
   });
 
-  const content = completion.choices[0]?.message?.content ?? "";
+  const encoder = new TextEncoder();
 
-  return new Response(content, {
+  const stream = new ReadableStream({
+    async start(controller) {
+      try {
+        for await (const chunk of completion) {
+          const delta = chunk.choices[0]?.delta?.content;
+          if (!delta) continue;
+          controller.enqueue(encoder.encode(delta));
+        }
+        controller.close();
+      } catch (err) {
+        console.error("[emma api] streaming error", err);
+        controller.error(err);
+      }
+    },
+  });
+
+  return new Response(stream, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
     },
