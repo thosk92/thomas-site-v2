@@ -94,7 +94,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-4 w-full max-w-xs mt-2">
             {/* GOOGLE */}
             <button
-              className="w-full bg-white text-black border border-gray-300 px-4 py-3 rounded-xl flex items-center justify-center gap-3"
+              className="w-full bg-white text-black border border-gray-300 px-4 py-3 rounded-xl flex items-center justify-center gap-3 cursor-pointer hover:shadow-md transition-shadow"
               onClick={() =>
                 supabase.auth.signInWithOAuth({
                   provider: "google",
