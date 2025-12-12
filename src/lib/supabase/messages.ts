@@ -5,17 +5,21 @@ export async function saveMessage(
   role: "user" | "assistant",
   content: string,
 ) {
-  const { data, error } = await supabase
-    .from("messages")
-    .insert({ conversation_id: conversationId, role, content })
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
+  const res = await fetch("/api/messages/save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ conversationId, role, content }),
+  });
+  if (!res.ok) {
+    const t = await res.text().catch(() => "");
+    throw new Error(t || "Failed to save message");
+  }
+  const { message } = await res.json();
+  return message;
 }
 
 export async function getMessages(conversationId: string) {
+  // keep direct client fetch for history (read-only)
   const { data, error } = await supabase
     .from("messages")
     .select("*")
