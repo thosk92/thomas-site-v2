@@ -1,3 +1,4 @@
+import Link from "next/link";
 import AccountProfileForm from "@/components/AccountProfileForm";
 import { createClient } from "@/lib/supabaseServerClient";
 
@@ -18,12 +19,12 @@ export default async function AccountPage() {
           <p className="text-sm text-white/70">
             Per modificare i dati del profilo entra con il tuo account.
           </p>
-          <a
+          <Link
             href="/"
             className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white hover:bg-white/10 transition"
           >
             Vai al login
-          </a>
+          </Link>
         </div>
       </div>
     );
@@ -54,12 +55,12 @@ export default async function AccountPage() {
               Aggiorna i dati che EMMA può usare per personalizzare le risposte.
             </p>
           </div>
-          <a
+          <Link
             href="/emma"
             className="rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/10 transition"
           >
             Torna alla chat
-          </a>
+          </Link>
         </header>
 
         <AccountProfileForm initialProfile={initialProfile} email={user.email} />
