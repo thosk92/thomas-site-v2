@@ -19,14 +19,22 @@ export async function POST(req: Request) {
   } = await supabase.auth.getUser();
 
   let currentUser = user;
+  const admin = createAdminClient();
 
   if (!currentUser) {
     const headerToken = extractAccessToken(req);
     const cookieToken = cookieStore.get("sb-access-token")?.value;
     const token = headerToken ?? cookieToken;
     if (token) {
+      // Try with anon client
       const { data } = await supabase.auth.getUser(token);
       currentUser = data.user;
+
+      // Fallback with admin client (bypasses RLS on auth)
+      if (!currentUser && admin) {
+        const { data: adminUser } = await admin.auth.getUser(token);
+        currentUser = adminUser.user;
+      }
     }
   }
 
@@ -60,8 +68,6 @@ export async function POST(req: Request) {
   } catch (err) {
     console.error("[profile] failed to persist auth metadata", err);
   }
-
-  const admin = createAdminClient();
 
   const attemptUpsert = async (withLanguage: boolean) => {
     const insertPayload = withLanguage
