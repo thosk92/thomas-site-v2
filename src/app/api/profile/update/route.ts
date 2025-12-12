@@ -43,12 +43,32 @@ export async function POST(req: Request) {
       .single();
   };
 
+  const attemptUpdate = async (withLanguage: boolean) => {
+    const updatePayload = withLanguage
+      ? payload
+      : { ...payload, language_preference: undefined };
+    return supabase
+      .from("profiles")
+      .update(updatePayload)
+      .eq("id", user.id)
+      .select()
+      .single();
+  };
+
   let data, error;
   ({ data, error } = await attemptUpsert(true));
 
   // Fallback when the column does not exist in the DB (legacy schema)
   if (error && /language_preference/.test(error.message ?? "")) {
     ({ data, error } = await attemptUpsert(false));
+  }
+
+  // Fallback when RLS blocks inserts: try an update only
+  if (error && /row-level security/i.test(error.message ?? "")) {
+    ({ data, error } = await attemptUpdate(true));
+    if (error && /language_preference/.test(error.message ?? "")) {
+      ({ data, error } = await attemptUpdate(false));
+    }
   }
 
   if (error) {
