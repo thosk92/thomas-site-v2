@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClientReadOnly } from "@/lib/supabaseServerClient";
+import { createClient } from "@/lib/supabaseServerClient";
 import { createAdminClient } from "@/lib/supabaseAdminClient";
 
 export async function GET() {
-  const supabase = await createClientReadOnly();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -13,11 +13,9 @@ export async function GET() {
   }
 
   const admin = createAdminClient();
-  if (!admin) {
-    return NextResponse.json({ error: "Missing Supabase configuration" }, { status: 500 });
-  }
+  const client = admin ?? supabase;
 
-  const { data, error } = await admin
+  const { data, error } = await client
     .from("conversations")
     .select("*")
     .eq("user_id", user.id)

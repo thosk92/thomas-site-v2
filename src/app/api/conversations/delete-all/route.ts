@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClientReadOnly } from "@/lib/supabaseServerClient";
+import { createClient } from "@/lib/supabaseServerClient";
 import { createAdminClient } from "@/lib/supabaseAdminClient";
 
 export async function POST() {
-  const supabase = await createClientReadOnly();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -13,11 +13,9 @@ export async function POST() {
   }
 
   const admin = createAdminClient();
-  if (!admin) {
-    return NextResponse.json({ error: "Missing Supabase configuration" }, { status: 500 });
-  }
+  const client = admin ?? supabase;
 
-  const { error } = await admin.from("conversations").delete().eq("user_id", user.id);
+  const { error } = await client.from("conversations").delete().eq("user_id", user.id);
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
