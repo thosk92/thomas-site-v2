@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabaseServerClient";
 import { createAdminClient } from "@/lib/supabaseAdminClient";
 
@@ -12,6 +13,7 @@ function extractAccessToken(req: Request): string | null {
 
 export async function POST(req: Request) {
   const supabase = await createClient();
+  const cookieStore = await cookies();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -19,7 +21,9 @@ export async function POST(req: Request) {
   let currentUser = user;
 
   if (!currentUser) {
-    const token = extractAccessToken(req);
+    const headerToken = extractAccessToken(req);
+    const cookieToken = cookieStore.get("sb-access-token")?.value;
+    const token = headerToken ?? cookieToken;
     if (token) {
       const { data } = await supabase.auth.getUser(token);
       currentUser = data.user;
