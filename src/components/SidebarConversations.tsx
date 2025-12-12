@@ -98,6 +98,46 @@ const UI_COPY: { default: UiStrings } & Partial<Record<Lang, UiStrings>> = {
     newConversation: "+ Nuova conversazione",
     creating: "Creazione in corso…",
   },
+  es: {
+    chatLabel: "Chat",
+    guestHint: "Invitado · inicia sesión para guardar",
+    profileActive: "Perfil activo",
+    account: "Cuenta y preferencias",
+    newConversation: "+ Nueva conversación",
+    creating: "Creando…",
+  },
+  fr: {
+    chatLabel: "Chat",
+    guestHint: "Invité · connectez-vous pour enregistrer",
+    profileActive: "Profil actif",
+    account: "Compte et préférences",
+    newConversation: "+ Nouvelle conversation",
+    creating: "Création…",
+  },
+  de: {
+    chatLabel: "Chat",
+    guestHint: "Gast · Anmelden zum Speichern",
+    profileActive: "Aktives Profil",
+    account: "Konto & Einstellungen",
+    newConversation: "+ Neues Gespräch",
+    creating: "Wird erstellt…",
+  },
+  "pt-PT": {
+    chatLabel: "Chat",
+    guestHint: "Convidado · inicie sessão para guardar",
+    profileActive: "Perfil ativo",
+    account: "Conta e preferências",
+    newConversation: "+ Nova conversa",
+    creating: "A criar…",
+  },
+  "pt-BR": {
+    chatLabel: "Chat",
+    guestHint: "Convidado · faça login para salvar",
+    profileActive: "Perfil ativo",
+    account: "Conta e preferências",
+    newConversation: "+ Nova conversa",
+    creating: "Criando…",
+  },
 };
 
 const getUiCopy = (lang: Lang): UiStrings => UI_COPY[lang] ?? UI_COPY.default;
