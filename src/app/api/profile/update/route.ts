@@ -14,21 +14,33 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { name, age, gender, personal_goal, language_preference } = body;
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .upsert(
-      {
-        id: user.id,
-        name,
-        age,
-        gender,
-        personal_goal,
-        language_preference,
-      },
-      { onConflict: "id" },
-    )
-    .select()
-    .single();
+  const payload = {
+    id: user.id,
+    name,
+    age,
+    gender,
+    personal_goal,
+    language_preference,
+  };
+
+  const attemptUpsert = async (withLanguage: boolean) => {
+    const insertPayload = withLanguage
+      ? payload
+      : { ...payload, language_preference: undefined };
+    return supabase
+      .from("profiles")
+      .upsert(insertPayload, { onConflict: "id" })
+      .select()
+      .single();
+  };
+
+  let data, error;
+  ({ data, error } = await attemptUpsert(true));
+
+  // Fallback when the column does not exist in the DB (legacy schema)
+  if (error && /language_preference/.test(error.message ?? "")) {
+    ({ data, error } = await attemptUpsert(false));
+  }
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });
