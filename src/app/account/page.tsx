@@ -1,47 +1,66 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import AccountProfileForm from "@/components/AccountProfileForm";
-import { createClient } from "@/lib/supabaseServerClient";
+import { supabase } from "@/lib/supabaseClient";
 
-export const revalidate = 0;
-export const dynamic = "force-dynamic";
+type Profile = {
+  name: string | null;
+  age: number | null;
+  gender: string | null;
+  personal_goal: string | null;
+  language_preference: string | null;
+};
 
-export default async function AccountPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function AccountPage() {
+  const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!user) {
-    return (
-      <div className="emma-chat-bg min-h-screen w-full px-6 pb-16 pt-16 text-white">
-        <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center gap-4">
-          <h1 className="text-3xl font-semibold">Accedi per gestire il profilo</h1>
-          <p className="text-sm text-white/70">
-            Per modificare i dati del profilo entra con il tuo account.
-          </p>
-          <Link
-            href="/"
-            className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white hover:bg-white/10 transition"
-          >
-            Vai al login
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const { data } = await supabase.auth.getSession();
+      if (!active) return;
+      const sessionUser = data.session?.user ?? null;
+      setUser(sessionUser);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+      if (!sessionUser) {
+        setLoading(false);
+        return;
+      }
 
-  const initialProfile = {
-    name: profile?.name ?? null,
-    age: profile?.age ?? null,
-    gender: profile?.gender ?? null,
-    personal_goal: profile?.personal_goal ?? null,
-    language_preference: profile?.language_preference ?? null,
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", sessionUser.id)
+        .maybeSingle();
+
+      if (active) {
+        setProfile({
+          name: profileData?.name ?? null,
+          age: profileData?.age ?? null,
+          gender: profileData?.gender ?? null,
+          personal_goal: profileData?.personal_goal ?? null,
+          language_preference: profileData?.language_preference ?? null,
+        });
+        setLoading(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const initialProfile: Profile = profile ?? {
+    name: null,
+    age: null,
+    gender: null,
+    personal_goal: null,
+    language_preference: null,
   };
 
   return (
@@ -57,13 +76,32 @@ export default async function AccountPage() {
           </div>
           <Link
             href="/emma"
-            className="rounded-full border border-white/20 px-4 py-2 text-sm text-white hover:bg-white/10 transition"
+            className="rounded-full border border-white/20 px-4 py-2 text-sm text-white transition hover:bg-white/10"
           >
             Torna alla chat
           </Link>
         </header>
 
-        <AccountProfileForm initialProfile={initialProfile} email={user.email} />
+        {loading ? (
+          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6 text-white/80 backdrop-blur">
+            Caricamento…
+          </div>
+        ) : user ? (
+          <AccountProfileForm initialProfile={initialProfile} email={user.email} />
+        ) : (
+          <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6 text-center text-white/80 backdrop-blur">
+            <h2 className="text-xl font-semibold text-white">Accedi per gestire il profilo</h2>
+            <p className="mt-2 text-sm text-white/70">
+              Per modificare i dati del profilo entra con il tuo account.
+            </p>
+            <Link
+              href="/"
+              className="mt-4 inline-flex items-center justify-center rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Vai al login
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );
