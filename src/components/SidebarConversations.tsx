@@ -23,6 +23,85 @@ type Conversation = {
   created_at: string;
 };
 
+const DATA_CTA_BY_LANG: Partial<Record<Lang, string>> = {
+  "en-US": "How we use your data",
+  "en-GB": "How we use your data",
+  it: "Come usiamo i tuoi dati",
+  es: "Cómo usamos tus datos",
+  fr: "Comment nous utilisons vos données",
+  de: "Wie wir deine Daten nutzen",
+  "pt-PT": "Como usamos os seus dados",
+  "pt-BR": "Como usamos seus dados",
+  nl: "Hoe we je gegevens gebruiken",
+  sv: "Hur vi använder dina data",
+  no: "Hvordan vi bruker dataene dine",
+  da: "Sådan bruger vi dine data",
+  fi: "Miten käytämme tietojasi",
+  pl: "Jak wykorzystujemy Twoje dane",
+  cs: "Jak používáme vaše data",
+  sk: "Ako používame vaše údaje",
+  sl: "Kako uporabljamo vaše podatke",
+  hu: "Hogyan használjuk az adataidat",
+  ro: "Cum îți folosim datele",
+  bg: "Как използваме данните ти",
+  hr: "Kako koristimo tvoje podatke",
+  sr: "Kako koristimo tvoje podatke",
+  ru: "Как мы используем ваши данные",
+  uk: "Як ми використовуємо ваші дані",
+  tr: "Verilerini nasıl kullanıyoruz",
+  el: "Πώς χρησιμοποιούμε τα δεδομένα σου",
+  hi: "हम आपके डेटा का उपयोग कैसे करते हैं",
+  ja: "データの利用について",
+  "zh-CN": "我们如何使用您的数据",
+  "zh-TW": "我們如何使用你的資料",
+};
+
+type UiStrings = {
+  chatLabel: string;
+  guestHint: string;
+  profileActive: string;
+  account: string;
+  newConversation: string;
+  creating: string;
+};
+
+const UI_COPY: Record<Lang | "default", UiStrings> = {
+  default: {
+    chatLabel: "Chat",
+    guestHint: "Guest · sign in to save",
+    profileActive: "Active profile",
+    account: "Account & preferences",
+    newConversation: "+ New conversation",
+    creating: "Creating…",
+  },
+  "en-US": {
+    chatLabel: "Chat",
+    guestHint: "Guest · sign in to save",
+    profileActive: "Active profile",
+    account: "Account & preferences",
+    newConversation: "+ New conversation",
+    creating: "Creating…",
+  },
+  "en-GB": {
+    chatLabel: "Chat",
+    guestHint: "Guest · sign in to save",
+    profileActive: "Active profile",
+    account: "Account & preferences",
+    newConversation: "+ New conversation",
+    creating: "Creating…",
+  },
+  it: {
+    chatLabel: "Chat",
+    guestHint: "Ospite · accedi per salvare",
+    profileActive: "Profilo attivo",
+    account: "Account e preferenze",
+    newConversation: "+ Nuova conversazione",
+    creating: "Creazione in corso…",
+  },
+};
+
+const getUiCopy = (lang: Lang): UiStrings => UI_COPY[lang] ?? UI_COPY.default;
+
 type Props = {
   userId?: string | null;
 };
@@ -48,6 +127,8 @@ export default function SidebarConversations({ userId }: Props) {
   const searchParams = useSearchParams();
 
   const activeConversationId = searchParams.get("conversationId");
+  const dataCta = DATA_CTA_BY_LANG[selectedLang] ?? DATA_CTA_BY_LANG["en-US"] ?? "How we use your data";
+  const uiCopy = getUiCopy(selectedLang);
 
   // Sync with userId from props when it changes (SSR -> CSR)
   useEffect(() => {
@@ -210,11 +291,11 @@ export default function SidebarConversations({ userId }: Props) {
       <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-xs text-white/80">
         <div>
           <p className="text-[10px] uppercase tracking-[0.22em] text-indigo-100/80">EMMA</p>
-          <p className="text-sm font-semibold text-white">Chat</p>
+          <p className="text-sm font-semibold text-white">{uiCopy.chatLabel}</p>
           <p className="text-[11px] text-white/70">
             {authReady && resolvedUserId
-              ? resolvedEmail || "Profilo attivo"
-              : "Ospite · accedi per salvare"}
+              ? resolvedEmail || uiCopy.profileActive
+              : uiCopy.guestHint}
           </p>
         </div>
         <div className="flex flex-col gap-2 text-[11px]">
@@ -238,7 +319,7 @@ export default function SidebarConversations({ userId }: Props) {
             href="/account"
             className="inline-flex items-center justify-center rounded-lg border border-white/15 px-3 py-2 text-[11px] font-medium text-white hover:bg-white/10"
           >
-            Account e preferenze
+            {uiCopy.account}
           </a>
         </div>
       </div>
@@ -261,7 +342,7 @@ export default function SidebarConversations({ userId }: Props) {
           }
         }}
       >
-        {creating ? "Creazione in corso…" : "+ Nuova conversazione"}
+        {creating ? uiCopy.creating : uiCopy.newConversation}
       </button>
 
       <div className="mt-2 flex-1 space-y-1 overflow-y-auto text-sm px-1">
@@ -354,7 +435,7 @@ export default function SidebarConversations({ userId }: Props) {
         onClick={() => window.dispatchEvent(new CustomEvent("emma:open-data-sheet"))}
         className="mt-auto inline-flex w-full items-center justify-center rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-[11px] font-medium text-white transition hover:bg-white/10"
       >
-        Come usiamo i tuoi dati
+        {dataCta}
       </button>
     </div>
   );
