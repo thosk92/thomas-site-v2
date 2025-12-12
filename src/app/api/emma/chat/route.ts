@@ -22,12 +22,7 @@ export async function POST(req: Request) {
 
   let profileBlock = "";
   let historyBlock: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-  let admin: ReturnType<typeof createAdminClient> | null = null;
-  try {
-    admin = createAdminClient();
-  } catch (err) {
-    console.warn("[emma chat] admin client unavailable, falling back to user client");
-  }
+  const admin = createAdminClient();
 
   if (user) {
     const metaName = (user.user_metadata?.name as string | undefined) ?? null;

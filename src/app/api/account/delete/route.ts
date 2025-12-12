@@ -3,6 +3,9 @@ import { createAdminClient } from "@/lib/supabaseAdminClient";
 
 export async function POST(req: Request) {
   const admin = createAdminClient();
+  if (!admin) {
+    return NextResponse.json({ error: "Supabase admin not configured" }, { status: 500 });
+  }
   const { userId } = await req.json();
 
   if (!userId) {

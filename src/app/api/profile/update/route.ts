@@ -39,12 +39,7 @@ export async function POST(req: Request) {
     console.error("[profile] failed to persist auth metadata", err);
   }
 
-  let admin: ReturnType<typeof createAdminClient> | null = null;
-  try {
-    admin = createAdminClient();
-  } catch (err) {
-    console.warn("[profile update] admin client unavailable, falling back to user client");
-  }
+  const admin = createAdminClient();
 
   const attemptUpsert = async (withLanguage: boolean) => {
     const insertPayload = withLanguage
