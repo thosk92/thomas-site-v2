@@ -102,6 +102,29 @@ const UI_COPY: { default: UiStrings } & Partial<Record<Lang, UiStrings>> = {
 
 const getUiCopy = (lang: Lang): UiStrings => UI_COPY[lang] ?? UI_COPY.default;
 
+const EMPTY_COPY: { default: { saved: string; guest: string } } & Partial<
+  Record<Lang, { saved: string; guest: string }>
+> = {
+  default: {
+    saved: "No saved conversations.",
+    guest: "No conversations: sign in to save them.",
+  },
+  it: {
+    saved: "Nessuna conversazione salvata.",
+    guest: "Nessuna conversazione: accedi per iniziare a salvarle.",
+  },
+  es: {
+    saved: "Ninguna conversación guardada.",
+    guest: "Ninguna conversación: inicia sesión para guardarlas.",
+  },
+  fr: {
+    saved: "Aucune conversation enregistrée.",
+    guest: "Aucune conversation : connectez-vous pour les enregistrer.",
+  },
+};
+
+const getEmptyCopy = (lang: Lang) => EMPTY_COPY[lang] ?? EMPTY_COPY.default;
+
 type Props = {
   userId?: string | null;
 };
@@ -129,6 +152,7 @@ export default function SidebarConversations({ userId }: Props) {
   const activeConversationId = searchParams.get("conversationId");
   const dataCta = DATA_CTA_BY_LANG[selectedLang] ?? DATA_CTA_BY_LANG["en-US"] ?? "How we use your data";
   const uiCopy = getUiCopy(selectedLang);
+  const emptyCopy = getEmptyCopy(selectedLang);
 
   // Sync with userId from props when it changes (SSR -> CSR)
   useEffect(() => {
@@ -363,9 +387,7 @@ export default function SidebarConversations({ userId }: Props) {
         )}
         {!loading && authReady && conversations.length === 0 && (
           <p className="text-xs text-slate-400">
-            {resolvedUserId
-              ? "Nessuna conversazione salvata."
-              : "Nessuna conversazione: accedi per iniziare a salvarle."}
+            {resolvedUserId ? emptyCopy.saved : emptyCopy.guest}
           </p>
         )}
         {conversations.map((c) => (
