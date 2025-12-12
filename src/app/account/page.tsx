@@ -77,7 +77,7 @@ export default function AccountPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [sessionSynced]);
 
   const initialProfile: Profile = profile ?? {
     name: null,

@@ -25,8 +25,6 @@
   Questa è la configurazione consigliata fino al refactor futuro della route.
 */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import OpenAI from "openai";
 
 export const runtime = "edge";
