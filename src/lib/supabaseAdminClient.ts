@@ -9,13 +9,12 @@ export function createAdminClient() {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
   }
 
-  // Fallback to anon key if service role is not configured to avoid crashing the app
-  const key = serviceRoleKey ?? anonKey;
-  if (!key) {
-    throw new Error("Missing Supabase keys");
+  // Prefer the service role key; if missing, throw explicitly (we rely on admin capabilities)
+  if (!serviceRoleKey) {
+    throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
   }
 
-  return createClient(supabaseUrl, key, {
+  return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
       persistSession: false,
     },
