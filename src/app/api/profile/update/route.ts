@@ -40,7 +40,7 @@ export async function POST(req: Request) {
       .from("profiles")
       .upsert(insertPayload, { onConflict: "id" })
       .select()
-      .single();
+      .maybeSingle();
   };
 
   const attemptUpdate = async (withLanguage: boolean) => {
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
       .update(updatePayload)
       .eq("id", user.id)
       .select()
-      .single();
+      .maybeSingle();
   };
 
   let data, error;
@@ -75,5 +75,5 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ success: true, profile: data });
+  return NextResponse.json({ success: true, profile: data ?? payload });
 }
