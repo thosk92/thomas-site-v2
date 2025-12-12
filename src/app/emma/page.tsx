@@ -932,14 +932,22 @@ export default function EmmaHome({
     lastPersistedLang.current = lang;
 
     // Persist on session and profile so the preference is reused
-    supabase.auth
-      .updateUser({ data: { lang } })
-      .catch((err) => console.error("[emma] failed to persist auth lang", err));
+    (async () => {
+      try {
+        await supabase.auth.updateUser({ data: { lang } });
+      } catch (err) {
+        console.error("[emma] failed to persist auth lang", err);
+      }
 
-    supabase
-      .from("profiles")
-      .upsert({ id: user.id, language_preference: lang }, { onConflict: "id" })
-      .catch((err) => console.error("[emma] failed to persist profile lang", err));
+      try {
+        await supabase.from("profiles").upsert(
+          { id: user.id, language_preference: lang },
+          { onConflict: "id" },
+        );
+      } catch (err) {
+        console.error("[emma] failed to persist profile lang", err);
+      }
+    })();
   }, [lang, user]);
 
   const examplePills = copy.examples;
