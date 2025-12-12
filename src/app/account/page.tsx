@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import AccountProfileForm from "@/components/AccountProfileForm";
 import { createClient } from "@/lib/supabaseServerClient";
 
@@ -12,7 +11,22 @@ export default async function AccountPage() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/");
+    return (
+      <div className="emma-chat-bg min-h-screen w-full px-6 pb-16 pt-16 text-white">
+        <div className="mx-auto flex w-full max-w-3xl flex-col items-center text-center gap-4">
+          <h1 className="text-3xl font-semibold">Accedi per gestire il profilo</h1>
+          <p className="text-sm text-white/70">
+            Per modificare i dati del profilo entra con il tuo account.
+          </p>
+          <a
+            href="/"
+            className="rounded-full border border-white/20 px-5 py-2 text-sm font-semibold text-white hover:bg-white/10 transition"
+          >
+            Vai al login
+          </a>
+        </div>
+      </div>
+    );
   }
 
   const { data: profile } = await supabase
@@ -30,7 +44,7 @@ export default async function AccountPage() {
   };
 
   return (
-    <div className="emma-immersive-bg min-h-screen w-full px-6 pb-16 pt-16 text-white">
+    <div className="emma-chat-bg min-h-screen w-full px-6 pb-16 pt-16 text-white">
       <div className="mx-auto flex w-full max-w-3xl flex-col">
         <header className="flex items-center justify-between">
           <div>
