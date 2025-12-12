@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { LANG_OPTIONS } from "@/lib/languageDetection";
+import { LANG_OPTIONS, isSupportedLang } from "@/lib/languageDetection";
 
 type Profile = {
   name: string | null;
@@ -63,6 +63,25 @@ export default function AccountProfileForm({ initialProfile, email }: Props) {
       setForm(data.profile);
       setBaseline(data.profile);
       setMessage("Profilo aggiornato con successo.");
+
+      // Aggiorna subito lo user metadata lato client e salva la lingua in locale
+      try {
+        await supabase.auth.updateUser({
+          data: {
+            lang: data.profile?.language_preference,
+            name: data.profile?.name,
+            age: data.profile?.age,
+            gender: data.profile?.gender,
+            personal_goal: data.profile?.personal_goal,
+          },
+        });
+      } catch {
+        // ignore
+      }
+
+      if (typeof window !== "undefined" && isSupportedLang(data.profile?.language_preference)) {
+        window.localStorage.setItem("emma:lang", data.profile.language_preference);
+      }
     } catch (err: any) {
       setError(err?.message ?? "Impossibile aggiornare il profilo.");
     } finally {

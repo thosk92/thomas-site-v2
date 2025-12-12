@@ -157,6 +157,9 @@ export default function SidebarConversations({ userId }: Props) {
     async (lang: Lang) => {
       setPersistingLang(true);
       try {
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("emma:lang", lang);
+        }
         await fetch("/api/profile/update", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

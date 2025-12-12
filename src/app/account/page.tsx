@@ -22,6 +22,22 @@ export default function AccountPage() {
 
   useEffect(() => {
     let active = true;
+    const syncSession = async (session: any) => {
+      if (!session?.access_token || !session?.refresh_token) return;
+      try {
+        await fetch("/api/auth/set-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          }),
+        });
+      } catch (err) {
+        console.error("[account] failed to sync session", err);
+      }
+    };
+
     (async () => {
       const { data } = await supabase.auth.getSession();
       if (!active) return;
@@ -35,19 +51,9 @@ export default function AccountPage() {
 
       // Ensure server-side session cookies are set for API routes (needed for profile update)
       if (!sessionSynced && data.session) {
-        try {
-          await fetch("/api/auth/set-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              access_token: data.session.access_token,
-              refresh_token: data.session.refresh_token,
-            }),
-          });
-          setSessionSynced(true);
-        } catch {
-          // ignore sync errors; API may still work if cookies are already valid
-        }
+        await syncSession(data.session);
+        if (!active) return;
+        setSessionSynced(true);
       }
 
       const { data: profileData } = await supabase
@@ -74,8 +80,19 @@ export default function AccountPage() {
       }
     })();
 
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (!active) return;
+      setUser(session?.user ?? null);
+      if (session) {
+        await syncSession(session);
+        if (!active) return;
+        setSessionSynced(true);
+      }
+    });
+
     return () => {
       active = false;
+      listener.subscription.unsubscribe();
     };
   }, [sessionSynced]);
 

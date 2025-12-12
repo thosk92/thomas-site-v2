@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { Session, User } from "@supabase/supabase-js";
 import { Send } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { createConversation } from "@/lib/supabase/conversations";
@@ -831,6 +831,7 @@ export default function EmmaHome({
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [profileLangLoaded, setProfileLangLoaded] = useState(false);
   const lastPersistedLang = useRef<Lang | null>(null);
+  const sessionSynced = useRef(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -842,20 +843,96 @@ export default function EmmaHome({
   }, [messages]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      const sessionUser = data.session?.user ?? null;
-      setUser(sessionUser);
+    let active = true;
 
+    const applyLangFromSession = (sessionUser: User | null, hasLangAlready: boolean) => {
+      if (hasLangAlready) return true;
       const metaLang = sessionUser?.user_metadata?.lang as string | undefined;
       if (isSupportedLang(metaLang)) {
         setLang(metaLang);
-      } else if (metaLang?.startsWith("en")) {
+        return true;
+      }
+      if (metaLang?.startsWith("en")) {
         setLang("en-US");
-      } else if (typeof navigator !== "undefined") {
+        return true;
+      }
+      return false;
+    };
+
+    const applyLangFromBrowser = (hasLangAlready: boolean) => {
+      if (hasLangAlready) return true;
+      if (typeof navigator !== "undefined") {
         const navLang = mapLocaleToLang(navigator.language || navigator.languages?.[0]);
         setLang(navLang);
+        return true;
+      }
+      return false;
+    };
+
+    const syncSession = async (session: Session | null) => {
+      if (!session?.access_token || !session?.refresh_token) return;
+      try {
+        await fetch("/api/auth/set-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            access_token: session.access_token,
+            refresh_token: session.refresh_token,
+          }),
+        });
+      } catch (err) {
+        console.error("[emma] failed to sync session", err);
+      }
+    };
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      const sessionUser = data.session?.user ?? null;
+      setUser(sessionUser);
+
+      let langSet = false;
+      if (typeof window !== "undefined") {
+        const stored = window.localStorage.getItem("emma:lang");
+        if (isSupportedLang(stored)) {
+          setLang(stored);
+          langSet = true;
+        }
+      }
+
+      langSet = applyLangFromSession(sessionUser, langSet) || langSet;
+      applyLangFromBrowser(langSet);
+
+      if (data.session && !sessionSynced.current) {
+        sessionSynced.current = true;
+        syncSession(data.session);
       }
     });
+
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!active) return;
+      setUser(session?.user ?? null);
+
+      let langSet = false;
+      if (typeof window !== "undefined") {
+        const stored = window.localStorage.getItem("emma:lang");
+        if (isSupportedLang(stored)) {
+          setLang(stored);
+          langSet = true;
+        }
+      }
+
+      langSet = applyLangFromSession(session?.user ?? null, langSet) || langSet;
+      applyLangFromBrowser(langSet);
+      if (session) {
+        sessionSynced.current = true;
+        syncSession(session);
+      }
+    });
+
+    return () => {
+      active = false;
+      listener.subscription.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -902,8 +979,15 @@ export default function EmmaHome({
         const pref = data?.language_preference as string | undefined;
         if (isSupportedLang(pref)) {
           setLang(pref);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("emma:lang", pref);
+          }
         } else if (pref) {
-          setLang(mapLocaleToLang(pref));
+          const mapped = mapLocaleToLang(pref);
+          setLang(mapped);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("emma:lang", mapped);
+          }
         }
       } catch {
         // ignore
@@ -923,6 +1007,9 @@ export default function EmmaHome({
       const detail = (event as CustomEvent<{ lang?: Lang }>).detail;
       if (detail?.lang && detail.lang !== lang) {
         setLang(detail.lang);
+        if (typeof window !== "undefined" && isSupportedLang(detail.lang)) {
+          window.localStorage.setItem("emma:lang", detail.lang);
+        }
       }
     };
     const onDataSheet = () => setShowDataSheet(true);
@@ -954,6 +1041,10 @@ export default function EmmaHome({
         );
       } catch (err) {
         console.error("[emma] failed to persist profile lang", err);
+      }
+
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("emma:lang", lang);
       }
     })();
   }, [lang, user]);
