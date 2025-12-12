@@ -58,11 +58,17 @@ export default function AccountPage() {
 
       if (active) {
         setProfile({
-          name: profileData?.name ?? null,
-          age: profileData?.age ?? null,
-          gender: profileData?.gender ?? null,
-          personal_goal: profileData?.personal_goal ?? null,
-          language_preference: profileData?.language_preference ?? null,
+          name: profileData?.name ?? (sessionUser.user_metadata?.name as string | null) ?? null,
+          age: profileData?.age ?? (sessionUser.user_metadata?.age as number | null) ?? null,
+          gender: profileData?.gender ?? (sessionUser.user_metadata?.gender as string | null) ?? null,
+          personal_goal:
+            profileData?.personal_goal ??
+            (sessionUser.user_metadata?.personal_goal as string | null) ??
+            null,
+          language_preference:
+            profileData?.language_preference ??
+            (sessionUser.user_metadata?.lang as string | null) ??
+            null,
         });
         setLoading(false);
       }
