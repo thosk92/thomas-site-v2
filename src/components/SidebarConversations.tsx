@@ -34,7 +34,14 @@ export default function SidebarConversations({ userId }: Props) {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [authReady, setAuthReady] = useState(false);
-  const [selectedLang, setSelectedLang] = useState<Lang>("en-US");
+  const [selectedLang, setSelectedLang] = useState<Lang>(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("emma:lang");
+      if (isSupportedLang(stored)) return stored;
+      return mapLocaleToLang(navigator.language || navigator.languages?.[0]);
+    }
+    return "en-US";
+  });
   const [persistingLang, setPersistingLang] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
   const router = useRouter();
@@ -51,9 +58,6 @@ export default function SidebarConversations({ userId }: Props) {
   }, [userId, resolvedUserId]);
 
   useEffect(() => {
-    // Se non abbiamo un userId dal server, proviamo a recuperarlo dal client
-    if (resolvedUserId) return;
-
     let active = true;
 
     const fetchSession = async () => {
@@ -63,12 +67,16 @@ export default function SidebarConversations({ userId }: Props) {
       const id = session?.user?.id ?? null;
       const email = session?.user?.email ?? null;
       const metaLang = session?.user?.user_metadata?.lang as string | undefined;
-      setResolvedUserId(id);
+      if (!resolvedUserId) setResolvedUserId(id);
       setResolvedEmail(email);
       if (isSupportedLang(metaLang)) {
         setSelectedLang(metaLang);
-      } else if (typeof navigator !== "undefined") {
-        setSelectedLang(mapLocaleToLang(navigator.language || navigator.languages?.[0]));
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("emma:lang", metaLang);
+        }
+      } else if (typeof navigator !== "undefined" && !window.localStorage.getItem("emma:lang")) {
+        const navLang = mapLocaleToLang(navigator.language || navigator.languages?.[0]);
+        setSelectedLang(navLang);
       }
       setAuthReady(true);
     };
@@ -142,6 +150,9 @@ export default function SidebarConversations({ userId }: Props) {
         const pref = data?.language_preference as string | undefined;
         if (isSupportedLang(pref)) {
           setSelectedLang(pref);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem("emma:lang", pref);
+          }
         }
         setProfileLoaded(true);
       } catch {
@@ -165,6 +176,11 @@ export default function SidebarConversations({ userId }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ language_preference: lang }),
         });
+        try {
+          await supabase.auth.updateUser({ data: { lang } });
+        } catch {
+          // ignore client metadata failures
+        }
         window.dispatchEvent(new CustomEvent("emma:lang-change", { detail: { lang } }));
       } catch (err) {
         console.error("[sidebar] failed to persist profile lang", err);
@@ -174,6 +190,20 @@ export default function SidebarConversations({ userId }: Props) {
     },
     [],
   );
+
+  useEffect(() => {
+    const onLangChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ lang?: Lang }>).detail;
+      if (detail?.lang && isSupportedLang(detail.lang)) {
+        setSelectedLang(detail.lang);
+        if (typeof window !== "undefined") {
+          window.localStorage.setItem("emma:lang", detail.lang);
+        }
+      }
+    };
+    window.addEventListener("emma:lang-change", onLangChange);
+    return () => window.removeEventListener("emma:lang-change", onLangChange);
+  }, []);
 
   return (
     <div className="flex h-full flex-col gap-3 rounded-2xl border border-white/10 bg-white/5/60 p-4 text-white shadow-xl backdrop-blur-md">
