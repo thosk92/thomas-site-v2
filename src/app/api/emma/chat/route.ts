@@ -6,7 +6,7 @@ import { getMessages as getHistory } from "@/lib/supabase/messages";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const body = await req.json();
@@ -22,7 +22,12 @@ export async function POST(req: Request) {
 
   let profileBlock = "";
   let historyBlock: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-  const admin = createAdminClient();
+  let admin: ReturnType<typeof createAdminClient> | null = null;
+  try {
+    admin = createAdminClient();
+  } catch (err) {
+    console.warn("[emma chat] admin client unavailable, falling back to user client");
+  }
 
   if (user) {
     const metaName = (user.user_metadata?.name as string | undefined) ?? null;
@@ -30,7 +35,7 @@ export async function POST(req: Request) {
     const metaGender = (user.user_metadata?.gender as string | undefined) ?? null;
     const metaGoal = (user.user_metadata?.personal_goal as string | undefined) ?? null;
 
-    const { data: profile } = await admin
+    const { data: profile } = await (admin ?? supabase)
       .from("profiles")
       .select("*")
       .eq("id", user.id)

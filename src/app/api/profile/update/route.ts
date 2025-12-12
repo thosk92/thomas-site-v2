@@ -39,13 +39,18 @@ export async function POST(req: Request) {
     console.error("[profile] failed to persist auth metadata", err);
   }
 
-  const admin = createAdminClient();
+  let admin: ReturnType<typeof createAdminClient> | null = null;
+  try {
+    admin = createAdminClient();
+  } catch (err) {
+    console.warn("[profile update] admin client unavailable, falling back to user client");
+  }
 
   const attemptUpsert = async (withLanguage: boolean) => {
     const insertPayload = withLanguage
       ? payload
       : { ...payload, language_preference: undefined };
-    return admin
+    return (admin ?? supabase)
       .from("profiles")
       .upsert(insertPayload, { onConflict: "id" })
       .select()
@@ -56,7 +61,7 @@ export async function POST(req: Request) {
     const updatePayload = withLanguage
       ? payload
       : { ...payload, language_preference: undefined };
-    return admin
+    return (admin ?? supabase)
       .from("profiles")
       .update(updatePayload)
       .eq("id", user.id)
