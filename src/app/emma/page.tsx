@@ -35,7 +35,7 @@ type Copy = {
   closeLabel: string;
 };
 
-const COPIES: Partial<Record<Lang, Copy>> = {
+const COPIES: Record<Lang, Copy> = {
   "en-US": {
     sessionTitle: "Tell EMMA what's happening",
     sessionSubtitle: "She helps you unpack what you feel, find the right words, and choose what to do next.",
