@@ -821,7 +821,15 @@ export default function EmmaHome({
 }: {
   initialConversationId?: string | null;
 } = {}) {
-  const [lang, setLang] = useState<Lang>("en-US");
+  const [lang, setLang] = useState<Lang>(() => {
+    if (typeof window !== "undefined") {
+      const stored = window.localStorage.getItem("emma:lang");
+      if (isSupportedLang(stored)) return stored;
+      const navLang = mapLocaleToLang(navigator.language || navigator.languages?.[0]);
+      return navLang;
+    }
+    return "en-US";
+  });
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
