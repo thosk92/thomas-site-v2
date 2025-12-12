@@ -1187,7 +1187,7 @@ export default function EmmaHome({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={1}
-                className="h-11 flex-1 resize-none bg-transparent py-3 text-center text-sm leading-5 text-white placeholder:text-white/70 focus:outline-none"
+                className="h-11 flex-1 resize-none bg-transparent py-3 text-left text-sm leading-5 text-white placeholder:text-white/70 focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
