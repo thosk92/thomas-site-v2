@@ -98,11 +98,19 @@ export default function AccountProfileForm({ initialProfile, email }: Props) {
   const handleSignOut = async () => {
     setSaving(true);
     try {
-      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData.session?.access_token;
+      await fetch("/api/auth/signout", {
+        method: "POST",
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
+      }).catch(() => {});
     } catch {
       // ignore
     }
     await supabase.auth.signOut();
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem("emma:lang");
+    }
     window.location.href = "/";
   };
 
