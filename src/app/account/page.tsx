@@ -18,6 +18,7 @@ export default function AccountPage() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionSynced, setSessionSynced] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -30,6 +31,23 @@ export default function AccountPage() {
       if (!sessionUser) {
         setLoading(false);
         return;
+      }
+
+      // Ensure server-side session cookies are set for API routes (needed for profile update)
+      if (!sessionSynced && data.session) {
+        try {
+          await fetch("/api/auth/set-session", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              access_token: data.session.access_token,
+              refresh_token: data.session.refresh_token,
+            }),
+          });
+          setSessionSynced(true);
+        } catch {
+          // ignore sync errors; API may still work if cookies are already valid
+        }
       }
 
       const { data: profileData } = await supabase
