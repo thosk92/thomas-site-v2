@@ -11,6 +11,23 @@ function extractAccessToken(req: Request): string | null {
   return req.headers.get("x-supabase-access-token");
 }
 
+function extractTokenFromCookies(cookieStore: Awaited<ReturnType<typeof cookies>>): string | null {
+  // Supabase stores auth in a cookie named sb-<project-ref>-auth-token
+  const all = cookieStore.getAll();
+  const authCookie = all.find((c) => c.name.includes("sb-") && c.name.endsWith("-auth-token"));
+  if (!authCookie?.value) return null;
+  try {
+    const parsed = JSON.parse(authCookie.value);
+    const accessToken = parsed?.access_token || parsed?.currentSession?.access_token;
+    if (typeof accessToken === "string" && accessToken.length > 10) {
+      return accessToken;
+    }
+  } catch {
+    // ignore parse errors
+  }
+  return null;
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient();
   const cookieStore = await cookies();
@@ -23,7 +40,7 @@ export async function POST(req: Request) {
 
   if (!currentUser) {
     const headerToken = extractAccessToken(req);
-    const cookieToken = cookieStore.get("sb-access-token")?.value;
+    const cookieToken = extractTokenFromCookies(cookieStore) ?? cookieStore.get("sb-access-token")?.value;
     const token = headerToken ?? cookieToken;
     if (token) {
       // Try with anon client

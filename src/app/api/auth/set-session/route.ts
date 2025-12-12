@@ -10,15 +10,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing tokens" }, { status: 400 });
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase.auth.setSession({
-    access_token,
-    refresh_token,
-  });
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.setSession({
+      access_token,
+      refresh_token,
+    });
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, session: data.session });
+  } catch (err: any) {
+    return NextResponse.json({ error: err?.message || "Failed to set session" }, { status: 400 });
   }
-
-  return NextResponse.json({ success: true, session: data.session });
 }
