@@ -203,7 +203,7 @@ export default function SidebarConversations({ userId }: Props) {
         {creating ? "Creazione in corso…" : "+ Nuova conversazione"}
       </button>
 
-      <div className="mt-2 flex-1 space-y-1 overflow-y-auto text-sm rounded-xl border border-white/10 bg-black/30 px-2 py-2">
+      <div className="mt-2 flex-1 space-y-1 overflow-y-auto text-sm px-1">
         {(loading || !authReady) && (
           <p className="text-xs text-slate-300">Caricamento…</p>
         )}
@@ -217,10 +217,10 @@ export default function SidebarConversations({ userId }: Props) {
         {conversations.map((c) => (
           <div
             key={c.id}
-            className={`flex cursor-pointer items-center justify-between rounded-md px-2 py-2 text-xs transition-colors ${
+            className={`flex cursor-pointer items-center justify-between rounded-xl border px-3 py-3 text-xs transition-colors ${
               activeConversationId === c.id
-                ? "bg-white text-slate-900"
-                : "bg-white/5 text-slate-100 hover:bg-white/10"
+                ? "border-white/50 bg-white/30 text-slate-900 shadow"
+                : "border-white/10 bg-white/10 text-slate-100 hover:border-white/30 hover:bg-white/15"
             }`}
             onClick={() => {
               router.push(`/chat?conversationId=${c.id}`);
@@ -287,6 +287,14 @@ export default function SidebarConversations({ userId }: Props) {
           Cancella tutte le conversazioni
         </button>
       )}
+
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new CustomEvent("emma:open-data-sheet"))}
+        className="mt-auto inline-flex w-full items-center justify-center rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-[11px] font-medium text-white transition hover:bg-white/10"
+      >
+        Come usiamo i tuoi dati
+      </button>
     </div>
   );
 }

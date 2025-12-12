@@ -925,8 +925,13 @@ export default function EmmaHome({
         setLang(detail.lang);
       }
     };
+    const onDataSheet = () => setShowDataSheet(true);
     window.addEventListener("emma:lang-change", onLangChange);
-    return () => window.removeEventListener("emma:lang-change", onLangChange);
+    window.addEventListener("emma:open-data-sheet", onDataSheet);
+    return () => {
+      window.removeEventListener("emma:lang-change", onLangChange);
+      window.removeEventListener("emma:open-data-sheet", onDataSheet);
+    };
   }, [lang]);
   useEffect(() => {
     if (!user) return;
@@ -1172,53 +1177,46 @@ export default function EmmaHome({
             )}
           </div>
 
-          <form
-            onSubmit={handleAskAdvice}
-            className="mt-4 flex items-center gap-3 rounded-full bg-white/10 px-4 py-3 backdrop-blur"
-          >
-            <textarea
-              ref={textareaRef}
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              rows={1}
-              className="h-11 flex-1 resize-none bg-transparent text-sm text-white placeholder:text-white/60 focus:outline-none"
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  const form = e.currentTarget.form;
-                  if (form) {
-                    form.requestSubmit();
+          <div className="flex w-full justify-center">
+            <form
+              onSubmit={handleAskAdvice}
+              className="mt-4 flex w-full max-w-4xl items-center gap-3 rounded-full bg-white/10 px-4 py-3 backdrop-blur"
+            >
+              <textarea
+                ref={textareaRef}
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                rows={1}
+                className="h-11 flex-1 resize-none bg-transparent text-center text-sm text-white placeholder:text-white/70 focus:outline-none"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    const form = e.currentTarget.form;
+                    if (form) {
+                      form.requestSubmit();
+                    }
                   }
-                }
-              }}
-              placeholder={textareaPlaceholder}
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#4f46e5] text-white shadow-lg shadow-indigo-900/40 transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {loading ? (
-                <div className="emma-typing">
-                  <span className="emma-typing-dot" />
-                  <span className="emma-typing-dot" />
-                  <span className="emma-typing-dot" />
-                </div>
-              ) : (
-                <Send className="h-5 w-5" />
-              )}
-            </button>
-          </form>
-          {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
-          <div className="mt-2 text-right">
-            <button
-              type="button"
-              onClick={() => setShowDataSheet(true)}
-              className="text-xs text-white/70 underline-offset-2 hover:underline"
-            >
-              {copy.dataCta}
-            </button>
+                }}
+                placeholder={textareaPlaceholder}
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex h-11 w-11 items-center justify-center rounded-full bg-[#4f46e5] text-white shadow-lg shadow-indigo-900/40 transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {loading ? (
+                  <div className="emma-typing">
+                    <span className="emma-typing-dot" />
+                    <span className="emma-typing-dot" />
+                    <span className="emma-typing-dot" />
+                  </div>
+                ) : (
+                  <Send className="h-5 w-5" />
+                )}
+              </button>
+            </form>
           </div>
+          {error && <p className="mt-2 text-center text-sm text-red-300">{error}</p>}
         </div>
       </div>
 
