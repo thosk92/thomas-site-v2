@@ -2,13 +2,31 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabaseServerClient";
 import { createAdminClient } from "@/lib/supabaseAdminClient";
 
+function extractAccessToken(req: Request): string | null {
+  const auth = req.headers.get("authorization");
+  if (auth?.toLowerCase().startsWith("bearer ")) {
+    return auth.slice(7);
+  }
+  return req.headers.get("x-supabase-access-token");
+}
+
 export async function POST(req: Request) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  let currentUser = user;
+
+  if (!currentUser) {
+    const token = extractAccessToken(req);
+    if (token) {
+      const { data } = await supabase.auth.getUser(token);
+      currentUser = data.user;
+    }
+  }
+
+  if (!currentUser) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -16,7 +34,7 @@ export async function POST(req: Request) {
   const { name, age, gender, personal_goal, language_preference } = body;
 
   const payload = {
-    id: user.id,
+    id: currentUser.id,
     name,
     age,
     gender,
@@ -59,7 +77,7 @@ export async function POST(req: Request) {
     return (admin ?? supabase)
       .from("profiles")
       .update(updatePayload)
-      .eq("id", user.id)
+      .eq("id", currentUser.id)
       .select()
       .maybeSingle();
   };

@@ -252,9 +252,21 @@ export default function SidebarConversations({ userId }: Props) {
         if (typeof window !== "undefined") {
           window.localStorage.setItem("emma:lang", lang);
         }
+
+        let accessToken: string | undefined;
+        try {
+          const { data } = await supabase.auth.getSession();
+          accessToken = data.session?.access_token ?? undefined;
+        } catch {
+          // ignore
+        }
+
         await fetch("/api/profile/update", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+          },
           body: JSON.stringify({ language_preference: lang }),
         });
         try {
