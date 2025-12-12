@@ -23,6 +23,15 @@ export async function POST(req: Request) {
     language_preference,
   };
 
+  // Persist language also in auth metadata so it's always stored, even if the DB column is missing
+  if (language_preference) {
+    try {
+      await supabase.auth.updateUser({ data: { lang: language_preference } });
+    } catch (err) {
+      console.error("[profile] failed to persist auth lang", err);
+    }
+  }
+
   const attemptUpsert = async (withLanguage: boolean) => {
     const insertPayload = withLanguage
       ? payload
