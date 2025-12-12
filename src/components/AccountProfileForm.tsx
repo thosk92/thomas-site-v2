@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import { LANG_OPTIONS } from "@/lib/languageDetection";
 
 type Profile = {
   name: string | null;
@@ -22,6 +23,10 @@ export default function AccountProfileForm({ initialProfile, email }: Props) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const langOptions = useMemo(
+    () => LANG_OPTIONS.map((opt) => ({ value: opt.code, label: opt.label })),
+    [],
+  );
 
   const updateField = (key: keyof Profile, value: string) => {
     setForm((prev) => {
@@ -138,9 +143,12 @@ export default function AccountProfileForm({ initialProfile, email }: Props) {
             onChange={(e) => updateField("language_preference", e.target.value)}
             className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus:border-indigo-300/60 focus:outline-none"
           >
-            <option value="">Auto (EN/IT)</option>
-            <option value="en">Inglese</option>
-            <option value="it">Italiano</option>
+            <option value="">Auto (lingua del browser)</option>
+            {langOptions.map((opt) => (
+              <option key={opt.value} value={opt.value} className="text-slate-900">
+                {opt.label}
+              </option>
+            ))}
           </select>
         </label>
       </div>
