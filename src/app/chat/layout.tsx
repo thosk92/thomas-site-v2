@@ -11,11 +11,15 @@ export default async function ChatLayout({ children }: { children: ReactNode }) 
   } = await supabase.auth.getUser();
 
   return (
-    <div className="flex min-h-screen w-full bg-[#020617] text-white">
-      <div className="hidden w-72 md:block">
-        <SidebarConversations userId={user?.id} />
+    <div className="emma-chat-bg min-h-screen w-full text-white">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl gap-4 px-4 py-4 md:px-6">
+        <div className="hidden w-[280px] shrink-0 md:block">
+          <SidebarConversations userId={user?.id} />
+        </div>
+        <main className="flex-1 min-w-0 rounded-3xl border border-white/5 bg-white/5/50 shadow-2xl shadow-black/30 backdrop-blur-md">
+          {children}
+        </main>
       </div>
-      <main className="flex-1 min-w-0">{children}</main>
     </div>
   );
 }

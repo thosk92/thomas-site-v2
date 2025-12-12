@@ -10,6 +10,12 @@ import {
   updateConversationTitle,
 } from "@/lib/supabase/conversations";
 import { supabase } from "@/lib/supabaseClient";
+import {
+  LANG_OPTIONS,
+  isSupportedLang,
+  mapLocaleToLang,
+  type Lang,
+} from "@/lib/languageDetection";
 
 type Conversation = {
   id: string;
@@ -28,6 +34,8 @@ export default function SidebarConversations({ userId }: Props) {
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [authReady, setAuthReady] = useState(false);
+  const [selectedLang, setSelectedLang] = useState<Lang>("en-US");
+  const [persistingLang, setPersistingLang] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -50,10 +58,17 @@ export default function SidebarConversations({ userId }: Props) {
     const fetchSession = async () => {
       const { data } = await supabase.auth.getSession();
       if (!active) return;
-      const id = data.session?.user?.id ?? null;
-      const email = data.session?.user?.email ?? null;
+      const session = data.session;
+      const id = session?.user?.id ?? null;
+      const email = session?.user?.email ?? null;
+      const metaLang = session?.user?.user_metadata?.lang as string | undefined;
       setResolvedUserId(id);
       setResolvedEmail(email);
+      if (isSupportedLang(metaLang)) {
+        setSelectedLang(metaLang);
+      } else if (typeof navigator !== "undefined") {
+        setSelectedLang(mapLocaleToLang(navigator.language || navigator.languages?.[0]));
+      }
       setAuthReady(true);
     };
 
@@ -63,6 +78,10 @@ export default function SidebarConversations({ userId }: Props) {
       if (!active) return;
       setResolvedUserId(session?.user?.id ?? null);
       setResolvedEmail(session?.user?.email ?? null);
+      const metaLang = session?.user?.user_metadata?.lang as string | undefined;
+      if (isSupportedLang(metaLang)) {
+        setSelectedLang(metaLang);
+      }
       setAuthReady(true);
     });
 
@@ -99,20 +118,73 @@ export default function SidebarConversations({ userId }: Props) {
     load();
   }, [authReady, load]);
 
+  const persistLang = useCallback(
+    async (lang: Lang) => {
+      setPersistingLang(true);
+      try {
+        await supabase.auth.updateUser({ data: { lang } });
+      } catch (err) {
+        console.error("[sidebar] failed to persist auth lang", err);
+      }
+      try {
+        if (resolvedUserId) {
+          await supabase.from("profiles").upsert(
+            { id: resolvedUserId, language_preference: lang },
+            { onConflict: "id" },
+          );
+        }
+      } catch (err) {
+        console.error("[sidebar] failed to persist profile lang", err);
+      } finally {
+        setPersistingLang(false);
+      }
+      window.dispatchEvent(new CustomEvent("emma:lang-change", { detail: { lang } }));
+    },
+    [resolvedUserId],
+  );
+
   return (
-    <div className="flex h-full flex-col gap-3 border-r border-white/10 bg-black/70 p-4 text-white">
-      {authReady && resolvedUserId ? (
-        <div className="rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/80">
-          {resolvedEmail ? `Bentornato, ${resolvedEmail}` : "Bentornato in EMMA"}
+    <div className="flex h-full flex-col gap-3 rounded-2xl border border-white/10 bg-white/5/60 p-4 text-white shadow-xl backdrop-blur-md">
+      <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-xs text-white/80">
+        <div>
+          <p className="text-[10px] uppercase tracking-[0.22em] text-indigo-100/80">EMMA</p>
+          <p className="text-sm font-semibold text-white">Chat</p>
+          <p className="text-[11px] text-white/70">
+            {authReady && resolvedUserId
+              ? resolvedEmail || "Profilo attivo"
+              : "Ospite · accedi per salvare"}
+          </p>
         </div>
-      ) : (
-        <div className="rounded-lg border border-white/15 bg-white/5 p-3 text-xs text-white/80">
-          Accedi per vedere e salvare le conversazioni.
+        <div className="flex flex-col gap-2 text-[11px]">
+          <select
+            value={selectedLang}
+            onChange={(e) => {
+              const next = e.target.value as Lang;
+              setSelectedLang(next);
+              persistLang(next);
+            }}
+            className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-[12px] font-medium text-white focus:outline-none"
+            disabled={persistingLang}
+          >
+            {LANG_OPTIONS.map((option) => (
+              <option key={option.code} value={option.code} className="text-slate-900">
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            className="inline-flex items-center justify-center rounded-lg border border-white/15 px-3 py-2 text-[11px] font-medium text-white hover:bg-white/10"
+            onClick={() => router.push("/account")}
+          >
+            Account e preferenze
+          </button>
         </div>
-      )}
+      </div>
+
       <button
         type="button"
-        className="w-full rounded-lg bg-white text-slate-900 px-3 py-2 text-sm font-semibold hover:bg-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
+        className="w-full rounded-xl bg-white text-slate-900 px-3 py-3 text-sm font-semibold shadow-lg shadow-indigo-900/40 transition hover:bg-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
         disabled={!resolvedUserId || creating || loading}
         onClick={async () => {
           if (!resolvedUserId) return;
@@ -130,15 +202,8 @@ export default function SidebarConversations({ userId }: Props) {
       >
         {creating ? "Creazione in corso…" : "+ Nuova conversazione"}
       </button>
-      <button
-        type="button"
-        className="w-full cursor-pointer rounded-lg border border-white/15 bg-transparent text-white px-3 py-2 text-sm font-medium hover:bg-white/10"
-        onClick={() => router.push("/account")}
-      >
-        Profilo e preferenze
-      </button>
 
-      <div className="mt-2 flex-1 space-y-1 overflow-y-auto text-sm">
+      <div className="mt-2 flex-1 space-y-1 overflow-y-auto text-sm rounded-xl border border-white/10 bg-black/30 px-2 py-2">
         {(loading || !authReady) && (
           <p className="text-xs text-slate-300">Caricamento…</p>
         )}

@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { Send } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { createConversation } from "@/lib/supabase/conversations";
 import { getMessages, saveMessage } from "@/lib/supabase/messages";
@@ -917,14 +917,17 @@ export default function EmmaHome({
     };
   }, [profileLangLoaded, user]);
 
-  useEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
-  }, [text]);
-
   const copy = getCopy(lang);
+  useEffect(() => {
+    const onLangChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ lang?: Lang }>).detail;
+      if (detail?.lang && detail.lang !== lang) {
+        setLang(detail.lang);
+      }
+    };
+    window.addEventListener("emma:lang-change", onLangChange);
+    return () => window.removeEventListener("emma:lang-change", onLangChange);
+  }, [lang]);
   useEffect(() => {
     if (!user) return;
     if (lastPersistedLang.current === lang) return;
@@ -1113,65 +1116,14 @@ export default function EmmaHome({
 
   return (
     <div className="flex min-h-screen flex-col bg-transparent">
-      <div className="mx-auto flex w-full flex-1 flex-col px-4 py-6 md:px-8">
-        <header className="mb-5 flex flex-wrap items-center justify-between gap-3 text-white">
-          <div className="text-xs text-slate-200/80">
-            {user ? (
-              <p>
-                {copy.usingAs}
-                <span className="font-semibold">{user.email}</span>
-              </p>
-            ) : (
-              <p>{copy.usingAsGuest}</p>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value as Lang)}
-              className="rounded-full border border-white/20 bg-white/10 px-3 py-2 text-[12px] font-medium text-white/90 backdrop-blur focus:outline-none"
-            >
-              {LANG_OPTIONS.map((option) => (
-                <option key={option.code} value={option.code} className="text-slate-900">
-                  {option.label}
-                </option>
-              ))}
-            </select>
-            {user && (
-              <div className="flex items-center gap-2 text-[11px]">
-                <Link
-                  href="/account"
-                  className="rounded-full border border-white/25 px-3 py-1 text-white/90 hover:bg-white/10 transition"
-                >
-                  Account
-                </Link>
-              </div>
-            )}
-          </div>
-        </header>
-
-        <div className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-2xl backdrop-blur">
-          <div className="flex items-start justify-between gap-4 border-b border-white/10 px-4 py-4 sm:px-6">
-            <div className="space-y-1">
-              <p className="text-xs uppercase tracking-[0.18em] text-indigo-200/80">EMMA</p>
-              <h1 className="text-lg font-semibold text-white sm:text-xl">{sessionTitle}</h1>
-              <p className="text-sm text-slate-200/80">{sessionSubtitle}</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowDataSheet(true)}
-              className="text-xs text-white/80 underline-offset-2 hover:underline"
-            >
-              {copy.dataCta}
-            </button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 md:px-8 gap-5">
+        <div className="flex flex-1 flex-col overflow-hidden px-2 py-4 sm:px-6 sm:py-6">
+          <div className="flex-1 overflow-y-auto">
             {messages.length === 0 ? (
               <div className="flex h-full items-center justify-center text-center">
-                <div className="max-w-2xl space-y-3 text-slate-100/85">
-                  <p className="text-base font-semibold sm:text-lg">{emptyTitle}</p>
-                  <p className="text-sm text-slate-200/80 sm:text-base">{emptySubtitle}</p>
+                <div className="max-w-3xl space-y-4 text-slate-100/90">
+                  <p className="text-lg font-semibold sm:text-xl">{emptyTitle}</p>
+                  <p className="text-sm sm:text-base text-slate-200/85">{emptySubtitle}</p>
                   <div className="mt-4 flex flex-wrap justify-center gap-2">
                     {examplePills.map((pill) => (
                       <button
@@ -1222,39 +1174,51 @@ export default function EmmaHome({
 
           <form
             onSubmit={handleAskAdvice}
-            className="border-t border-white/10 bg-black/40 px-4 py-4 sm:px-6"
+            className="mt-4 flex items-center gap-3 rounded-full bg-white/10 px-4 py-3 backdrop-blur"
           >
-            <div className="flex flex-col gap-3 md:flex-row md:items-end">
-              <div className="flex-1">
-                <textarea
-                  ref={textareaRef}
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  rows={3}
-                  className="emma-input-fade emma-textarea min-h-[72px] w-full resize-none text-sm shadow-xl"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !e.shiftKey) {
-                      e.preventDefault();
-                      const form = e.currentTarget.form;
-                      if (form) {
-                        form.requestSubmit();
-                      }
-                    }
-                  }}
-                  placeholder={textareaPlaceholder}
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="emma-btn-soft inline-flex w-full items-center justify-center rounded-full bg-[#4f46e5] px-6 py-3 text-[15px] font-semibold text-white shadow-lg shadow-indigo-900/40 transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-70 md:w-auto"
-              >
-                {loading ? loadingLabel : askCta}
-              </button>
-            </div>
-            {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
+            <textarea
+              ref={textareaRef}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              rows={1}
+              className="h-11 flex-1 resize-none bg-transparent text-sm text-white placeholder:text-white/60 focus:outline-none"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  const form = e.currentTarget.form;
+                  if (form) {
+                    form.requestSubmit();
+                  }
+                }
+              }}
+              placeholder={textareaPlaceholder}
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex h-11 w-11 items-center justify-center rounded-full bg-[#4f46e5] text-white shadow-lg shadow-indigo-900/40 transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {loading ? (
+                <div className="emma-typing">
+                  <span className="emma-typing-dot" />
+                  <span className="emma-typing-dot" />
+                  <span className="emma-typing-dot" />
+                </div>
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+            </button>
           </form>
+          {error && <p className="mt-2 text-sm text-red-300">{error}</p>}
+          <div className="mt-2 text-right">
+            <button
+              type="button"
+              onClick={() => setShowDataSheet(true)}
+              className="text-xs text-white/70 underline-offset-2 hover:underline"
+            >
+              {copy.dataCta}
+            </button>
+          </div>
         </div>
       </div>
 
