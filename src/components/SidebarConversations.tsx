@@ -65,7 +65,7 @@ type UiStrings = {
   creating: string;
 };
 
-const UI_COPY: Record<Lang | "default", UiStrings> = {
+const UI_COPY: { default: UiStrings } & Partial<Record<Lang, UiStrings>> = {
   default: {
     chatLabel: "Chat",
     guestHint: "Guest · sign in to save",
