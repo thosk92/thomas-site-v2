@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabaseServerClient";
-import { getUserProfile } from "@/lib/supabase/profile";
 import { getMessages as getHistory } from "@/lib/supabase/messages";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -24,7 +23,11 @@ export async function POST(req: Request) {
   let historyBlock: OpenAI.Chat.ChatCompletionMessageParam[] = [];
 
   if (user) {
-    const profile = await getUserProfile(user.id);
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle();
 
     if (profile) {
       profileBlock = [

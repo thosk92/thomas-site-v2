@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabaseServerClient";
+import { createAdminClient } from "@/lib/supabaseAdminClient";
 
 export async function POST(req: Request) {
   const supabase = await createClient();
@@ -32,11 +33,13 @@ export async function POST(req: Request) {
     }
   }
 
+  const admin = createAdminClient();
+
   const attemptUpsert = async (withLanguage: boolean) => {
     const insertPayload = withLanguage
       ? payload
       : { ...payload, language_preference: undefined };
-    return supabase
+    return admin
       .from("profiles")
       .upsert(insertPayload, { onConflict: "id" })
       .select()
@@ -47,7 +50,7 @@ export async function POST(req: Request) {
     const updatePayload = withLanguage
       ? payload
       : { ...payload, language_preference: undefined };
-    return supabase
+    return admin
       .from("profiles")
       .update(updatePayload)
       .eq("id", user.id)
