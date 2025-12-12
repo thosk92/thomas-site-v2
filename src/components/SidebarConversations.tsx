@@ -36,6 +36,7 @@ export default function SidebarConversations({ userId }: Props) {
   const [authReady, setAuthReady] = useState(false);
   const [selectedLang, setSelectedLang] = useState<Lang>("en-US");
   const [persistingLang, setPersistingLang] = useState(false);
+  const [profileLoaded, setProfileLoaded] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -91,6 +92,14 @@ export default function SidebarConversations({ userId }: Props) {
     };
   }, [resolvedUserId]);
 
+  // Default language when no session (browser locale)
+  useEffect(() => {
+    if (resolvedUserId) return;
+    if (typeof navigator !== "undefined") {
+      setSelectedLang(mapLocaleToLang(navigator.language || navigator.languages?.[0]));
+    }
+  }, [resolvedUserId]);
+
   useEffect(() => {
     // Se abbiamo l'utente ma non l'email (es. userId passato da SSR), proviamo a leggerla dalla sessione client
     if (!resolvedUserId || resolvedEmail) return;
@@ -118,29 +127,49 @@ export default function SidebarConversations({ userId }: Props) {
     load();
   }, [authReady, load]);
 
+  // Load language preference from profile (if available)
+  useEffect(() => {
+    if (!authReady || !resolvedUserId || profileLoaded) return;
+    let active = true;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("profiles")
+          .select("language_preference")
+          .eq("id", resolvedUserId)
+          .maybeSingle();
+        if (!active) return;
+        const pref = data?.language_preference as string | undefined;
+        if (isSupportedLang(pref)) {
+          setSelectedLang(pref);
+        }
+        setProfileLoaded(true);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [authReady, resolvedUserId, profileLoaded]);
+
   const persistLang = useCallback(
     async (lang: Lang) => {
       setPersistingLang(true);
       try {
-        await supabase.auth.updateUser({ data: { lang } });
-      } catch (err) {
-        console.error("[sidebar] failed to persist auth lang", err);
-      }
-      try {
-        if (resolvedUserId) {
-          await supabase.from("profiles").upsert(
-            { id: resolvedUserId, language_preference: lang },
-            { onConflict: "id" },
-          );
-        }
+        await fetch("/api/profile/update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ language_preference: lang }),
+        });
+        window.dispatchEvent(new CustomEvent("emma:lang-change", { detail: { lang } }));
       } catch (err) {
         console.error("[sidebar] failed to persist profile lang", err);
       } finally {
         setPersistingLang(false);
       }
-      window.dispatchEvent(new CustomEvent("emma:lang-change", { detail: { lang } }));
     },
-    [resolvedUserId],
+    [],
   );
 
   return (
