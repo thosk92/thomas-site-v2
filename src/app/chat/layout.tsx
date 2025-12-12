@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
-import { createClient } from "@/lib/supabaseServerClient";
+import { createClientReadOnly } from "@/lib/supabaseServerClient";
 import SidebarConversations from "@/components/SidebarConversations";
 
 export const dynamic = "force-dynamic";
 
 export default async function ChatLayout({ children }: { children: ReactNode }) {
-  const supabase = await createClient();
+  const supabase = await createClientReadOnly();
   const {
     data: { user },
   } = await supabase.auth.getUser();
