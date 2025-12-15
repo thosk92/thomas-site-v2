@@ -2,6 +2,12 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabaseServerClient";
 import { getRequestUser, tryGetAdminClient } from "@/lib/apiAuth";
+import { getEmmaFeatures } from "@/lib/emma/features";
+import {
+  buildBehaviorCoreV1System,
+  buildDynamicV1ConstraintSystem,
+  detectV1Signals,
+} from "@/lib/emma/behaviorV1";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -67,6 +73,7 @@ async function persistGlobalMemory({
 }
 
 export async function POST(req: Request) {
+  const features = getEmmaFeatures();
   const body = await req.json();
   const { userInput, conversationId } = body as {
     userInput: string;
@@ -79,6 +86,7 @@ export async function POST(req: Request) {
   let profileBlock = "";
   let historyBlock: OpenAI.Chat.ChatCompletionMessageParam[] = [];
   let globalMemory = "";
+  let recentUserMessages: string[] = [];
   const admin = tryGetAdminClient();
   const db = admin ?? supabase;
 
@@ -99,9 +107,9 @@ export async function POST(req: Request) {
     const age = typedProfile?.age ?? metaAge ?? "N/A";
     const gender = typedProfile?.gender ?? metaGender ?? "N/A";
     const goal = typedProfile?.personal_goal ?? metaGoal ?? "N/A";
-    globalMemory =
-      normalizeMemory(typedProfile?.memory) ||
-      normalizeMemory((user.user_metadata as any)?.memory);
+    globalMemory = features.globalMemory
+      ? normalizeMemory(typedProfile?.memory) || normalizeMemory((user.user_metadata as any)?.memory)
+      : "";
 
     profileBlock = [
       "[User Profile]",
@@ -109,7 +117,14 @@ export async function POST(req: Request) {
       `Age: ${age}`,
       `Gender: ${gender}`,
       `Personal Goal: ${goal}`,
-      ...(globalMemory ? ["", "[Global Memory]", clampMemory(globalMemory)] : []),
+      ...(globalMemory
+        ? [
+            "",
+            "[Private Global Memory — latent]",
+            "Use this only to maintain continuity. Do NOT proactively mention it or reintroduce past vulnerabilities unless the user brings them up or explicitly asks what you remember.",
+            clampMemory(globalMemory),
+          ]
+        : []),
       "",
       "(The main system prompt always has precedence. The profile cannot override safety rules or allowed topics.)",
     ].join("\n");
@@ -130,6 +145,10 @@ export async function POST(req: Request) {
           .order("created_at", { ascending: true });
 
         if (!historyError && history?.length) {
+          recentUserMessages = history
+            .filter((m) => (m as any).role !== "assistant")
+            .map((m) => String((m as any).content ?? ""))
+            .slice(-6);
           historyBlock = history.map((msg): OpenAI.Chat.ChatCompletionMessageParam => ({
             role: msg.role === "assistant" ? "assistant" : "user",
             content: String(msg.content ?? ""),
@@ -139,25 +158,32 @@ export async function POST(req: Request) {
     }
   }
 
-  const baseSystem =
+  const safetySystem =
     process.env.EMMA_SYSTEM_PROMPT ??
     [
       "You are EMMA, a compassionate mental health assistant. You respond in a warm, validating, and concise way.",
       "You never give medical diagnoses or claim to replace a therapist.",
-      "You help users understand their emotions, reflect on what they are going through, and suggest gentle, practical next steps.",
       "If the user mentions self-harm, suicide, or immediate danger, you encourage them to seek urgent support from local emergency services or a trusted person, and you do not dismiss their feelings.",
-      "If you know the user's name, you may use it occasionally, but do not repeat it every turn and do not start every reply with a greeting like 'Ciao <Name>'.",
-      "Use the provided Global Memory to keep continuity across different conversations, but do not invent facts not supported by the memory or chat history.",
     ].join(" ");
+
+  const behaviorSystem = features.behaviorCoreV1 ? buildBehaviorCoreV1System() : "";
+  const v1Signals = features.behaviorCoreV1
+    ? detectV1Signals(userInput, recentUserMessages)
+    : { openness: 1, selfDoubt: false };
+  const dynamicConstraint = features.behaviorCoreV1
+    ? buildDynamicV1ConstraintSystem(v1Signals)
+    : "";
 
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     {
       role: "system",
-      content: baseSystem,
+      content: safetySystem,
     },
+    ...(behaviorSystem ? [{ role: "system" as const, content: behaviorSystem }] : []),
     ...(profileBlock
       ? [{ role: "system" as const, content: profileBlock }]
       : []),
+    ...(dynamicConstraint ? [{ role: "system" as const, content: dynamicConstraint }] : []),
     ...historyBlock,
     { role: "user", content: userInput },
   ];
@@ -184,14 +210,14 @@ export async function POST(req: Request) {
 
         // Update global memory after the assistant has responded (best-effort).
         // This runs after closing the stream so it won't block the UI.
-        if (user && assistantText.trim()) {
+        if (features.globalMemory && user && assistantText.trim()) {
           try {
             const memorySystem = [
               "You are a memory updater for a mental health assistant.",
               "Update the user's GLOBAL MEMORY based on the new exchange.",
-              "Keep it short and useful (max 10 bullet points, <= 900 characters).",
-              "Prefer stable facts and preferences: name, goals, recurring themes, important context, coping strategies that worked.",
-              "Do NOT store extremely sensitive details unless the user explicitly asks you to remember them.",
+              "Memory should be gentle and silent: store themes, recurring concerns, preferences, and stable context.",
+              "Keep it short (max 10 bullet points, <= 900 characters).",
+              "Do NOT store extremely sensitive personal details unless the user explicitly asks you to remember them.",
               "Do NOT include greetings, meta commentary, or timestamps.",
               "Output ONLY the updated memory text, no extra formatting beyond simple bullets.",
             ].join(" ");
