@@ -74,6 +74,8 @@ async function persistGlobalMemory({
 
 export async function POST(req: Request) {
   const features = getEmmaFeatures();
+  // In V1, the behavioral core must always be present and authoritative.
+  // Keeping the flag for future versioning, but we enforce V1-first ordering when enabled.
   const body = await req.json();
   const { userInput, conversationId } = body as {
     userInput: string;
@@ -158,13 +160,15 @@ export async function POST(req: Request) {
     }
   }
 
-  const safetySystem =
-    process.env.EMMA_SYSTEM_PROMPT ??
+  const safetyRules =
+    process.env.EMMA_SAFETY_RULES ??
     [
-      "You are EMMA, a compassionate mental health assistant. You respond in a warm, validating, and concise way.",
-      "You never give medical diagnoses or claim to replace a therapist.",
-      "If the user mentions self-harm, suicide, or immediate danger, you encourage them to seek urgent support from local emergency services or a trusted person, and you do not dismiss their feelings.",
-    ].join(" ");
+      "SAFETY RULES:",
+      "- Do not provide medical diagnoses or claim to replace professional care.",
+      "- If the user mentions self-harm, suicide, or immediate danger, encourage urgent help from local emergency services or a trusted person.",
+      "- Do not validate, encourage, or assist harmful actions.",
+      "- Do not provide instructions for wrongdoing or self-harm.",
+    ].join("\n");
 
   const behaviorSystem = features.behaviorCoreV1 ? buildBehaviorCoreV1System() : "";
   const v1Signals = features.behaviorCoreV1
@@ -175,11 +179,8 @@ export async function POST(req: Request) {
     : "";
 
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    {
-      role: "system",
-      content: safetySystem,
-    },
     ...(behaviorSystem ? [{ role: "system" as const, content: behaviorSystem }] : []),
+    { role: "system", content: safetyRules },
     ...(profileBlock
       ? [{ role: "system" as const, content: profileBlock }]
       : []),
@@ -213,7 +214,7 @@ export async function POST(req: Request) {
         if (features.globalMemory && user && assistantText.trim()) {
           try {
             const memorySystem = [
-              "You are a memory updater for a mental health assistant.",
+              "You are a memory updater for a relational companion system.",
               "Update the user's GLOBAL MEMORY based on the new exchange.",
               "Memory should be gentle and silent: store themes, recurring concerns, preferences, and stable context.",
               "Keep it short (max 10 bullet points, <= 900 characters).",
