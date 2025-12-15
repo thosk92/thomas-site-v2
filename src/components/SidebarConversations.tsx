@@ -280,6 +280,15 @@ export default function SidebarConversations({ userId }: Props) {
     load();
   }, [authReady, load]);
 
+  useEffect(() => {
+    const onConversationCreated = () => {
+      load();
+    };
+
+    window.addEventListener("emma:conversation-created", onConversationCreated);
+    return () => window.removeEventListener("emma:conversation-created", onConversationCreated);
+  }, [load]);
+
   // Load language preference from profile (if available)
   useEffect(() => {
     if (!authReady || !resolvedUserId || profileLoaded) return;

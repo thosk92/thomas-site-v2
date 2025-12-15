@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { Send } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { createConversation } from "@/lib/supabase/conversations";
 import { getMessages, saveMessage } from "@/lib/supabase/messages";
@@ -821,6 +822,7 @@ export default function EmmaHome({
 }: {
   initialConversationId?: string | null;
 } = {}) {
+  const router = useRouter();
   const [lang, setLang] = useState<Lang>(() => {
     if (typeof window !== "undefined") {
       const stored = window.localStorage.getItem("emma:lang");
@@ -837,10 +839,12 @@ export default function EmmaHome({
   const [error, setError] = useState<string | null>(null);
   const [showDataSheet, setShowDataSheet] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [conversationId, setConversationId] = useState<string | null>(null);
+  const [conversationId, setConversationId] = useState<string | null>(initialConversationId ?? null);
   const [profileLangLoaded, setProfileLangLoaded] = useState(false);
   const lastPersistedLang = useRef<Lang | null>(null);
   const sessionSynced = useRef(false);
+  const historyConversationId = useRef<string | null>(initialConversationId ?? null);
+  const skipNextHistoryFetch = useRef(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -947,22 +951,49 @@ export default function EmmaHome({
   useEffect(() => {
     let cancelled = false;
 
-    if (!initialConversationId) {
-      setConversationId(null);
-      setMessages([]);
+    if (initialConversationId === conversationId) {
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setConversationId(initialConversationId ?? null);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initialConversationId, conversationId]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!conversationId) {
       setHistoryLoading(false);
       return () => {
         cancelled = true;
       };
     }
 
-    setConversationId(initialConversationId);
+    if (skipNextHistoryFetch.current) {
+      skipNextHistoryFetch.current = false;
+      historyConversationId.current = conversationId;
+      setHistoryLoading(false);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    // Evitiamo di cancellare i messaggi quando creiamo una nuova conversazione dal client (passaggio da null -> id)
+    if (historyConversationId.current && historyConversationId.current !== conversationId) {
+      setMessages([]);
+    }
+
+    historyConversationId.current = conversationId;
     setHistoryLoading(true);
-    setMessages([]);
 
     (async () => {
       try {
-        const dbMessages = await getMessages(initialConversationId);
+        const dbMessages = await getMessages(conversationId);
         if (cancelled) return;
 
         setMessages(
@@ -981,7 +1012,7 @@ export default function EmmaHome({
     return () => {
       cancelled = true;
     };
-  }, [initialConversationId]);
+  }, [conversationId]);
 
   useEffect(() => {
     if (!user || profileLangLoaded) return;
@@ -1039,6 +1070,26 @@ export default function EmmaHome({
       window.removeEventListener("emma:open-data-sheet", onDataSheet);
     };
   }, [lang]);
+
+  const ensureServerSession = useCallback(async () => {
+    if (sessionSynced.current) return;
+    try {
+      const { data } = await supabase.auth.getSession();
+      const session = data.session;
+      if (!session?.access_token || !session?.refresh_token) return;
+      await fetch("/api/auth/set-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        }),
+      });
+      sessionSynced.current = true;
+    } catch (err) {
+      console.error("[emma] failed to ensure server session", err);
+    }
+  }, []);
   useEffect(() => {
     if (!user) return;
     if (lastPersistedLang.current === lang) return;
@@ -1090,6 +1141,8 @@ export default function EmmaHome({
     setError(null);
     setLoading(true);
 
+    await ensureServerSession();
+
     // Show the user's message in the chat immediately and prepare an empty assistant bubble
     setMessages((prev) => [
       ...prev,
@@ -1107,6 +1160,15 @@ export default function EmmaHome({
           const conv = await createConversation(user?.id ?? "", title);
           convId = conv.id;
           setConversationId(conv.id);
+          skipNextHistoryFetch.current = true;
+
+          // Aggiorna la URL per preservare la conversazione al refresh e notifica la sidebar
+          if (typeof window !== "undefined") {
+            const url = new URL(window.location.href);
+            url.searchParams.set("conversationId", conv.id);
+            router.replace(url.pathname + url.search);
+            window.dispatchEvent(new CustomEvent("emma:conversation-created", { detail: { id: conv.id } }));
+          }
         } catch (err) {
           console.error("[emma] failed to create conversation", err);
         }
