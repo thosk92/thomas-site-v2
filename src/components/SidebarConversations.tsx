@@ -56,6 +56,39 @@ const DATA_CTA_BY_LANG: Partial<Record<Lang, string>> = {
   "zh-TW": "我們如何使用你的資料",
 };
 
+const DELETE_ALL_CTA_BY_LANG: Partial<Record<Lang, string>> = {
+  "en-US": "Delete all conversations",
+  "en-GB": "Delete all conversations",
+  it: "Cancella tutte le conversazioni",
+  es: "Eliminar todas las conversaciones",
+  fr: "Supprimer toutes les conversations",
+  de: "Alle Unterhaltungen löschen",
+  "pt-PT": "Apagar todas as conversas",
+  "pt-BR": "Apagar todas as conversas",
+  nl: "Alle gesprekken verwijderen",
+  sv: "Radera alla konversationer",
+  no: "Slett alle samtaler",
+  da: "Slet alle samtaler",
+  fi: "Poista kaikki keskustelut",
+  pl: "Usuń wszystkie rozmowy",
+  cs: "Smazat všechny konverzace",
+  sk: "Vymazať všetky konverzácie",
+  sl: "Izbriši vse pogovore",
+  hu: "Összes beszélgetés törlése",
+  ro: "Șterge toate conversațiile",
+  bg: "Изтрий всички разговори",
+  hr: "Izbriši sve razgovore",
+  sr: "Обриши све разговоре",
+  ru: "Удалить все разговоры",
+  uk: "Видалити всі розмови",
+  tr: "Tüm konuşmaları sil",
+  el: "Διαγραφή όλων των συνομιλιών",
+  hi: "सभी बातचीत हटाएँ",
+  ja: "すべての会話を削除",
+  "zh-CN": "删除所有对话",
+  "zh-TW": "刪除所有對話",
+};
+
 type UiStrings = {
   chatLabel: string;
   guestHint: string;
@@ -194,6 +227,10 @@ export default function SidebarConversations({ userId }: Props) {
 
   const activeConversationId = searchParams.get("conversationId");
   const dataCta = DATA_CTA_BY_LANG[selectedLang] ?? DATA_CTA_BY_LANG["en-US"] ?? "How we use your data";
+  const deleteAllCta =
+    DELETE_ALL_CTA_BY_LANG[selectedLang] ??
+    DELETE_ALL_CTA_BY_LANG["en-US"] ??
+    "Delete all conversations";
   const uiCopy = getUiCopy(selectedLang);
   const emptyCopy = getEmptyCopy(selectedLang);
   const renamingConversation = renamingId ? conversations.find((c) => c.id === renamingId) : null;
@@ -591,7 +628,7 @@ export default function SidebarConversations({ userId }: Props) {
             await load();
           }}
         >
-          Cancella tutte le conversazioni
+          {deleteAllCta}
         </button>
       )}
 
