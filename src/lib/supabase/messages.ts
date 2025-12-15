@@ -1,3 +1,8 @@
+export type ConversationMessage = {
+  role: "user" | "assistant";
+  content: string | null;
+};
+
 export async function saveMessage(
   conversationId: string,
   role: "user" | "assistant",
@@ -16,7 +21,7 @@ export async function saveMessage(
   return message;
 }
 
-export async function getMessages(conversationId: string) {
+export async function getMessages(conversationId: string): Promise<ConversationMessage[]> {
   const res = await fetch(`/api/messages/list?conversationId=${encodeURIComponent(conversationId)}`);
   if (!res.ok) {
     const t = await res.text().catch(() => "");
@@ -24,5 +29,5 @@ export async function getMessages(conversationId: string) {
   }
 
   const { messages } = await res.json();
-  return messages ?? [];
+  return (messages ?? []) as ConversationMessage[];
 }
