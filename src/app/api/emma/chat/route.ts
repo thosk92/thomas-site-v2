@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabaseServerClient";
 import { createAdminClient } from "@/lib/supabaseAdminClient";
-import { getMessages as getHistory } from "@/lib/supabase/messages";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -52,11 +51,18 @@ export async function POST(req: Request) {
     ].join("\n");
 
     if (conversationId) {
-      const history = await getHistory(conversationId);
-      historyBlock = history.map((msg: any): OpenAI.Chat.ChatCompletionMessageParam => ({
-        role: msg.role === "assistant" ? "assistant" : "user",
-        content: String(msg.content ?? ""),
-      }));
+      const { data: history, error: historyError } = await supabase
+        .from("messages")
+        .select("role, content")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: true });
+
+      if (!historyError && history?.length) {
+        historyBlock = history.map((msg): OpenAI.Chat.ChatCompletionMessageParam => ({
+          role: msg.role === "assistant" ? "assistant" : "user",
+          content: String(msg.content ?? ""),
+        }));
+      }
     }
   }
 

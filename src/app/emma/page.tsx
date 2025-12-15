@@ -833,6 +833,7 @@ export default function EmmaHome({
   const [text, setText] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDataSheet, setShowDataSheet] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -944,33 +945,43 @@ export default function EmmaHome({
   }, []);
 
   useEffect(() => {
-    if (!user || !initialConversationId) {
-      return;
+    let cancelled = false;
+
+    if (!initialConversationId) {
+      setConversationId(null);
+      setMessages([]);
+      setHistoryLoading(false);
+      return () => {
+        cancelled = true;
+      };
     }
 
-    let cancelled = false;
+    setConversationId(initialConversationId);
+    setHistoryLoading(true);
+    setMessages([]);
 
     (async () => {
       try {
         const dbMessages = await getMessages(initialConversationId);
         if (cancelled) return;
 
-        setConversationId(initialConversationId);
         setMessages(
           dbMessages.map((m) => ({
-            role: m.role as "user" | "assistant",
+            role: m.role === "assistant" ? "assistant" : "user",
             content: m.content ?? "",
           })),
         );
       } catch (err) {
         console.error("[emma] failed to load conversation messages", err);
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [initialConversationId, user]);
+  }, [initialConversationId]);
 
   useEffect(() => {
     if (!user || profileLangLoaded) return;
@@ -1087,13 +1098,13 @@ export default function EmmaHome({
     ]);
 
     try {
-      let convId = conversationId;
+      let convId = conversationId || initialConversationId || null;
 
-      // Crea una conversazione se l'utente è loggato e non ne esiste ancora una
-      if (!convId && user) {
+      // Crea una conversazione se non ne esiste ancora una per questa sessione
+      if (!convId) {
         try {
           const title = value.length > 80 ? `${value.slice(0, 77)}...` : value;
-          const conv = await createConversation(user.id, title);
+          const conv = await createConversation(user?.id ?? "", title);
           convId = conv.id;
           setConversationId(conv.id);
         } catch (err) {
@@ -1102,7 +1113,7 @@ export default function EmmaHome({
       }
 
       // Salva il messaggio dell'utente se abbiamo una conversazione
-      if (convId && user) {
+      if (convId) {
         try {
           await saveMessage(convId, "user", value);
         } catch (err) {
@@ -1195,7 +1206,7 @@ export default function EmmaHome({
       }
 
       // Salva il messaggio di EMMA a fine stream
-      if (convId && user) {
+      if (convId) {
         try {
           await saveMessage(convId, "assistant", assistantText);
         } catch (err) {
@@ -1223,7 +1234,13 @@ export default function EmmaHome({
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-6 md:px-8 gap-5">
         <div className="flex flex-1 flex-col overflow-hidden px-2 py-4 sm:px-6 sm:py-6">
           <div className="flex-1 overflow-y-auto">
-            {messages.length === 0 ? (
+            {historyLoading ? (
+              <div className="flex h-full items-center justify-center text-center">
+                <p className="text-sm text-slate-200/85">
+                  {lang.startsWith("it") ? "Caricamento conversazione…" : "Loading conversation…"}
+                </p>
+              </div>
+            ) : messages.length === 0 ? (
               <div className="flex h-full items-center justify-center text-center">
                 <div className="max-w-3xl space-y-4 text-slate-100/90">
                   <p className="text-lg font-semibold sm:text-xl">{emptyTitle}</p>
@@ -1286,6 +1303,7 @@ export default function EmmaHome({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 rows={1}
+                disabled={historyLoading}
                 className="h-11 flex-1 resize-none bg-transparent py-3 text-left text-sm leading-5 text-white placeholder:text-white/70 focus:outline-none"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
@@ -1300,7 +1318,7 @@ export default function EmmaHome({
               />
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || historyLoading}
                 className="flex h-11 w-11 items-center justify-center rounded-full bg-[#4f46e5] text-white shadow-lg shadow-indigo-900/40 transition hover:bg-[#4338ca] disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {loading ? (

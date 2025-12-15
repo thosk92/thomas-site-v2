@@ -1,5 +1,3 @@
-import { supabase } from "@/lib/supabaseClient";
-
 export async function saveMessage(
   conversationId: string,
   role: "user" | "assistant",
@@ -19,13 +17,12 @@ export async function saveMessage(
 }
 
 export async function getMessages(conversationId: string) {
-  // keep direct client fetch for history (read-only)
-  const { data, error } = await supabase
-    .from("messages")
-    .select("*")
-    .eq("conversation_id", conversationId)
-    .order("created_at", { ascending: true });
+  const res = await fetch(`/api/messages/list?conversationId=${encodeURIComponent(conversationId)}`);
+  if (!res.ok) {
+    const t = await res.text().catch(() => "");
+    throw new Error(t || "Failed to fetch messages");
+  }
 
-  if (error) throw error;
-  return data ?? [];
+  const { messages } = await res.json();
+  return messages ?? [];
 }
