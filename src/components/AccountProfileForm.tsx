@@ -127,20 +127,29 @@ export default function AccountProfileForm({ initialProfile, email, copy }: Prop
   const handleSignOut = async () => {
     setSaving(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const accessToken = sessionData.session?.access_token;
-      await fetch("/api/auth/signout", {
-        method: "POST",
-        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-      }).catch(() => {});
-    } catch {
-      // ignore
+      // Always clear client session first (prevents immediate redirect back to /chat)
+      try {
+        await supabase.auth.signOut({ scope: "local" });
+      } catch {
+        // ignore
+      }
+
+      // Clear server cookies as well (used by server-side API routes / layouts)
+      await fetch("/api/auth/signout", { method: "POST" }).catch(() => {});
+
+      // Best-effort global sign-out (revokes refresh tokens)
+      try {
+        await supabase.auth.signOut();
+      } catch {
+        // ignore
+      }
+    } finally {
+      if (typeof window !== "undefined") {
+        window.localStorage.removeItem("emma:lang");
+        window.location.assign("/");
+      }
+      setSaving(false);
     }
-    await supabase.auth.signOut();
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem("emma:lang");
-    }
-    window.location.href = "/";
   };
 
   return (

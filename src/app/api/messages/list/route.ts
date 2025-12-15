@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabaseServerClient";
-import { createAdminClient } from "@/lib/supabaseAdminClient";
+import { getRequestUser, tryGetAdminClient } from "@/lib/apiAuth";
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
@@ -11,16 +11,17 @@ export async function GET(req: Request) {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getRequestUser(req, supabase);
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Ensure the conversation belongs to the current user before reading messages
-  const { data: conversation, error: convError } = await supabase
+  const admin = tryGetAdminClient();
+  const client = admin ?? supabase;
+
+  const { data: conversation, error: convError } = await client
     .from("conversations")
     .select("id")
     .eq("id", conversationId)
@@ -34,9 +35,6 @@ export async function GET(req: Request) {
   if (!conversation) {
     return NextResponse.json({ messages: [] });
   }
-
-  const admin = createAdminClient();
-  const client = admin ?? supabase;
 
   const { data, error } = await client
     .from("messages")

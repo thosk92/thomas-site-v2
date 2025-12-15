@@ -1,9 +1,22 @@
 import { supabase } from "@/lib/supabaseClient";
 
+async function getAuthHeaders() {
+  const headers: Record<string, string> = {};
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return headers;
+  } catch {
+    return headers;
+  }
+}
+
 export async function createConversation(userId: string, title?: string | null) {
+  const authHeaders = await getAuthHeaders();
   const res = await fetch("/api/conversations/create", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify({ title }),
   });
   if (!res.ok) {
@@ -15,7 +28,8 @@ export async function createConversation(userId: string, title?: string | null) 
 }
 
 export async function getConversations(userId: string) {
-  const res = await fetch("/api/conversations/list");
+  const authHeaders = await getAuthHeaders();
+  const res = await fetch("/api/conversations/list", { headers: authHeaders });
   if (!res.ok) {
     const t = await res.text().catch(() => "");
     throw new Error(t || "Failed to fetch conversations");
@@ -25,9 +39,10 @@ export async function getConversations(userId: string) {
 }
 
 export async function deleteConversation(conversationId: string) {
+  const authHeaders = await getAuthHeaders();
   const res = await fetch("/api/conversations/delete", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify({ id: conversationId }),
   });
   if (!res.ok) {
@@ -37,7 +52,8 @@ export async function deleteConversation(conversationId: string) {
 }
 
 export async function deleteAllConversations(userId: string) {
-  const res = await fetch("/api/conversations/delete-all", { method: "POST" });
+  const authHeaders = await getAuthHeaders();
+  const res = await fetch("/api/conversations/delete-all", { method: "POST", headers: authHeaders });
   if (!res.ok) {
     const t = await res.text().catch(() => "");
     throw new Error(t || "Failed to delete conversations");
@@ -45,9 +61,10 @@ export async function deleteAllConversations(userId: string) {
 }
 
 export async function updateConversationTitle(conversationId: string, title: string) {
+  const authHeaders = await getAuthHeaders();
   const res = await fetch("/api/conversations/create", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders },
     body: JSON.stringify({ id: conversationId, title }),
   });
   if (!res.ok) {

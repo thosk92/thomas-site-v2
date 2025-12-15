@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabaseServerClient";
-import { createAdminClient } from "@/lib/supabaseAdminClient";
+import { getRequestUser, tryGetAdminClient } from "@/lib/apiAuth";
 
-export async function POST() {
+export async function POST(req: Request) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getRequestUser(req, supabase);
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const admin = createAdminClient();
+  const admin = tryGetAdminClient();
   const client = admin ?? supabase;
 
   const { error } = await client.from("conversations").delete().eq("user_id", user.id);

@@ -1142,6 +1142,13 @@ export default function EmmaHome({
     setLoading(true);
 
     await ensureServerSession();
+    let accessToken: string | undefined;
+    try {
+      const { data } = await supabase.auth.getSession();
+      accessToken = data.session?.access_token ?? undefined;
+    } catch {
+      // ignore
+    }
 
     // Show the user's message in the chat immediately and prepare an empty assistant bubble
     setMessages((prev) => [
@@ -1185,7 +1192,10 @@ export default function EmmaHome({
 
       const res = await fetch("/api/emma/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({ userInput: value, conversationId: convId }),
       });
 
