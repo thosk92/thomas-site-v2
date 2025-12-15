@@ -1140,7 +1140,9 @@ export default function EmmaHome({
     const value = text.trim();
     if (!value) return;
 
-    if (messages.length === 0) {
+    const wasEmpty = messages.length === 0;
+
+    if (wasEmpty) {
       const guessed = detectLanguage(value);
       setLang(guessed);
     }
@@ -1171,7 +1173,7 @@ export default function EmmaHome({
       const shouldAutotitleExisting =
         !convId
           ? false
-          : messages.length === 0 &&
+          : wasEmpty &&
             typeof window !== "undefined" &&
             window.sessionStorage.getItem("emma:pending-title-conversation-id") === convId;
 

@@ -175,6 +175,9 @@ export default function SidebarConversations({ userId }: Props) {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+  const [renameSaving, setRenameSaving] = useState(false);
   const [authReady, setAuthReady] = useState(false);
   const [selectedLang, setSelectedLang] = useState<Lang>(() => {
     if (typeof window !== "undefined") {
@@ -193,6 +196,7 @@ export default function SidebarConversations({ userId }: Props) {
   const dataCta = DATA_CTA_BY_LANG[selectedLang] ?? DATA_CTA_BY_LANG["en-US"] ?? "How we use your data";
   const uiCopy = getUiCopy(selectedLang);
   const emptyCopy = getEmptyCopy(selectedLang);
+  const renamingConversation = renamingId ? conversations.find((c) => c.id === renamingId) : null;
 
   // Sync with userId from props when it changes (SSR -> CSR)
   useEffect(() => {
@@ -373,6 +377,92 @@ export default function SidebarConversations({ userId }: Props) {
 
   return (
     <div className="flex h-full flex-col gap-3 rounded-2xl border border-white/10 bg-white/5/60 p-4 text-white shadow-xl backdrop-blur-md">
+      {renamingId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => {
+            if (renameSaving) return;
+            setRenamingId(null);
+          }}
+        >
+          <div
+            className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-950/90 p-4 shadow-2xl backdrop-blur"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-xs uppercase tracking-[0.18em] text-indigo-200/80">Rinomina</p>
+            <p className="mt-1 text-sm text-white/80">
+              {renamingConversation?.title || "Conversazione"}
+            </p>
+            <input
+              autoFocus
+              value={renameValue}
+              onChange={(e) => setRenameValue(e.target.value)}
+              onKeyDown={async (e) => {
+                if (e.key === "Escape") {
+                  if (!renameSaving) setRenamingId(null);
+                }
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (!renamingId) return;
+                  const trimmed = renameValue.trim();
+                  if (!trimmed) return;
+                  setRenameSaving(true);
+                  try {
+                    await updateConversationTitle(renamingId, trimmed);
+                    setConversations((prev) =>
+                      prev.map((c) => (c.id === renamingId ? { ...c, title: trimmed } : c)),
+                    );
+                    setRenamingId(null);
+                  } catch (err) {
+                    console.error("[sidebar] failed to rename conversation", err);
+                  } finally {
+                    setRenameSaving(false);
+                  }
+                }
+              }}
+              placeholder="Titolo conversazione…"
+              className="mt-3 w-full rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/40 focus:border-indigo-300/60 focus:outline-none"
+              disabled={renameSaving}
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-lg border border-white/20 px-3 py-2 text-sm text-white hover:bg-white/10 disabled:opacity-60"
+                disabled={renameSaving}
+                onClick={() => setRenamingId(null)}
+              >
+                Annulla
+              </button>
+              <button
+                type="button"
+                className="rounded-lg bg-indigo-500 px-3 py-2 text-sm font-semibold text-white hover:bg-indigo-400 disabled:opacity-60"
+                disabled={renameSaving || !renameValue.trim()}
+                onClick={async () => {
+                  if (!renamingId) return;
+                  const trimmed = renameValue.trim();
+                  if (!trimmed) return;
+                  setRenameSaving(true);
+                  try {
+                    await updateConversationTitle(renamingId, trimmed);
+                    setConversations((prev) =>
+                      prev.map((c) => (c.id === renamingId ? { ...c, title: trimmed } : c)),
+                    );
+                    setRenamingId(null);
+                  } catch (err) {
+                    console.error("[sidebar] failed to rename conversation", err);
+                  } finally {
+                    setRenameSaving(false);
+                  }
+                }}
+              >
+                Salva
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="flex items-center justify-between rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-xs text-white/80">
         <div>
           <p className="text-[10px] uppercase tracking-[0.22em] text-indigo-100/80">EMMA</p>
@@ -464,19 +554,8 @@ export default function SidebarConversations({ userId }: Props) {
                 onClick={async (e) => {
                   e.stopPropagation();
                   if (!resolvedUserId) return;
-                  const nextTitle = window.prompt("Rinomina conversazione", c.title ?? "Conversazione");
-                  if (nextTitle === null) return;
-                  const trimmed = nextTitle.trim();
-                  if (!trimmed) return;
-                  setLoading(true);
-                  try {
-                    await updateConversationTitle(c.id, trimmed);
-                    await load();
-                  } catch (err) {
-                    console.error("[sidebar] failed to rename conversation", err);
-                  } finally {
-                    setLoading(false);
-                  }
+                  setRenamingId(c.id);
+                  setRenameValue(c.title ?? "");
                 }}
                 aria-label="Rinomina"
                 title="Rinomina"

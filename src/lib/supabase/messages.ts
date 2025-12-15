@@ -40,6 +40,7 @@ export async function getMessages(conversationId: string): Promise<ConversationM
   const authHeaders = await getAuthHeaders();
   const res = await fetch(`/api/messages/list?conversationId=${encodeURIComponent(conversationId)}`, {
     headers: authHeaders,
+    cache: "no-store",
   });
   if (!res.ok) {
     const t = await res.text().catch(() => "");

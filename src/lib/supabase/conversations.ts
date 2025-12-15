@@ -29,7 +29,7 @@ export async function createConversation(userId: string, title?: string | null) 
 
 export async function getConversations(userId: string) {
   const authHeaders = await getAuthHeaders();
-  const res = await fetch("/api/conversations/list", { headers: authHeaders });
+  const res = await fetch("/api/conversations/list", { headers: authHeaders, cache: "no-store" });
   if (!res.ok) {
     const t = await res.text().catch(() => "");
     throw new Error(t || "Failed to fetch conversations");

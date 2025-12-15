@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabaseServerClient";
 import { getRequestUser, tryGetAdminClient } from "@/lib/apiAuth";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request) {
   const supabase = await createClient();
   const user = await getRequestUser(req, supabase);
