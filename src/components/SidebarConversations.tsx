@@ -419,6 +419,9 @@ export default function SidebarConversations({ userId }: Props) {
           try {
             const conv = await createConversation(resolvedUserId, "Nuova conversazione");
             setConversations((prev) => [conv, ...prev]);
+            if (typeof window !== "undefined") {
+              window.sessionStorage.setItem("emma:pending-title-conversation-id", conv.id);
+            }
             router.push(`/chat?conversationId=${conv.id}`);
           } catch (err) {
             console.error("[sidebar] failed to create conversation", err);

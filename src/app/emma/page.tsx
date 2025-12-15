@@ -5,7 +5,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { createConversation } from "@/lib/supabase/conversations";
+import { createConversation, updateConversationTitle } from "@/lib/supabase/conversations";
 import { getMessages, saveMessage } from "@/lib/supabase/messages";
 import {
   LANG_OPTIONS,
@@ -1126,6 +1126,15 @@ export default function EmmaHome({
     textareaRef.current?.focus();
   };
 
+  const makeConversationTitle = (input: string) => {
+    const raw = input.replace(/\s+/g, " ").trim();
+    if (!raw) return "Conversazione";
+    const firstLine = raw.split("\n")[0] ?? raw;
+    const match = firstLine.match(/^(.{12,}?[.!?])\s/);
+    const base = (match?.[1] ?? firstLine).trim();
+    return base.length > 80 ? `${base.slice(0, 77)}...` : base;
+  };
+
   async function handleAskAdvice(e: React.FormEvent) {
     e.preventDefault();
     const value = text.trim();
@@ -1159,11 +1168,17 @@ export default function EmmaHome({
 
     try {
       let convId = conversationId || initialConversationId || null;
+      const shouldAutotitleExisting =
+        !convId
+          ? false
+          : messages.length === 0 &&
+            typeof window !== "undefined" &&
+            window.sessionStorage.getItem("emma:pending-title-conversation-id") === convId;
 
       // Crea una conversazione se non ne esiste ancora una per questa sessione
       if (!convId) {
         try {
-          const title = value.length > 80 ? `${value.slice(0, 77)}...` : value;
+          const title = makeConversationTitle(value);
           const conv = await createConversation(user?.id ?? "", title);
           convId = conv.id;
           setConversationId(conv.id);
@@ -1178,6 +1193,18 @@ export default function EmmaHome({
           }
         } catch (err) {
           console.error("[emma] failed to create conversation", err);
+        }
+      }
+
+      // Se la conversazione è stata creata dalla sidebar con titolo placeholder, aggiorniamolo con il primo messaggio
+      if (convId && shouldAutotitleExisting) {
+        try {
+          const nextTitle = makeConversationTitle(value);
+          await updateConversationTitle(convId, nextTitle);
+          window.sessionStorage.removeItem("emma:pending-title-conversation-id");
+          window.dispatchEvent(new CustomEvent("emma:conversation-created", { detail: { id: convId } }));
+        } catch (err) {
+          console.error("[emma] failed to auto-title conversation", err);
         }
       }
 
