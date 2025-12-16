@@ -173,23 +173,33 @@ export async function POST(req: Request) {
 
   const behaviorSystem = buildBehaviorCoreV1System();
   const v1Signals = detectV1Signals(userInput, recentUserMessages);
-  const dynamicConstraint = buildDynamicV1ConstraintSystem(v1Signals);
+  const baseDynamicConstraint = buildDynamicV1ConstraintSystem(v1Signals);
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-    ...(behaviorSystem ? [{ role: "system" as const, content: behaviorSystem }] : []),
+  const systemMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    { role: "system", content: behaviorSystem },
     { role: "system", content: safetyRules },
-    ...(profileBlock
-      ? [{ role: "system" as const, content: profileBlock }]
-      : []),
-    ...(dynamicConstraint ? [{ role: "system" as const, content: dynamicConstraint }] : []),
-    ...historyBlock,
-    { role: "user", content: userInput },
+    ...(profileBlock ? [{ role: "system" as const, content: profileBlock }] : []),
+    ...(baseDynamicConstraint ? [{ role: "system" as const, content: baseDynamicConstraint }] : []),
   ];
 
-  async function generateAssistantText(extraSystem?: string) {
-    const nextMessages = extraSystem
-      ? ([...messages.slice(0, 1), { role: "system" as const, content: extraSystem }, ...messages.slice(1)] as OpenAI.Chat.ChatCompletionMessageParam[])
-      : messages;
+  const historyMessages = historyBlock;
+  const userMessage: OpenAI.Chat.ChatCompletionMessageParam = { role: "user", content: userInput };
+
+  const baseMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    ...systemMessages,
+    ...historyMessages,
+    userMessage,
+  ];
+
+  async function generateAssistantText(extraDynamicConstraint?: string) {
+    const nextMessages = extraDynamicConstraint
+      ? ([
+          ...systemMessages,
+          { role: "system" as const, content: extraDynamicConstraint },
+          ...historyMessages,
+          userMessage,
+        ] as OpenAI.Chat.ChatCompletionMessageParam[])
+      : baseMessages;
 
     const completion = await client.chat.completions.create({
       model: "gpt-4.1-mini",
@@ -213,7 +223,7 @@ export async function POST(req: Request) {
           });
 
           if (!validation.ok) {
-            const rewriteSystem = [
+            const rewriteDynamic = [
               "Rewrite the assistant reply to comply with the Behavioral Core V1 and Dynamic constraints.",
               "Hard rules:",
               "- Do not use therapy-style phrases or generic emotional scripts.",
@@ -225,7 +235,7 @@ export async function POST(req: Request) {
               ...validation.issues.map((i) => `- ${i}`),
             ].join("\n");
 
-            assistantText = await generateAssistantText(rewriteSystem);
+            assistantText = await generateAssistantText(rewriteDynamic);
           }
         }
 
