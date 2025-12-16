@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import OpenAI from "openai";
 import { createClient } from "@/lib/supabaseServerClient";
 import { getRequestUser, tryGetAdminClient } from "@/lib/apiAuth";
@@ -172,7 +171,10 @@ export async function POST(req: Request) {
     ].join("\n");
 
   const behaviorSystem = buildBehaviorCoreV1System();
-  const v1Signals = detectV1Signals(userInput, recentUserMessages);
+  const rawSignals = detectV1Signals(userInput, recentUserMessages);
+  const v1Signals = features.supportModeV15
+    ? rawSignals
+    : { ...rawSignals, supportMode: false, supportReason: null };
   const baseDynamicConstraint = buildDynamicV1ConstraintSystem(v1Signals);
 
   const systemMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
@@ -217,18 +219,25 @@ export async function POST(req: Request) {
         let assistantText = await generateAssistantText();
 
         if (features.outputValidation) {
-          const validation = validateEmmaOutput({
-            userInput,
-            assistantOutput: assistantText,
-          });
+          for (let attempt = 0; attempt < 3; attempt += 1) {
+            const validation = validateEmmaOutput({
+              userInput,
+              assistantOutput: assistantText,
+            });
 
-          if (!validation.ok) {
+            if (validation.ok) break;
+
             const rewriteDynamic = [
               "Rewrite the assistant reply to comply with the Behavioral Core V1 and Dynamic constraints.",
+              "",
+              "Original reply to rewrite:",
+              assistantText,
+              "",
               "Hard rules:",
-              "- Do not use therapy-style phrases or generic emotional scripts.",
+              "- Do not use forbidden phrases (global blacklist) or therapy-style scripts.",
               "- Ask at most ONE question total (or none if not needed).",
               "- If the user described a concrete practical problem, be concrete and give options/steps.",
+              "- Do NOT suggest breathing/grounding exercises unless the user explicitly requested them.",
               "- Keep it short, spoken, native in the user's language (not translated-from-English style).",
               "",
               "Validation issues to fix:",

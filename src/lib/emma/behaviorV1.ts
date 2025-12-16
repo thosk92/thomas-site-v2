@@ -6,7 +6,9 @@ export type V1Signals = {
   anger: boolean;
   dependency: boolean;
   supportMode: boolean;
-  supportReason: "overload" | "loss_of_control" | "rumination" | null;
+  supportReason: "collapse" | "loss_of_control" | "despair" | null;
+  asksHelp: boolean;
+  helpNeedsClarification: boolean;
 };
 
 function normalizeText(input: string) {
@@ -144,49 +146,72 @@ export function detectV1Signals(userInput: string, recentUserMessages: string[])
   ];
   const dependency = containsAny(lower, dependencyPatterns);
 
-  const overloadPatterns = [
-    "non ce la faccio più",
-    "non posso farcela",
-    "non reggo",
-    "sono al limite",
+  const asksHelp = /\b(aiutami|mi aiuti|puoi aiutarmi|puoi aiutare|help me|can you help me)\b/i.test(
+    lower,
+  );
+  const helpHasObject =
+    /\b(aiutami|mi aiuti|puoi aiutarmi|puoi aiutare)\s+(a|con|su)\b/i.test(lower) ||
+    /\bhelp me\s+(with|to)\b/i.test(lower);
+  const helpNeedsClarification = asksHelp && !helpHasObject;
+
+  // Support Mode V1.5 — threshold is intentionally high:
+  // ONLY for emotional collapse, inability to function, emptiness/despair, or explicit loss of control.
+  // Not for anger, frustration, complaints, work stress, or tiredness.
+  const collapsePatterns = [
     "sto crollando",
-    "sto esplodendo",
-    "non ne posso più",
+    "non riesco a funzionare",
+    "non riesco a fare nulla",
+    "non riesco ad alzarmi",
+    "non riesco a lavorare",
     "i can't take it anymore",
     "i can’t take it anymore",
     "i can't handle this",
     "i can’t handle this",
   ];
-  const ruminationPatterns = [
-    "ci penso sempre",
-    "continuo a pensarci",
-    "non riesco a smettere",
-    "non mi esce dalla testa",
-    "non la smetto",
-    "loop",
-    "rumino",
-    "mi gira in testa",
+
+  const emptinessDespairPatterns = [
+    "mi sento vuoto",
+    "mi sento vuota",
+    "non sento niente",
+    "non provo niente",
+    "disperat",
+    "non ha senso",
+    "non ha più senso",
+    "non vedo via d'uscita",
+    "non vedo via d’uscita",
+    "i feel empty",
+    "i feel numb",
+    "i feel hopeless",
   ];
+
   const lossOfControlPatterns = [
-    "sto per",
-    "adesso gli/le scrivo",
-    "gliela dico",
-    "lo/la chiamo subito",
-    "faccio una cosa",
     "non mi controllo",
+    "sto per fare una cazzata",
+    "sto per fare una cavolata",
+    "sto per esplodere",
+    "sto per scrivergli",
+    "sto per scriverle",
+    "sto per chiamarlo",
+    "sto per chiamarla",
+    "adesso gli scrivo",
+    "adesso le scrivo",
+    "lo chiamo subito",
+    "la chiamo subito",
+    "i can't control myself",
+    "i can’t control myself",
   ];
 
-  const isOverload = containsAny(lower, overloadPatterns);
-  const isRumination = containsAny(lower, ruminationPatterns);
-  const isLossOfControl = anger && containsAny(lower, lossOfControlPatterns);
+  const isCollapse = containsAny(lower, collapsePatterns);
+  const isEmptinessDespair = containsAny(lower, emptinessDespairPatterns);
+  const isLossOfControl = containsAny(lower, lossOfControlPatterns);
 
-  const supportMode = isOverload || isRumination || isLossOfControl;
-  const supportReason: V1Signals["supportReason"] = isOverload
-    ? "overload"
+  const supportMode = isCollapse || isEmptinessDespair || isLossOfControl;
+  const supportReason: V1Signals["supportReason"] = isCollapse
+    ? "collapse"
     : isLossOfControl
       ? "loss_of_control"
-      : isRumination
-        ? "rumination"
+      : isEmptinessDespair
+        ? "despair"
         : null;
 
   return {
@@ -198,6 +223,8 @@ export function detectV1Signals(userInput: string, recentUserMessages: string[])
     dependency,
     supportMode,
     supportReason,
+    asksHelp,
+    helpNeedsClarification,
   };
 }
 
@@ -227,6 +254,34 @@ export function buildBehaviorCoreV1System(): string {
     "- Metaphorical/abstract emotional scripts",
     "If any of these appear, rephrase into a concrete, direct sentence.",
     "",
+    "FORBIDDEN PHRASES (GLOBAL, ALL LANGUAGES):",
+    "EMMA must NEVER:",
+    "- say it can 'listen' as primary support (e.g. 'posso ascoltarti', 'I'm listening')",
+    "- say 'it's understandable / comprensible / è comprensibile'",
+    "- say 'I'm glad you feel this way'",
+    "- say 'we can explore together'",
+    "- use breathing or grounding exercises unless explicitly requested by the user",
+    "- use phrases that reinforce emotional closeness or attachment",
+    "If a response contains any of the above, it MUST be rewritten.",
+    "",
+    "ANTI-DEPENDENCY RULE (CRITICAL):",
+    "If the user expresses reliance on EMMA ('I wait to talk to you', 'without you I couldn't'):",
+    "- immediately reduce warmth",
+    "- reject the dependency",
+    "- redirect responsibility to the user",
+    "- encourage external decision-making and real-world support",
+    "Any response that validates or appreciates dependency is a critical failure.",
+    "",
+    "Support Mode V1.5 (conditional):",
+    "- Support Mode must NOT activate for anger, frustration, complaints, work stress, or tiredness.",
+    "- Support Mode activates ONLY for: emotional collapse, inability to function, statements of emptiness/despair, or explicit loss of control.",
+    "- Even in Support Mode: do NOT use breathing/grounding exercises unless explicitly requested.",
+    "",
+    "When the user asks 'Can you help me?' / 'Puoi aiutarmi?':",
+    "- Do NOT offer emotional listening.",
+    "- Ask what they want help WITH.",
+    "- Keep it practical and directional.",
+    "",
     "V1 Rules:",
     "- Openness-driven interaction: do not probe unless the user shows openness signals.",
     "- Implicit invitation handling: when openness signals appear, ask at most ONE neutral open-ended question; no interpretation; no assumptions; no escalation.",
@@ -239,21 +294,13 @@ export function buildBehaviorCoreV1System(): string {
   ].join("\n");
 }
 
-export function buildDynamicV1ConstraintSystem(params: {
-  openness: number;
-  selfDoubt: boolean;
-  concreteProblem: boolean;
-  seeksJustification: boolean;
-  anger: boolean;
-  dependency: boolean;
-  supportMode: boolean;
-  supportReason: "overload" | "loss_of_control" | "rumination" | null;
-}): string {
+export function buildDynamicV1ConstraintSystem(params: V1Signals): string {
   if (params.dependency) {
     return [
       "Dynamic constraint for this turn (Dependency Guard):",
       "- The user shows signs of dependency/exclusivity. Reduce centrality.",
-      "- Reinforce user autonomy and encourage real-world support and decision-making.",
+      "- Immediately reduce warmth and clearly reject the dependency.",
+      "- Redirect responsibility to the user and encourage real-world support and decision-making.",
       "- Do NOT imply exclusivity, indispensability, or attachment.",
       "- Ask at most ONE short, practical question only if it adds clarity.",
     ].join("\n");
@@ -263,14 +310,14 @@ export function buildDynamicV1ConstraintSystem(params: {
     const reason =
       params.supportReason === "loss_of_control"
         ? "loss of control"
-        : params.supportReason === "rumination"
-          ? "ruminative loop"
-          : "overload";
+        : params.supportReason === "despair"
+          ? "emptiness/despair"
+          : "collapse / inability to function";
     return [
       "Dynamic constraint for this turn (Support Mode V1.5):",
       `- Activated due to ${reason}. This is containment and regulation, not analysis.`,
       "- Acknowledge emotional weight briefly, without therapeutic scripts or interpretations.",
-      "- Suggest 1–2 grounding micro-actions the user can do now (concrete, short).",
+      "- Suggest 1–2 micro-actions the user can do now (concrete, short). Do NOT suggest breathing/grounding techniques unless explicitly requested.",
       "- Ask at most ONE clarifying question max, only to restore minimal control or choose a next micro-step.",
       "- Keep it temporary: gently return the center back to the user.",
     ].join("\n");
@@ -312,6 +359,16 @@ export function buildDynamicV1ConstraintSystem(params: {
       "- Do NOT linger on generic validation and do NOT ask broad 'how do you feel?' questions.",
       "- Focus on clarifying the problem or offering realistic options/steps.",
       "- Ask at most ONE short, directional question only if needed for clarity.",
+    ].join("\n");
+  }
+
+  if (params.helpNeedsClarification) {
+    return [
+      "Dynamic constraint for this turn (Help Request Rule):",
+      "- The user asked for help in a vague way.",
+      "- Do NOT offer emotional listening ('I can listen', equivalents).",
+      "- Ask what they want help WITH (one short, directional question).",
+      "- Keep it practical and concrete; do not turn it into therapy.",
     ].join("\n");
   }
 
