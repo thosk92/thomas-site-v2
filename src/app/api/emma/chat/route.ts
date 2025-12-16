@@ -8,6 +8,7 @@ import {
   buildDynamicV1ConstraintSystem,
   detectV1Signals,
 } from "@/lib/emma/behaviorV1";
+import { validateEmmaOutput } from "@/lib/emma/validation";
 
 const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -170,13 +171,9 @@ export async function POST(req: Request) {
       "- Do not provide instructions for wrongdoing or self-harm.",
     ].join("\n");
 
-  const behaviorSystem = features.behaviorCoreV1 ? buildBehaviorCoreV1System() : "";
-  const v1Signals = features.behaviorCoreV1
-    ? detectV1Signals(userInput, recentUserMessages)
-    : { openness: 1, selfDoubt: false };
-  const dynamicConstraint = features.behaviorCoreV1
-    ? buildDynamicV1ConstraintSystem(v1Signals)
-    : "";
+  const behaviorSystem = buildBehaviorCoreV1System();
+  const v1Signals = detectV1Signals(userInput, recentUserMessages);
+  const dynamicConstraint = buildDynamicV1ConstraintSystem(v1Signals);
 
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     ...(behaviorSystem ? [{ role: "system" as const, content: behaviorSystem }] : []),
@@ -189,28 +186,57 @@ export async function POST(req: Request) {
     { role: "user", content: userInput },
   ];
 
-  const completion = await client.chat.completions.create({
-    model: "gpt-4.1-mini",
-    messages,
-    stream: true,
-  });
+  async function generateAssistantText(extraSystem?: string) {
+    const nextMessages = extraSystem
+      ? ([...messages.slice(0, 1), { role: "system" as const, content: extraSystem }, ...messages.slice(1)] as OpenAI.Chat.ChatCompletionMessageParam[])
+      : messages;
+
+    const completion = await client.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: nextMessages,
+    });
+
+    return String(completion.choices[0]?.message?.content ?? "");
+  }
 
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
     async start(controller) {
-      let assistantText = "";
       try {
-        for await (const chunk of completion) {
-          const delta = chunk.choices[0]?.delta?.content;
-          if (!delta) continue;
-          assistantText += delta;
-          controller.enqueue(encoder.encode(delta));
+        let assistantText = await generateAssistantText();
+
+        if (features.outputValidation) {
+          const validation = validateEmmaOutput({
+            userInput,
+            assistantOutput: assistantText,
+          });
+
+          if (!validation.ok) {
+            const rewriteSystem = [
+              "Rewrite the assistant reply to comply with the Behavioral Core V1 and Dynamic constraints.",
+              "Hard rules:",
+              "- Do not use therapy-style phrases or generic emotional scripts.",
+              "- Ask at most ONE question total (or none if not needed).",
+              "- If the user described a concrete practical problem, be concrete and give options/steps.",
+              "- Keep it short, spoken, native in the user's language (not translated-from-English style).",
+              "",
+              "Validation issues to fix:",
+              ...validation.issues.map((i) => `- ${i}`),
+            ].join("\n");
+
+            assistantText = await generateAssistantText(rewriteSystem);
+          }
+        }
+
+        const text = assistantText || "";
+        const chunkSize = 48;
+        for (let i = 0; i < text.length; i += chunkSize) {
+          controller.enqueue(encoder.encode(text.slice(i, i + chunkSize)));
         }
         controller.close();
 
         // Update global memory after the assistant has responded (best-effort).
-        // This runs after closing the stream so it won't block the UI.
         if (features.globalMemory && user && assistantText.trim()) {
           try {
             const memorySystem = [
@@ -258,7 +284,7 @@ export async function POST(req: Request) {
           }
         }
       } catch (err) {
-        console.error("[emma api] streaming error", err);
+        console.error("[emma api] generation error", err);
         controller.error(err);
       }
     },

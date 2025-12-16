@@ -1,6 +1,6 @@
 export type EmmaFeatureFlags = {
-  behaviorCoreV1: boolean;
   globalMemory: boolean;
+  outputValidation: boolean;
 };
 
 function envBool(value: string | undefined, defaultValue: boolean) {
@@ -13,8 +13,7 @@ function envBool(value: string | undefined, defaultValue: boolean) {
 
 export function getEmmaFeatures(): EmmaFeatureFlags {
   return {
-    behaviorCoreV1: envBool(process.env.EMMA_BEHAVIOR_CORE_V1, true),
     globalMemory: envBool(process.env.EMMA_GLOBAL_MEMORY, true),
+    outputValidation: envBool(process.env.EMMA_OUTPUT_VALIDATION, true),
   };
 }
-
