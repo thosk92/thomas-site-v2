@@ -845,6 +845,7 @@ export default function EmmaHome({
   const sessionSynced = useRef(false);
   const historyConversationId = useRef<string | null>(initialConversationId ?? null);
   const skipNextHistoryFetch = useRef(false);
+  const pendingUrlConversationId = useRef<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -1185,12 +1186,12 @@ export default function EmmaHome({
           convId = conv.id;
           setConversationId(conv.id);
           skipNextHistoryFetch.current = true;
+          pendingUrlConversationId.current = conv.id;
 
           // Aggiorna la URL per preservare la conversazione al refresh e notifica la sidebar
           if (typeof window !== "undefined") {
             const url = new URL(window.location.href);
             url.searchParams.set("conversationId", conv.id);
-            router.replace(url.pathname + url.search);
             window.dispatchEvent(new CustomEvent("emma:conversation-created", { detail: { id: conv.id } }));
           }
         } catch (err) {
@@ -1319,6 +1320,17 @@ export default function EmmaHome({
       setError(copy.errorAi);
     } finally {
       setLoading(false);
+      if (pendingUrlConversationId.current && typeof window !== "undefined") {
+        const id = pendingUrlConversationId.current;
+        pendingUrlConversationId.current = null;
+        try {
+          const url = new URL(window.location.href);
+          url.searchParams.set("conversationId", id);
+          router.replace(url.pathname + url.search);
+        } catch (err) {
+          console.error("[emma] failed to update url with conversation id", err);
+        }
+      }
     }
   }
 
