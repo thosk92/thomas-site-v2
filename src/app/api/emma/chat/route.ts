@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { createClient } from "@/lib/supabaseServerClient";
 import { getRequestUser, tryGetAdminClient } from "@/lib/apiAuth";
 import { getEmmaFeatures } from "@/lib/emma/features";
+import { isSupportedLang, type Lang } from "@/lib/languageDetection";
 import {
   buildBehaviorCoreV1System,
   buildDynamicV1ConstraintSystem,
@@ -19,6 +20,7 @@ type MaybeProfile = {
   gender?: string | null;
   personal_goal?: string | null;
   memory?: string | null;
+  language_preference?: string | null;
 };
 
 function normalizeMemory(value: unknown): string {
@@ -77,10 +79,13 @@ export async function POST(req: Request) {
   // In V1, the behavioral core must always be present and authoritative.
   // Keeping the flag for future versioning, but we enforce V1-first ordering when enabled.
   const body = await req.json();
-  const { userInput, conversationId } = body as {
+  const { userInput, conversationId, lang: requestedLang } = body as {
     userInput: string;
     conversationId?: string | null;
+    lang?: string | null;
   };
+
+  let activeLang: Lang | null = isSupportedLang(requestedLang) ? requestedLang : null;
 
   const supabase = await createClient();
   const user = await getRequestUser(req, supabase);
@@ -97,6 +102,7 @@ export async function POST(req: Request) {
     const metaAge = (user.user_metadata?.age as number | undefined) ?? null;
     const metaGender = (user.user_metadata?.gender as string | undefined) ?? null;
     const metaGoal = (user.user_metadata?.personal_goal as string | undefined) ?? null;
+    const metaLang = (user.user_metadata?.lang as string | undefined) ?? null;
 
     const { data: profile } = await db
       .from("profiles")
@@ -112,6 +118,15 @@ export async function POST(req: Request) {
     globalMemory = features.globalMemory
       ? normalizeMemory(typedProfile?.memory) || normalizeMemory((user.user_metadata as any)?.memory)
       : "";
+
+    const profileLang = typedProfile?.language_preference ?? null;
+    if (!activeLang) {
+      activeLang = isSupportedLang(profileLang)
+        ? profileLang
+        : isSupportedLang(metaLang)
+          ? metaLang
+          : null;
+    }
 
     profileBlock = [
       "[User Profile]",
@@ -160,6 +175,14 @@ export async function POST(req: Request) {
     }
   }
 
+  const languageBlock = activeLang
+    ? [
+        "[Active Language]",
+        `Reply language for this session: ${activeLang}.`,
+        "Generate text natively in this language unless the user explicitly asks to switch.",
+      ].join("\n")
+    : "";
+
   const safetyRules =
     process.env.EMMA_SAFETY_RULES ??
     [
@@ -180,6 +203,7 @@ export async function POST(req: Request) {
   const systemMessages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: "system", content: behaviorSystem },
     { role: "system", content: safetyRules },
+    ...(languageBlock ? [{ role: "system" as const, content: languageBlock }] : []),
     ...(profileBlock ? [{ role: "system" as const, content: profileBlock }] : []),
     ...(baseDynamicConstraint ? [{ role: "system" as const, content: baseDynamicConstraint }] : []),
   ];

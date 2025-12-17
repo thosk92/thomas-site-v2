@@ -62,24 +62,36 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { name, age, gender, personal_goal, language_preference } = body;
 
+  const normalizedLanguagePreference =
+    typeof language_preference === "string"
+      ? language_preference
+      : language_preference == null
+        ? null
+        : null;
+
   const payload = {
     id: currentUser.id,
     name,
     age,
     gender,
     personal_goal,
-    language_preference,
+    language_preference: normalizedLanguagePreference,
   };
 
   // Persist also in auth metadata so it's stored even if the DB column is missing
   try {
+    const authData: Record<string, unknown> = {
+      name,
+      age,
+      gender,
+      personal_goal,
+    };
+    // Explicitly set `lang` to null for "Auto", or to the selected string otherwise.
+    authData.lang = normalizedLanguagePreference;
+
     await supabase.auth.updateUser({
       data: {
-        lang: language_preference,
-        name,
-        age,
-        gender,
-        personal_goal,
+        ...authData,
       },
     });
   } catch (err) {
@@ -129,5 +141,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 400 });
   }
 
-  return NextResponse.json({ success: true, profile: data ?? payload });
+  // If the DB schema doesn't have `language_preference`, Supabase will omit it from `data`.
+  // Always return it so clients don't accidentally reset UI to "Auto".
+  const profileOut = {
+    ...payload,
+    ...(data ?? {}),
+    language_preference:
+      payload.language_preference ??
+      (data as any)?.language_preference ??
+      null,
+  };
+
+  return NextResponse.json({ success: true, profile: profileOut });
 }

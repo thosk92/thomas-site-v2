@@ -96,9 +96,15 @@ export default function AccountProfileForm({ initialProfile, email, copy }: Prop
 
       // Aggiorna subito lo user metadata lato client e salva la lingua in locale
       try {
+        const langPrefRaw =
+          (data.profile?.language_preference as string | null | undefined) ??
+          form.language_preference ??
+          null;
+        const langPref = isSupportedLang(langPrefRaw) ? langPrefRaw : null;
+
         await supabase.auth.updateUser({
           data: {
-            lang: data.profile?.language_preference,
+            lang: langPref,
             name: data.profile?.name,
             age: data.profile?.age,
             gender: data.profile?.gender,
@@ -109,13 +115,23 @@ export default function AccountProfileForm({ initialProfile, email, copy }: Prop
         // ignore
       }
 
-      if (typeof window !== "undefined" && isSupportedLang(data.profile?.language_preference)) {
-        window.localStorage.setItem("emma:lang", data.profile.language_preference);
-        window.dispatchEvent(
-          new CustomEvent("emma:lang-change", {
-            detail: { lang: data.profile.language_preference },
-          }),
-        );
+      if (typeof window !== "undefined") {
+        const langPrefRaw =
+          (data.profile?.language_preference as string | null | undefined) ??
+          form.language_preference ??
+          null;
+        const langPref = isSupportedLang(langPrefRaw) ? langPrefRaw : null;
+
+        if (langPref) {
+          window.localStorage.setItem("emma:lang", langPref);
+          window.dispatchEvent(
+            new CustomEvent("emma:lang-change", {
+              detail: { lang: langPref },
+            }),
+          );
+        } else {
+          window.localStorage.removeItem("emma:lang");
+        }
       }
     } catch (err: any) {
       setError(err?.message ?? copy.errorGeneric);

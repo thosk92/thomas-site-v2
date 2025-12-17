@@ -1143,7 +1143,11 @@ export default function EmmaHome({
 
     const wasEmpty = messages.length === 0;
 
-    if (wasEmpty) {
+    const hasExplicitLang =
+      typeof window !== "undefined" && isSupportedLang(window.localStorage.getItem("emma:lang"));
+
+    // Auto-detect only when the user hasn't explicitly selected a language.
+    if (wasEmpty && !hasExplicitLang) {
       const guessed = detectLanguage(value);
       setLang(guessed);
     }
@@ -1226,7 +1230,7 @@ export default function EmmaHome({
           "Content-Type": "application/json",
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
         },
-        body: JSON.stringify({ userInput: value, conversationId: convId }),
+        body: JSON.stringify({ userInput: value, conversationId: convId, lang }),
       });
 
       if (!res.ok || !res.body) {
